@@ -1,7 +1,7 @@
 /*
-    $Id: main.c,v 1.14 2003/05/20 20:38:06 airborne Exp $
+    $Id: main.c,v 1.15 2004/03/09 01:28:38 rockyb Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,7 +26,13 @@
 #include "main.h"
 
 /* command-line option string */
+
+#ifdef HAVE_LIBCDIO
+/* Allow -i <device> parameter */
+#define OPT_STRING ":c:D:hi:l:p:P:qs:"
+#else
 #define OPT_STRING ":c:D:hl:p:P:qs:"
+#endif
 
 /* other stuff */
 #define ENV_HTTP_PROXY "http_proxy"
@@ -46,6 +52,8 @@ static int dlength = 0;         /* disc length command-line argument */
 static int tcount = 0;          /* track count command-line parameter */
 static int *foffset = NULL;     /* frame offset list command-line parameter */
 static int use_cd = 0;          /* use CD-ROM to retrieve disc data */
+static char *device = NULL;     /* device to use if use_cd == 1. NULL means 
+				   to find a suitable CD-ROM drive. */
 
 /* print usage message */
 static void usage(void)
@@ -56,6 +64,9 @@ static void usage(void)
     fprintf(stderr, "  -c <mode>        local cache mode [on|off|only] (default = on)\n");
     fprintf(stderr, "  -D <cache dir>   directory for local cache (default = ~/.cddbslave)\n");
     fprintf(stderr, "  -h               display this help and exit\n");
+#ifdef HAVE_LIBCDIO
+    fprintf(stderr, "  -i <device>      use device to get disc data for commands\n");
+#endif
     fprintf(stderr, "  -l <level>       log level, one of debug, info, warning, error or\n");
     fprintf(stderr, "                   critical (default = warning)\n");
     fprintf(stderr, "  -p <port>        port of CDDB server (default = 888)\n");
@@ -77,9 +88,11 @@ static void usage(void)
     fprintf(stderr, "  <len>            disc length in seconds\n");
     fprintf(stderr, "  <n>              track count\n");
     fprintf(stderr, "\n");
+#ifdef HAVE_LIBCDIO
     fprintf(stderr, "If you do not specify any arguments for a command, the program\n");
     fprintf(stderr, "will try to retrieve the needed disc data from a CD in your CD-ROM\n");
     fprintf(stderr, "drive.\n");
+#endif
     fprintf(stderr, "\n");
     fprintf(stderr, "Available CDDB categories are:\n");
     fprintf(stderr, "  data, folk, jazz, misc, rock, country, blues, newage, reggae,\n");
@@ -269,6 +282,13 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
                ~/.cddbslave. */
             cddb_cache_set_dir(conn, optarg);
             break;
+        case 'i':               /* device for arguments */
+            if (!*optarg) {
+                error_usage("-i, device name missing");
+            }
+	    use_cd = 1;
+	    device=strdup(optarg);
+	    break;
         case 'l':               /* log level */
             if (!*optarg) {
                 error_usage("-l, log level missing");
@@ -387,7 +407,7 @@ int main(int argc, char **argv)
     if (use_cd) {
         /* Retrieve the disc length and track offsets from the CD in
            the CD-ROM drive. */
-        disc = cd_read(NULL);
+        disc = cd_read(device);
         if (!disc) {
             error_exit(GENERIC_ERROR, "could not read CD in CD-ROM drive");
         }
