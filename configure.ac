@@ -10,7 +10,7 @@ AC_CONFIG_FILES([Makefile              \
                  examples/Makefile     \
                  tests/Makefile        \
                  tests/settings.sh])
-AM_INIT_AUTOMAKE(libcddb, 0.9.4)
+AM_INIT_AUTOMAKE(libcddb, 0.9.5cvs)
 AM_MAINTAINER_MODE
 
 dnl Process custom command-line options
@@ -66,7 +66,6 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 dnl Checks for libraries.
-AC_CHECK_LIB([cdio], [cdio_open])
 AC_CHECK_LIB([socket], [connect])
 
 dnl Checks for header files.
@@ -87,6 +86,16 @@ AC_FUNC_VPRINTF
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr memset alarm select])
 AC_CHECK_FUNC([gethostbyname], , AC_CHECK_LIB([nsl], [gethostbyname]))
+
+PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.67, [
+    HAVE_LIBCDIO=yes 
+    AC_DEFINE(HAVE_LIBCDIO, [], [Define this if you have libcdio installed])
+    ],
+    [AC_MSG_WARN(new enough libcdio not found. CD reading in CDDB test program disabled. Get libcdio from http://www.gnu.org/software/libcdio/) 
+    HAVE_LIBCDIO=no])
+
+AC_SUBST(LIBCDIO_LIBS)
+AC_SUBST(LIBCDIO_CFLAGS)
 
 dnl Check and add some GCC specific warning flags
 dnl - we do this as the last thing so that a possible -Werror flag
