@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.8 2003/04/20 22:20:19 airborne Exp $
+    $Id: main.c,v 1.9 2003/04/21 10:19:30 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -26,7 +26,7 @@
 #include "main.h"
 
 /* command-line option string */
-#define OPT_STRING ":c:d:hp:P:qs:"
+#define OPT_STRING ":c:D:hp:P:qs:"
 
 /* parsed command-line parameters */
 #define CMD_NONE   0
@@ -105,14 +105,14 @@ static void prt_error(const char *fmt, va_list ap)
 }
 
 /* print error message and die */
-void error_exit(const char *fmt, ...)
+void error_exit(int err, const char *fmt, ...)
 {
     va_list ap;
 
     va_start(ap, fmt);
     prt_error(fmt, ap);
     va_end(ap);
-    exit(-1);
+    exit(err);
 }
 
 /* print error message, program usage and die */
@@ -126,7 +126,7 @@ static void error_usage(const char *fmt, ...)
     if (!quiet) {
         usage();
     }
-    exit(-1);
+    exit(GENERIC_ERROR);
 }
 
 #define CMD_STR(c) ((c) == CMD_DISCID ? "calc" : "query")
@@ -191,7 +191,7 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
             break;
         case 'D':               /* local cache directory */
             if (!*optarg) {
-                error_usage("-d, cache directory missing");
+                error_usage("-D, cache directory missing");
             }
             /* Set the location of the local CDDB cache directory.
                The default location of this directory is
@@ -226,7 +226,7 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
                 cddb_http_enable(conn);
                 cddb_set_server_port(conn, 80);
             } else if (strcmp(optarg, "proxy") == 0) {
-                error_exit("-P, server protocol 'proxy' not yet supported");
+                error_exit(GENERIC_ERROR, "-P, server protocol 'proxy' not yet supported");
             } else {
                 /* XXX: get proxy settings from env var 'http_proxy'!! */
                 error_usage("-P, invalid server protocol '%s'", optarg);
@@ -305,7 +305,7 @@ int main(int argc, char **argv)
 
     /* If the pointer is NULL then an error occured (out of memory). */
     if (!conn) {
-		error_exit("unable to create connection structure");
+		error_exit(GENERIC_ERROR, "unable to create connection structure");
     }
 
     /* Check command-line parameters. */
@@ -317,7 +317,7 @@ int main(int argc, char **argv)
            the CD-ROM drive. */
         disc = cd_read(NULL);
         if (!disc) {
-            error_exit("could not read CD in CD-ROM drive");
+            error_exit(GENERIC_ERROR, "could not read CD in CD-ROM drive");
         }
     } else if (command == CMD_DISCID || command == CMD_QUERY) {
         /* The disc ID calculation and query command both need a disc
@@ -325,7 +325,7 @@ int main(int argc, char **argv)
            provided on the command-line. */
         disc = cd_create(dlength, tcount, foffset);
         if (!disc) {
-            error_exit("could not create disc structure");
+            error_exit(GENERIC_ERROR, "could not create disc structure");
         }
     }
 
@@ -354,9 +354,9 @@ int main(int argc, char **argv)
             cddb_disc_calc_discid(disc);
             matches = cddb_query(conn, disc);
             if (matches == -1) {
-                error_exit("could not query");
+                error_exit(cddb_errno(conn), "could not query");
             } else if (matches == 0) {
-                error_exit("no matching discs found");
+                error_exit(CDDB_ERR_DISC_NOT_FOUND, "no matching discs found");
             }
             /* Get the disc information needed for the read command.
                Afterwards we destroy the current disc because do_read
@@ -367,7 +367,7 @@ int main(int argc, char **argv)
         }
         disc = do_read(conn, category, discid);
         if (!disc) {
-            error_exit("could not read disc data");
+            error_exit(cddb_errno(conn), "could not read disc data");
         }
         do_display(disc);
         break;
