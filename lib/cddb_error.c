@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.c,v 1.6 2004/07/18 07:23:09 airborne Exp $
+    $Id: cddb_error.c,v 1.7 2004/07/21 16:16:40 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,7 +29,7 @@ static const char* err_str[CDDB_ERR_LAST] = {
     /* CDDB_ERR_OUT_OF_MEMORY */
     "out of memory",
     /* CDDB_ERR_BUFFER_SIZE */
-    "internal buffer too small (increase LINE_SIZE in cddb_cmd.h)",
+    "internal buffer too small",
     /* CDDB_ERR_NOT_IMPLEMENTED */
     "feature not implemented",
     /* CDDB_ERR_UNKNOWN */
