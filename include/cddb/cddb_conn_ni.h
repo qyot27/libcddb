@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn_ni.h,v 1.9 2004/10/15 18:54:10 airborne Exp $
+    $Id: cddb_conn_ni.h,v 1.10 2004/10/15 19:42:16 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -34,7 +34,7 @@ struct cddb_iconv_s {
                                      converting from user to FreeDB format */
     iconv_t cd_from_freedb;     /**< character set conversion descriptor for
                                      converting from FreeDB to user format */
- };
+};
 
 
 /* --- getters & setters --- */
