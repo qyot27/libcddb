@@ -22,7 +22,7 @@ typedef enum {
 extern const char *CDDB_CATEGORY[CDDB_CAT_LAST];
 
 /**
- * The CDDB full structure.  Contains all information associated with
+ * The CDDB disc structure.  Contains all information associated with
  * a full CD.
  */
 typedef struct cddb_disc_s
