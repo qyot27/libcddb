@@ -1,5 +1,5 @@
 /*
-    $Id: do_query.c,v 1.3 2003/04/20 17:24:56 airborne Exp $
+    $Id: do_query.c,v 1.4 2003/04/21 10:19:44 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -86,7 +86,7 @@ void do_query(cddb_conn_t *conn, cddb_disc_t *disc)
                function.  If there are no more matches left, false
                (i.e. 0) will be returned. */
             if (!cddb_query_next(conn, disc)) {
-                error_exit("query index out of bounds");
+                error_exit(cddb_errno(conn), "query index out of bounds");
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
-    $Id: main.h,v 1.4 2003/04/20 14:40:30 airborne Exp $
+    $Id: main.h,v 1.5 2003/04/21 10:19:44 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -24,8 +24,18 @@
 
 #include <cddb/cddb.h>
 
+/* generic error code */
+#define GENERIC_ERROR -1
 
-void error_exit(const char *fmt, ...);
+
+/**
+ * Prints out an error string and exits the program with the provided
+ * error code.
+ *
+ * @param err Error code.
+ * @param fmt A printf style format string.
+ */
+void error_exit(int err, const char *fmt, ...);
 
 void do_query(cddb_conn_t *conn, cddb_disc_t *disc);
 

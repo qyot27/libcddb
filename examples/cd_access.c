@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.3 2003/04/20 17:12:17 airborne Exp $
+    $Id: cd_access.c,v 1.4 2003/04/21 10:19:44 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -26,7 +26,7 @@
 #include <cdio/cdio.h>
 #endif
 
-#define libcdio_error_exit(...) error_exit("libcdio: " __VA_ARGS__)
+#define libcdio_error_exit(...) error_exit(GENERIC_ERROR, "libcdio: " __VA_ARGS__)
 
 
 cddb_disc_t *cd_read(const char *device)
@@ -49,7 +49,7 @@ cddb_disc_t *cd_read(const char *device)
     if (!device) {
         device = cdio_get_default_device(NULL);
         if (!device) {
-            error_exit("unable to get default CD device");
+            libcdio_error_exit("unable to get default CD device");
         }
     }
     printf("CD-ROM device: %s\n", device);
