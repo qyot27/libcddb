@@ -1,0 +1,66 @@
+$Id: NEWS,v 1.2 2003/04/16 19:38:45 airborne Exp $
+
+
+This file describes the external changes between different libcddb
+releases.  These changes might impact the programs that use this
+library.  It does not describe every single change made to the code
+tree.  An overview of the CVS changes can be found in the Changelog
+file.
+
+
+THE FUTURE
+
+This release is meant as the starting point to stabilize the current
+API towards the big 1.0 release.  My intention is to improve the
+documentation, expand the included example code, add several
+regression tests and fix any bugs that are found.  When all this is
+finished, 1.0 will be released.
+
+
+CHANGES 0.1.6 -> 0.9.0
+
+* The src/ directory has been removed from the distribution.  But a
+  new examples/ directory was added.  Currently the example program
+  only supports the CDDB read command.  This example will be expanded
+  in order to demonstrate every public function of the library.
+
+* Local CDDB cache semantics have been expanded.  Next to the option
+  to enable and disable caching that was already present, it is now
+  also possible to force the use of the cache.  When this
+  functionality is enabled and an entry is not found in the local
+  cache a CDDB_ERR_DISC_NOT_FOUND error is returned.  Three functions
+  have also been added to set the desired caching mode:
+  - cddb_cache_enable(c)
+  - cddb_cache_only(c)
+  - cddb_cache_disable(c)
+  All three functions expect a CDDB connection structure as a
+  parameter.
+
+* Several get and set functions have been added to the API.  It is my
+  intention to have such functions for every possible field that a
+  user is allowed to alter in the different library structures.  This
+  will prevent problems in the future if the internal structures
+  should change.
+
+* When the length of a CD track is not set when you call the
+  cddb_track_get_length function, it will be calculated.  The
+  calculation uses the frame offsets of the current and next track and
+  possibly the disc length.  The current implementation does not do
+  any rounding of the calculated value to the nearest second.
+  Therefore it is possible that the sum of the track lengths does not
+  equal the disc length.  If the length can not be calculated -1 is
+  returned.
+
+* The network access code has been rewritten to use the network
+  sockets directly instead of wrapping them in file descriptors.  This
+  should enable BeOS users to use the library without having to change
+  any code.  I don not have a BeOS system myself and am still waiting
+  for a confirmation whether the changes were enough.
+
+* Support has been added for reading CDDB entries that have
+  multi-lined fields.  Support to also split certain fields into
+  multiple lines when writing them (to the network or disc) is not yet
+  present.  The FreeDB spec states that no line should be longer than
+  256 characters.  This limit is not yet checked.
+
+* Support to parse the year field of a CDDB entry has been added.
