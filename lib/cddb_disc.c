@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.14 2003/05/04 17:38:52 airborne Exp $
+    $Id: cddb_disc.c,v 1.15 2003/05/20 20:43:34 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -43,6 +43,8 @@ cddb_disc_t *cddb_disc_new(void)
     disc = (cddb_disc_t*)calloc(1, sizeof(cddb_disc_t));
     if (disc) {
         disc->category = CDDB_CAT_INVALID;
+    } else {
+        cddb_log_crit(cddb_error_str(CDDB_ERR_OUT_OF_MEMORY));
     }
 
     return disc;
@@ -72,7 +74,7 @@ cddb_disc_t *cddb_disc_clone(cddb_disc_t *disc)
     cddb_disc_t *clone;
     cddb_track_t *track;
 
-    dlog("cddb_disc_clone()");
+    cddb_log_debug("cddb_disc_clone()");
     clone = cddb_disc_new();
     clone->discid = disc->discid;
     clone->category = disc->category;
@@ -97,7 +99,7 @@ cddb_disc_t *cddb_disc_clone(cddb_disc_t *disc)
 
 void cddb_disc_add_track(cddb_disc_t *disc, cddb_track_t *track)
 {
-    dlog("cddb_disc_add_track()");
+    cddb_log_debug("cddb_disc_add_track()");
     if (!disc->tracks) {
         /* first track on disc */
         disc->tracks = track;
@@ -240,7 +242,7 @@ void cddb_disc_copy(cddb_disc_t *dst, cddb_disc_t *src)
 {
     cddb_track_t *src_track, *dst_track;
 
-    dlog("cddb_disc_copy()");
+    cddb_log_debug("cddb_disc_copy()");
     if (src->discid != 0) {
         dst->discid = src->discid;
     }
@@ -289,7 +291,7 @@ int cddb_disc_calc_discid(cddb_disc_t *disc)
     long tmp;
     cddb_track_t *track, *first;
 
-    dlog("cddb_disc_calc_discid()");
+    cddb_log_debug("cddb_disc_calc_discid()");
     for (first = track = cddb_disc_get_track_first(disc); 
          track != NULL; 
          track = cddb_disc_get_track_next(disc)) {
@@ -312,7 +314,7 @@ int cddb_disc_calc_discid(cddb_disc_t *disc)
                        (disc->length - FRAMES_TO_SECONDS(first->frame_offset)) << 8 | 
                        disc->track_cnt;
     }
-    dlog("\tDisc ID: %08x", disc->discid);
+    cddb_log_debug("...Disc ID: %08x", disc->discid);
 
     return TRUE;
 }

@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.7 2003/05/13 20:28:00 airborne Exp $
+    $Id: cddb_net.c,v 1.8 2003/05/20 20:43:34 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -51,7 +51,7 @@ static int sock_ready(int sock, int timeout, int to_write)
     struct timeval tv;
     int rv;
 
-    dlog("sock_ready()");
+    cddb_log_debug("sock_ready()");
     /* set up select time out */
     tv.tv_sec = timeout;
     tv.tv_usec = 0;
@@ -85,7 +85,7 @@ char *sock_fgets(char *s, int size, int sock, int timeout)
     time_t now, end;
     char *p = s;
 
-    dlog("sock_fgets()");
+    cddb_log_debug("sock_fgets()");
     end = time(NULL) + timeout;
     size--;                      /* save one for terminating null */
     while (size) {
@@ -117,11 +117,11 @@ char *sock_fgets(char *s, int size, int sock, int timeout)
         size--;
     }
     if (p == s) {
-        dlog("\tread = Empty");
+        cddb_log_debug("\tread = Empty");
         return NULL;
     }
     *p = CHR_EOS;
-    dlog("\tread = '%s'", s);
+    cddb_log_debug("\tread = '%s'", s);
     return s;
 }
 
@@ -132,7 +132,7 @@ size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock, int tim
     int rv;
     const char *p = (const char *)ptr;
 
-    dlog("sock_fwrite()");
+    cddb_log_debug("sock_fwrite()");
     total_size = size * nmemb;
     to_send = total_size;
     end = time(NULL) + timeout;
@@ -167,7 +167,7 @@ int sock_fprintf(int sock, int timeout, const char *format, ...)
     int rv;
     va_list args;
 
-    dlog("sock_fprintf()");
+    cddb_log_debug("sock_fprintf()");
     va_start(args, format);
     rv = sock_vfprintf(sock, timeout, format, args);
     va_end(args);
@@ -179,12 +179,12 @@ int sock_vfprintf(int sock, int timeout, const char *format, va_list ap)
     char buf[1024];
     int rv;
    
-    dlog("sock_vfprintf()");
+    cddb_log_debug("sock_vfprintf()");
     rv = vsnprintf(buf, sizeof(buf), format, ap);
-    dlog("\tbuf = '%s'", buf);
+    cddb_log_debug("\tbuf = '%s'", buf);
     if (rv >= sizeof(buf)) {
         /* buffer too small */
-        dlog("\t!!! buffer too small");
+        cddb_log_crit("internal sock_vfprintf buffer too small");
         return -1;
     }
 

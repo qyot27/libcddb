@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.11 2003/05/04 09:29:13 airborne Exp $
+    $Id: cddb_track.c,v 1.12 2003/05/20 20:43:34 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -37,6 +37,8 @@ cddb_track_t *cddb_track_new(void)
         track->frame_offset = -1;
         track->length = -1;
         track->disc = NULL;
+    } else {
+        cddb_log_crit(cddb_error_str(CDDB_ERR_OUT_OF_MEMORY));
     }
 
     return track;
@@ -56,7 +58,7 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track)
 {
     cddb_track_t *clone;
 
-    dlog("cddb_track_clone()");
+    cddb_log_debug("cddb_track_clone()");
     clone = cddb_track_new();
     clone->num = track->num;
     clone->frame_offset = track->frame_offset;
@@ -177,7 +179,7 @@ void cddb_track_append_artist(cddb_track_t *track, const char *artist)
 
 void cddb_track_copy(cddb_track_t *dst, cddb_track_t *src)
 {
-    dlog("cddb_track_copy()");
+    cddb_log_debug("cddb_track_copy()");
     if (src->num != -1) {
         dst->num = src->num;
     }
