@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: check_cache.sh,v 1.6 2003/05/08 20:40:06 airborne Exp $
+# $Id: check_cache.sh,v 1.7 2003/05/09 18:09:17 airborne Exp $
 
 . ./settings.sh
 
@@ -53,7 +53,7 @@ cddb_query -c on -D $CACHE read misc $DISCID2
 check_not_found $? $DISCID2
 
 # create non-existing disc in cache and read again (should succeed now)
-cp $CACHE/misc/$DISCID1 $CACHE/misc/$DISCID2
+cp $CACHE/misc/$DISCID1 $CACHE/misc/$DISCID2 > /dev/null 2>&1 &&
 cddb_query -c on -D $CACHE read misc $DISCID2
 check_read $? $DISCID2
 
