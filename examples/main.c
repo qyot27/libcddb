@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.11 2003/04/24 18:47:33 airborne Exp $
+    $Id: main.c,v 1.12 2003/04/25 17:55:05 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -419,7 +419,7 @@ int main(int argc, char **argv)
             discid = cddb_disc_get_discid(disc);
             cddb_disc_destroy(disc);
         }
-        disc = do_read(conn, category, discid);
+        disc = do_read(conn, category, discid, quiet);
         if (!disc) {
             error_exit(cddb_errno(conn), "could not read disc data");
         }

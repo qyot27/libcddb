@@ -1,5 +1,5 @@
 /*
-    $Id: do_read.c,v 1.4 2003/04/14 22:25:48 airborne Exp $
+    $Id: do_read.c,v 1.5 2003/04/25 17:55:05 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -22,7 +22,7 @@
 #include "main.h"
 
 
-cddb_disc_t *do_read(cddb_conn_t *conn, const char *category, int discid)
+cddb_disc_t *do_read(cddb_conn_t *conn, const char *category, int discid, int quiet)
 {
     cddb_disc_t *disc = NULL;   /* libcddb disc structure */
     int success;
@@ -53,7 +53,9 @@ cddb_disc_t *do_read(cddb_conn_t *conn, const char *category, int discid)
             /* Print an explanatory message on stderr.  Other routines are
                available for retrieving the message without printing it or
                printing it on a stream other than stderr. */
-            cddb_error_print(cddb_errno(conn));
+            if (!quiet) {
+                cddb_error_print(cddb_errno(conn));
+            }
             /* Destroy the disc. */
             cddb_disc_destroy(disc);
             /* And return NULL to signal an error. */
