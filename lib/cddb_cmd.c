@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.50 2004/10/15 19:05:06 airborne Exp $
+    $Id: cddb_cmd.c,v 1.51 2004/10/16 06:32:52 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -995,6 +995,11 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
         /* only title of disc is specified */
         disc->title = cddb_regex_get_string(line, matches, 6);
     }        
+
+    if (!cddb_disc_iconv(c->charset->cd_from_freedb, disc)) {
+        cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+        return FALSE;
+    }
 
     cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
