@@ -1,5 +1,5 @@
 /*
-    $Id: do_display.c,v 1.3 2003/05/23 21:12:23 airborne Exp $
+    $Id: do_display.c,v 1.4 2003/05/25 14:24:24 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -81,7 +81,7 @@ void do_display(cddb_disc_t *disc)
 
         /* 5.d. The extended track data. */
         s = cddb_track_get_ext_data(track);
-        if (s) {
+        if (s && strlen(s) > 0) {
             printf(" [%s]\n", s);
         } else {
             printf("\n");
