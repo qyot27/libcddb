@@ -1,7 +1,7 @@
 #!/bin/sh
 # @configure_input@
 #
-# $Id: settings.sh.in,v 1.5 2003/05/08 19:40:40 airborne Exp $
+# $Id: settings.sh.in,v 1.6 2003/05/08 19:43:55 airborne Exp $
 
 # location of the example program used in the tests
 CDDB_QUERY='@abs_top_builddir@/examples/cddb_query -q'
@@ -48,6 +48,7 @@ skip()
 
 finalize()
 {
+    rm $TMP_FILE > /dev/null 2>&1
     CNT_TOTAL=`expr $CNT_SUCCESS + $CNT_FAIL + $CNT_SKIP`
     echo "Results for $0"
     if [ $CNT_SUCCESS -gt 0 ]; then
