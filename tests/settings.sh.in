@@ -1,7 +1,7 @@
 #!/bin/sh
 # @configure_input@
 #
-# $Id: settings.sh.in,v 1.7 2003/05/25 13:14:34 airborne Exp $
+# $Id: settings.sh.in,v 1.8 2004/07/18 07:19:01 airborne Exp $
 
 # location of the example program used in the tests
 CDDB_QUERY='@abs_top_builddir@/examples/cddb_query -q'
@@ -21,7 +21,7 @@ FAILURE=1
 SKIPPED=77
 
 # libcddb/cddb_query error codes
-DISC_NOT_FOUND=11
+DISC_NOT_FOUND=12
 
 # counters for number of succeeded/failed/skipped/total tests
 CNT_SUCCESS=0
@@ -37,7 +37,12 @@ start_test()
 
 fail()
 {
-    printf 'failed.\n'
+    REASON=$*
+    if test -z "$REASON"; then
+        printf 'failed.\n'
+    else
+        printf 'failed (%s).\n' "${REASON}"
+    fi
     CNT_FAIL=`expr $CNT_FAIL + 1`
     RESULT=${FAILURE}
 }
@@ -96,12 +101,12 @@ check_discid()
     RV=$1
     EXP_ID=$2
     if [ ${RV} -ne 0 ]; then
-        fail
+        fail 'cddb_query failed'
         return
     fi
     RET_ID=`cat $TMP_FILE | sed "/^${DISCID_STR}[0-9a-f]*\$/!d;s/${DISCID_STR}\([0-9a-f]*\)/\1/"`
     if [ ${RET_ID}x != ${EXP_ID}x ]; then
-        fail
+        fail 'result mismatch'
         return
     fi
     success
@@ -112,7 +117,7 @@ diff_res_exp()
     EXPECTED=$1
     diff $TMP_FILE $EXPECTED > /dev/null
     if [ $? -ne 0 ]; then
-        fail
+        fail 'result mismatch'
         return
     fi
     success
@@ -123,7 +128,7 @@ check_read()
     RV=$1
     DISC_ID=$2
     if [ ${RV} -ne 0 ]; then
-        fail
+        fail 'cddb_query failed'
         return
     fi
     EXP_READ="${CDDB_DATA}/${DISC_ID}.txt"
@@ -135,11 +140,33 @@ check_query()
     RV=$1
     QUERY_HASH=$2
     if [ ${RV} -ne 0 ]; then
-        fail
+        fail 'cddb_query failed'
         return
     fi
-    EXP_QUERY="${CDDB_DATA}/${QUERY_HASH}.txt"
-    diff_res_exp $EXP_QUERY
+    MATCH_COUNT='^Number of matches: \([0-9]*\)$'
+    CNT=`grep "${MATCH_COUNT}" ${TMP_FILE} | sed "s/${MATCH_COUNT}/\1/"`
+    if test \( -z "$CNT" \) -o \( $CNT -eq 0 \) ; then
+        fail 'number of matches not found'
+        return
+    fi
+    # check whether all $CNT entries are present
+    # XXX: check for category, disc ID and title ?!?
+    I=1
+    while test $I -le $CNT; do
+        grep "Match $I" $TMP_FILE > /dev/null 2>&1
+        if test $? -ne 0; then
+            fail "entry $I missing, $CNT expected"
+            return
+        fi
+        I=`expr $I + 1`
+    done
+    # make sure there are not more matches than $CNT
+    grep "Match $I" $TMP_FILE > /dev/null 2>&1
+    if test $? -eq 0; then
+        fail "entry $I present, $CNT expected"
+        return
+    fi
+    success
 }
 
 check_not_found()
