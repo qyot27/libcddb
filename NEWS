@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.7 2003/05/31 13:31:29 airborne Exp $
+$Id: NEWS,v 1.8 2004/07/21 16:19:07 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -15,6 +15,31 @@ the big 1.0 release.  My intention is to improve the documentation,
 expand the included example code, add several regression tests and fix
 any bugs that are found.  When all this is finished, 1.0 will be
 released.
+
+
+CHANGES 0.9.4 -> 0.9.5
+
+* It is now possible to query CD entries if you only know the track
+  length.  Previous versions of libcddb needed the track offsets from
+  the CD.  Track offsets will be calculated automatically when a
+  length is specified and the offset is missing.  This is less precise
+  than using the actual frame offsets.  So whenever possible use the
+  offsets instead.
+
+* Fixed some possible buffer overflows.  The internal buffer size has
+  also been increased from 257 to 1024 bytes.  It is now also possible
+  to change this buffer size in the cddb_cmd.h.
+
+* Updated regression tests with less strict testing.  Changes in the
+  queried CDDB entries should no longer trigger a test failure.
+
+* Improved support for Win32 platforms (thx to Rocky Bernstein).
+
+* improved support for Mac OS X (thx to Rocky Bernstein and Derk-Jan
+  Hartman).
+
+* It is now possible to specify the CD-ROM device to be used in the
+  example program.
 
 
 CHANGES 0.9.3 -> 0.9.4
