@@ -2,6 +2,9 @@
 #define CDDB_TRACK_H 1
 
 
+/* Forward declaration of the disc structure. */
+struct cddb_disc_c;
+
 /**
  * The CDDB track structure.  Contains all information associated with
  * a single CD track.  This structure will be used to populate the
@@ -14,8 +17,9 @@ typedef struct cddb_track_s
     int length;                 /**< track length in seconds */
     char *title;                /**< track title */
     char *artist;               /**< (optional) track artist */
-    char *ext_data;             /**< (optional) extended disc data  */
-    struct cddb_track_s *next;  /**< pointer to next track, or NULL  */
+    char *ext_data;             /**< (optional) extended disc data */
+    struct cddb_track_s *next;  /**< pointer to next track, or NULL */
+    struct cddb_disc_s *disc;   /**< disc of which this is a track */
 } cddb_track_t;
 
 
@@ -59,6 +63,15 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
  * @param title The new track title.
  */
 void cddb_track_set_title(cddb_track_t *track, const char *title);
+
+/**
+ * Get the track artist name.  If there is no track artist defined,
+ * the disc artist will be returned.  NULL will be returned if neither
+ * is defined.
+ *
+ * @param track  The CDDB track structure.
+ */
+const char *cddb_track_get_artist(cddb_track_t *track);
 
 /**
  * Set the track artist name.  If the track already had an artist
