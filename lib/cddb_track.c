@@ -100,6 +100,6 @@ void cddb_track_print(cddb_track_t *track)
     printf("    number: %d\n", track->num);
     printf("    frame offset: %d\n", track->frame_offset);
     printf("    length: %d seconds\n", track->length);
-    if (track->artist) printf("    artist: '%s'\n", track->artist);
-    if (track->title) printf("    title: '%s'\n", track->title);
+    printf("    artist: '%s'\n", STR_OR_NULL(track->artist));
+    printf("    title: '%s'\n", STR_OR_NULL(track->title));
 }

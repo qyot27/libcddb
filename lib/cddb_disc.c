@@ -230,8 +230,8 @@ void cddb_disc_print(cddb_disc_t *disc)
     cddb_track_t *track;
     int cnt;
 
-    printf("Artist: '%s'\n", disc->artist);
-    printf("Title: '%s'\n", disc->title);
+    printf("Artist: '%s'\n", STR_OR_NULL(disc->artist));
+    printf("Title: '%s'\n", STR_OR_NULL(disc->title));
     printf("Length: %d seconds\n", disc->length);
     printf("Number of tracks: %d\n", disc->track_cnt);
     track = disc->tracks;
