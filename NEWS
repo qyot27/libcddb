@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.5 2003/05/07 19:01:49 airborne Exp $
+$Id: NEWS,v 1.6 2003/05/29 10:34:32 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -15,6 +15,36 @@ the big 1.0 release.  My intention is to improve the documentation,
 expand the included example code, add several regression tests and fix
 any bugs that are found.  When all this is finished, 1.0 will be
 released.
+
+
+CHANGES 0.9.3 -> 0.9.4
+
+* Support for tilde-expansion (~) in the local cache directory has
+  been added.  If the cache directory starts wit a tilde and the $HOME
+  environment variable is defined, then the tilde will be replaced by
+  the value of $HOME.
+
+* All the networking code (DNS query, connect, read, write) now
+  supports time-outs to prevent blocking indefinitely.  By default
+  this time-out is set to ten seconds.  See the cddb_conn_t structure
+  for more information.
+
+* A logging framework was added.  This framework supports different
+  log levels and provides the possibility to install a custom log
+  handler.  (based on a similar framework in libcdio, thx Rocky)
+  Because of this new framework, the --enable-debug configure
+  parameter has been obsoleted by --enable-loglevel=LVL.
+
+* Added support for extended disc and track data.  The parsing has
+  been updated and getters and setters were added to the disc and
+  track structures.
+
+* If the DTITLE field of a CDDB entry does not contain both an artist
+  name and a disc title, libcddb assumes that they are equal.
+
+* Extra regression tests were updated and added.  The test framework
+  was also improved to skip proxy tests if the http_proxy environment
+  variable is not defined.
 
 
 CHANGES 0.9.2 -> 0.9.3
