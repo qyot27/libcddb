@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.41 2003/05/23 21:15:48 airborne Exp $
+    $Id: cddb_cmd.c,v 1.42 2003/05/23 21:17:31 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -699,6 +699,11 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                     /* not yet parsing multi-line DTITLE */
                     /* might be comment line, just skip it */
                     break;
+                }
+                /* if format was not 'artist / title' we assume that
+                   the title and artist name are equal (see specs) */
+                if (disc->artist != NULL && disc->title == NULL) {
+                    cddb_disc_set_title(disc, disc->artist);
                 }
                 multi_line = MULTI_NONE;
                 /* fall through to end multi-line disc title */
