@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_util.c,v 1.2 2004/10/15 19:07:20 airborne Exp $
+    $Id: cddb_util.c,v 1.3 2004/10/16 13:53:38 airborne Exp $
 
     Copyright (C) 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -50,6 +50,7 @@ int cddb_str_iconv(iconv_t cd, char *in, char **out)
         buf = (char*)realloc(buf - len, buflen) + len;
         if (buf == NULL) {
             /* XXX: report out of memory error */
+            return FALSE;
         }
         rc = iconv(cd, &in, &inlen, &buf, &outlen);
         if ((rc == -1) && (errno != E2BIG)) {
