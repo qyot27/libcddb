@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.1 2003/04/20 14:31:24 airborne Exp $
+    $Id: cd_access.c,v 1.2 2003/04/20 14:43:11 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -116,5 +116,21 @@ cddb_disc_t *cd_read(const char *device)
 
 #endif
 
+    return disc;
+}
+
+cddb_disc_t *cd_create(int dlength, int tcount, int *foffset)
+{
+    int i;
+    cddb_disc_t *disc;
+    cddb_track_t *track;
+
+    disc = cddb_disc_new();
+    cddb_disc_set_length(disc, dlength);
+    for (i = 0; i < tcount; i++) {
+        track = cddb_track_new();
+        cddb_track_set_frame_offset(track, foffset[i]);
+        cddb_disc_add_track(disc, track);
+    }
     return disc;
 }
