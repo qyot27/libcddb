@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.9 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_ni.h,v 1.10 2003/04/17 17:35:24 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -66,7 +66,7 @@
 
 #define FRAMES_PER_SECOND 75
 
-#define FREE_NOT_NULL(p) if (p) free(p)
+#define FREE_NOT_NULL(p) if (p) { free(p); p = NULL; }
 #define CONNECTION_OK(c) (c->socket != -1)
 #define STR_OR_NULL(s) ((s) ? s : "NULL")
 
