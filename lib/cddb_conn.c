@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.27 2004/10/09 06:14:28 airborne Exp $
+    $Id: cddb_conn.c,v 1.28 2004/10/15 19:21:40 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -107,15 +107,28 @@ cddb_conn_t *cddb_new(void)
         c->query_idx = 0;
         c->query_cnt = 0;
 
-#ifdef HAVE_ICONV_H
-        c->cd_to_freedb = NULL;
-        c->cd_from_freedb = NULL;
-#endif /* HAVE_ICONV_H */
+        c->charset = malloc(sizeof(cddb_iconv_t));
+        c->charset->cd_to_freedb = NULL;
+        c->charset->cd_from_freedb = NULL;
     } else {
         cddb_log_crit(cddb_error_str(CDDB_ERR_OUT_OF_MEMORY));
     }
 
     return c;
+}
+
+static void cddb_close_iconv(cddb_conn_t *c)
+{
+    if (c->charset) {
+#ifdef HAVE_ICONV_H
+        if (c->charset->cd_to_freedb) {
+            iconv_close(c->charset->cd_to_freedb);
+        }
+        if (c->charset->cd_from_freedb) {
+            iconv_close(c->charset->cd_from_freedb);
+        }
+#endif /* HAVE_ICONV_H */
+    }
 }
 
 void cddb_destroy(cddb_conn_t *c)
@@ -130,14 +143,8 @@ void cddb_destroy(cddb_conn_t *c)
         FREE_NOT_NULL(c->user);
         FREE_NOT_NULL(c->hostname);
         cddb_query_clear(c);
-#ifdef HAVE_ICONV_H
-        if (c->cd_to_freedb) {
-            iconv_close(c->cd_to_freedb);
-        }
-        if (c->cd_from_freedb) {
-            iconv_close(c->cd_from_freedb);
-        }
-#endif /* HAVE_ICONV_H */
+        cddb_close_iconv(c);
+        FREE_NOT_NULL(c->charset);
         free(c);
     }
 }
@@ -149,23 +156,25 @@ void cddb_destroy(cddb_conn_t *c)
 int cddb_set_charset(cddb_conn_t *c, const char *charset)
 {
 #ifdef HAVE_ICONV_H
-    if (c->cd_to_freedb) {
-        iconv_close(c->cd_to_freedb);
+    cddb_close_iconv(c);
+    c->charset->cd_to_freedb = iconv_open(SERVER_CHARSET, charset);
+    if (c->charset->cd_to_freedb == (iconv_t)-1) {
+        c->charset->cd_to_freedb = NULL;
+        cddb_errno_set(c, CDDB_ERR_INVALID_CHARSET);
+        return FALSE;
     }
-    if (c->cd_from_freedb) {
-        iconv_close(c->cd_from_freedb);
-    }
-    c->cd_to_freedb = iconv_open(SERVER_CHARSET, charset);
-    c->cd_from_freedb = iconv_open(charset, SERVER_CHARSET);
-    if ((c->cd_to_freedb == (iconv_t)-1) || (c->cd_from_freedb == (iconv_t)-1)) {
-        c->cd_to_freedb = NULL;
-        c->cd_from_freedb = NULL;
+    c->charset->cd_from_freedb = iconv_open(charset, SERVER_CHARSET);
+    if (c->charset->cd_from_freedb == (iconv_t)-1) {
+        iconv_close(c->charset->cd_to_freedb);
+        c->charset->cd_to_freedb = NULL;
+        c->charset->cd_from_freedb = NULL;
         cddb_errno_set(c, CDDB_ERR_INVALID_CHARSET);
         return FALSE;
     }
     cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 #else
+    cddb_errno_set(c, CDDB_ERR_ICONV_FAIL);
     return FALSE;
 #endif /* HAVE_ICONV_H */
 }
