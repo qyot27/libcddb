@@ -1,7 +1,7 @@
 /*
-    $Id: main.h,v 1.9 2004/07/18 07:05:27 airborne Exp $
+    $Id: main.h,v 1.10 2004/07/18 07:23:08 airborne Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

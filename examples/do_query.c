@@ -1,7 +1,7 @@
 /*
-    $Id: do_query.c,v 1.5 2003/05/09 18:17:16 airborne Exp $
+    $Id: do_query.c,v 1.6 2004/07/18 07:23:08 airborne Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

@@ -1,7 +1,7 @@
 /*
-    $Id: cddb.h,v 1.8 2004/04/23 02:17:02 rockyb Exp $
+    $Id: cddb.h,v 1.9 2004/07/18 07:23:09 airborne Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
