@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: check_cache.sh,v 1.8 2003/05/25 13:14:34 airborne Exp $
+# $Id: check_cache.sh,v 1.9 2004/07/18 07:14:52 airborne Exp $
 
 . ./settings.sh
 
@@ -17,7 +17,7 @@ mkdir $CACHE
 #
 DISCID0='12345678'
 DISCID1='920ef00b'
-DISCID2='920ef00c'
+DISCID2='11111111'
 
 # check setting of cache dir (-D option)
 start_test 'Check cache dir customization'
@@ -78,7 +78,7 @@ if test ${PRV_RESULT} -eq ${FAILURE}; then
 else
     cp $CACHE/misc/$DISCID1 $CACHE/misc/$DISCID2 > /dev/null 2>&1 &&
     cddb_query -c on -D $CACHE read misc $DISCID2
-    check_read $? $DISCID2
+    check_read $? $DISCID1
 fi
 
 #
