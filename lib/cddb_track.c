@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.13 2003/05/23 21:10:30 airborne Exp $
+    $Id: cddb_track.c,v 1.14 2004/07/07 10:29:24 rockyb Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -18,9 +18,16 @@
     Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA  02111-1307, USA.
 */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif
 #include "cddb/cddb_ni.h"
 
 

@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_config.h.in,v 1.1 2004/04/04 02:11:42 rockyb Exp $
+    $Id: cddb_config.h.in,v 1.2 2004/07/07 10:29:24 rockyb Exp $
 
     Copyright (C) 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,5 +27,11 @@
    include it.
 */
 #undef CDDB_NEED_UNISTD_H
+
+/* Define if you have <sys/socket.h> and need it included. 
+   On MacOS, <cddb_net.h> needs this but that header doesn't
+   include it.
+*/
+#undef CDDB_NEED_SYS_SOCKET_H
 
 #endif /* CDDB_CONFIG_H */

@@ -59,6 +59,10 @@ case $host in
 	[Define if you have <unistd.h> and need it included. 
 	 On MacOS, <regex.h> needs this but that header doesn't
 	 include it.])
+        AC_DEFINE([CDDB_NEED_SYS_SOCKET_H],1,
+	[Define if you have <sys/socket.h> and need it included. 
+	 On MacOS, <cddb_net.h> needs this but that header doesn't
+	 include it.])
         ;;
 esac
 

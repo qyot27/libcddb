@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_net.h,v 1.7 2004/07/06 09:50:59 rockyb Exp $
+    $Id: cddb_net.h,v 1.8 2004/07/07 10:29:24 rockyb Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,6 +35,8 @@
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #endif 
+
+#include <cddb/cddb_config.h>
 
 #if defined(CDDB_NEED_SYS_SOCKET_H) || defined(HAVE_SYS_SOCKET_H)
 #include <sys/socket.h>
@@ -124,7 +126,8 @@ struct hostent *timeout_gethostbyname(const char *hostname, int timeout);
  * @param timeout  Number of seconds after which to time out.
  * @return Zero on success, -1 on failure (errno will be set).
  */
-int timeout_connect(int sockfd, const struct sockaddr *addr, socklen_t len, int timeout);
+int timeout_connect(int sockfd, const struct sockaddr *addr, size_t len, 
+		    int timeout);
 
 
 #ifdef __cplusplus

@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.12 2004/07/06 08:32:34 rockyb Exp $
+    $Id: cddb_net.c,v 1.13 2004/07/07 10:29:24 rockyb Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -262,7 +262,7 @@ struct hostent *timeout_gethostbyname(const char *hostname, int timeout)
 }
 
 int timeout_connect(int sockfd, const struct sockaddr *addr, 
-                    socklen_t len, int timeout)
+                    size_t len, int timeout)
 {
     int got_error = 0;
 
@@ -291,7 +291,7 @@ int timeout_connect(int sockfd, const struct sockaddr *addr,
             int rv;
             fd_set wfds;
             struct timeval tv;
-            socklen_t l;
+            size_t l;
 
             /* set up select time out */
             tv.tv_sec = timeout;
