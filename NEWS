@@ -1,7 +1,7 @@
-$Id: NEWS,v 1.4 2003/04/24 20:02:33 airborne Exp $
+$Id: NEWS,v 1.5 2003/05/07 19:01:49 airborne Exp $
 
 
-This file describes the external changes and important bugfixes
+This file describes the external changes and important bug fixes
 between different libcddb releases.  These changes might impact the
 programs that use this library.  It does not describe every single
 change made to the code tree.  An overview of the CVS changes can be
@@ -10,17 +10,41 @@ found in the Changelog file.
 
 THE FUTURE
 
-The 0.9.x releases will be used to stabilize the current API towards
+The 0.9.x releases will be used to stabilize the current API toward
 the big 1.0 release.  My intention is to improve the documentation,
 expand the included example code, add several regression tests and fix
 any bugs that are found.  When all this is finished, 1.0 will be
 released.
 
 
+CHANGES 0.9.2 -> 0.9.3
+
+* [SECURITY] The default values for the user name and the host name
+  that is used when contacting a CDDB server have been changed to
+  'anonymous@localhost'.  Libcddb used to take the values from the
+  $USER and $HOSTNAME environment variables if they were present.
+  This would reveal confidential information about a user without that
+  person knowing it.  It is still necessary to use a valid e-mail
+  address when submitting a new or updated CDDB entry to the server.
+  The libcddb write command will fail if the default value are still
+  present.
+
+* Extra regression tests were added to test caching behaviour.
+
+* Some getters and setters were added for fields in the connection
+  structure.
+
+* It is now possible to customize the program name and version that is
+  used when contacting a CDDB server.  This used to default to
+  'libcddb' and the version number of the library being used.  Now it
+  is possible for a developer to use the name of the program using the
+  library.
+
+
 CHANGES 0.9.1 -> 0.9.2
 
 * [BUGFIX] There was a problem with multi-line track titles.  The
-  title was being appended to tilte of the disc instead of to the one
+  title was being appended to title of the disc instead of to the one
   from the track.  This should now work correctly.
 
 * [BUGFIX] The parsing state machine did not correctly detect the end
