@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.12 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_conn.h,v 1.13 2003/05/01 09:49:38 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -72,6 +72,10 @@ typedef struct cddb_conn_s
     int cache_read;             /**< read data from cached file instead of
                                      from the network */
 
+    char *cname;                /**< name of the client program, 'libcddb' by
+                                     default */
+    char *cversion;             /**< version of the client program, current 
+                                     libcddb version by default */
     char *user;                 /**< user name supplied to CDDB server, defaults
                                      to the value of the 'USER' environment 
                                      variable or 'anonymous' if undefined */
@@ -92,7 +96,9 @@ typedef struct cddb_conn_s
 
 /**
  * Creates a new CDDB connection structure.  This structure will have
- * to be passed to all libcddb functions.
+ * to be passed to all libcddb functions.  Default values will be used
+ * for the connection parameters allowing it to contact the CDDB
+ * server at freedb.org.
  *
  * @return The CDDB connection structure or NULL if something went wrong.
  */
@@ -107,6 +113,14 @@ void cddb_destroy(cddb_conn_t *c);
 
 /* --- getters & setters --- */
 
+
+/**
+ * Get the host name of the CDDB server that is currently being used.
+ *
+ * @param c The connection structure.
+ * @return The server host name.
+ */
+#define cddb_get_server_name(c) (c)->server_name;
 
 /**
  * Set the host name of the CDDB server.  The default value for the
@@ -210,6 +224,20 @@ void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
 #define cddb_errno(c) (c)->errnum
 
 /**
+ * Set the name and version of the client program overwriting the
+ * previous values.  This function will make a copy of the provided
+ * strings.  The defaults are 'libcddb' and the version number of the
+ * libcddb library in use.  Both parameters must be valid strings.  If
+ * any of teh strings is NULL, this fucntion will return without
+ * changing anything.
+ *
+ * @param c        The connection structure.
+ * @param cname    The name of the client program.
+ * @param cversion The version number of the client program.
+ */
+void cddb_set_client(cddb_conn_t *c, const char *cname, const char *cversion);
+
+/**
  * Sets the user name and host name of the local machine.  This
  * function will parse out the user name and host name from the e-mail
  * address.
@@ -220,11 +248,24 @@ void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
 int cddb_set_email_address(cddb_conn_t *c, const char *email);
 
 /**
+ * Returns the current cache mode.  This can be either on, off or
+ * cache only.
+ *
+ * @see CACHE_ON
+ * @see CACHE_ONLY
+ * @see CACHE_OFF
+ *
+ * @param c The connection structure.
+ */
+#define cddb_cache_mode(c) (c)->use_cache
+
+/**
  * Enable caching of CDDB entries locally.  Caching is enabled by
  * default.  The cache directory can be changed with the
  * cddb_cache_set_dir function.
  *
  * @see cddb_cache_disable
+ * @see cddb_cache_only
  * @see cddb_cache_set_dir
  *
  * @param c The connection structure.
@@ -232,10 +273,11 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
 #define cddb_cache_enable(c) (c)->use_cache = CACHE_ON
 
 /**
- * Enable caching of CDDB entries locally.  Caching is enabled by
- * default.  The cache directory can be changed with the
+ * Only use the local CDDB cache.  Never contact a server to retrieve
+ * any data.  The cache directory can be changed with the
  * cddb_cache_set_dir function.
  *
+ * @see cddb_cache_enable
  * @see cddb_cache_disable
  * @see cddb_cache_set_dir
  *
@@ -244,21 +286,30 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
 #define cddb_cache_only(c) (c)->use_cache = CACHE_ONLY
 
 /**
- * Disable caching of CDDB entries locally.
+ * Disable caching of CDDB entries locally.  All data will be fetched
+ * from a CDDB server everytime and the retrieved data will not be
+ * cached locally.
  *
  * @see cddb_cache_enable
+ * @see cddb_cache_only
+ * @see cddb_cache_set_dir
  *
  * @param c The connection structure.
  */
 #define cddb_cache_disable(c) (c)->use_cache = CACHE_OFF
 
 /**
+ * Return the directory currently being used for caching.
+ *
+ * @param c The connection structure.
+ * @return The directory being used for caching.
+ */
+#define cddb_cache_get_dir(c) (c)->cache_dir;
+
+/**
  * Change the directory used for caching CDDB entries locally.  The
  * default location of the cached entries is a subdirectory
  * (.cddbslave) of the user's home directory.
- *
- * @see cddb_cache_enable
- * @see cddb_cache_disable
  *
  * @param c   The connection structure.
  * @param dir The directory to use for caching.
