@@ -64,7 +64,7 @@ else
     WARN_CFLAGS="-Wall -Wchar-subscripts -Wmissing-prototypes -Wmissing-declarations"
     WARN_CFLAGS="$WARN_CFLAGS -Wunused -Wpointer-arith -Wwrite-strings -Wnested-externs"
     WARN_CFLAGS="$WARN_CFLAGS -Wno-sign-compare"
-    MAINTAINER_CFLAGS="-std=c99 -pedantic -Werror"
+    MAINTAINER_CFLAGS="-std=c99 -pedantic -Werror -O0"
 
     if test "x$enable_maintainer_mode" = "xyes"; then
         maintainer_flags=""
