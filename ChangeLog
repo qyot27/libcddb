@@ -1,3 +1,142 @@
+2003-04-24 22:02  airborne
+
+	* NEWS: added changes between 0.9.1 and 0.9.2
+
+2003-04-24 21:38  airborne
+
+	* README: added some comments about the network regression tests
+
+2003-04-24 21:23  airborne
+
+	* tests/Makefile.am: add more testdata to dist hook
+
+2003-04-24 21:18  airborne
+
+	* tests/check_server.sh: added code to test the read and query
+	commands
+
+2003-04-24 21:18  airborne
+
+	* tests/settings.sh.in: added query check function
+
+2003-04-24 21:16  airborne
+
+	* tests/testdata/b2bba00e1890d659.txt: Initial version
+
+2003-04-24 21:05  airborne
+
+	* tests/testdata/56c2171b89496518.txt: Initial version
+
+2003-04-24 20:47  airborne
+
+	* examples/main.c: added proxy support
+
+2003-04-24 20:46  airborne
+
+	* tests/testdata/920ef00b.txt: Initial version
+
+2003-04-22 20:16  airborne
+
+	* .cvsignore, include/.cvsignore, include/cddb/.cvsignore,
+	lib/.cvsignore, tests/.cvsignore, examples/.cvsignore: added some
+	files for people building (configure,make) in main CVS tree
+
+2003-04-22 20:14  airborne
+
+	* lib/cddb_cmd.c: moved buffer freeing to right after when it is no
+	longer needed
+
+2003-04-22 20:07  airborne
+
+	* TODO: added pkg-config entry
+
+2003-04-21 19:17  airborne
+
+	* examples/cd_access.c, examples/main.c, examples/main.h,
+	lib/cddb_cmd.c: [bugfix] fixed memory leaks reported by valgrind
+
+2003-04-21 14:08  airborne
+
+	* tests/Makefile.am: added cache and server test scripts
+
+2003-04-21 14:07  airborne
+
+	* tests/: check_server.sh, check_cache.sh: Initial revision
+
+2003-04-21 14:06  airborne
+
+	* Makefile.am: make sure example gets build before executing any
+	tests
+
+2003-04-21 13:22  airborne
+
+	* tests/Makefile.am: make sure test data makes it into distribution
+	archive
+
+2003-04-21 13:09  airborne
+
+	* configure.ac: version bump to 0.9.2
+
+2003-04-21 13:08  airborne
+
+	* tests/: testcache/misc/12345678, testcache/misc/12345679,
+	testcache/misc/1234567a, testcache/misc/1234567b,
+	testcache/misc/1234567c, testcache/misc/1234567d,
+	testcache/misc/1234567e, testcache/misc/1234567f,
+	testcache/misc/12345680, testcache/misc/12345681,
+	testcache/misc/12345682, testcache/misc/12345683,
+	testdata/12345678.txt, testdata/12345679.txt,
+	testdata/1234567a.txt, testdata/1234567b.txt,
+	testdata/1234567c.txt, testdata/1234567d.txt,
+	testdata/1234567e.txt, testdata/1234567f.txt,
+	testdata/12345680.txt, testdata/12345681.txt,
+	testdata/12345682.txt, testdata/12345683.txt: Initial revision
+
+2003-04-21 13:04  airborne
+
+	* tests/check_parse.sh: added some disc title and artist parsing
+	tests
+
+2003-04-21 12:21  airborne
+
+	* tests/settings.sh.in: added function to verify CDDB read data
+
+2003-04-21 12:20  airborne
+
+	* tests/Makefile.am: added parsing test
+
+2003-04-21 12:20  airborne
+
+	* tests/check_parse.sh: Initial revision
+
+2003-04-21 12:19  airborne
+
+	* examples/: cd_access.c, do_query.c, main.h: return error codes
+	when exiting
+
+2003-04-21 12:19  airborne
+
+	* examples/main.c: return error codes when exiting + bugfix in
+	cache dir command-line argument parsing
+
+2003-04-21 11:07  airborne
+
+	* lib/cddb_cmd.c: [bugfix] fixed state machine when parsing reaches
+	end of stream
+
+2003-04-21 10:46  airborne
+
+	* lib/cddb_cmd.c: [bugfix] multi-line parsing now append track
+	title to track instead of disc
+
+2003-04-21 08:59  airborne
+
+	* ChangeLog: added 0.9.1 changes
+
+2003-04-21 08:59  airborne
+
+	* NEWS: added changes between 0.9.0 and 0.9.1
+
 2003-04-21 00:23  airborne
 
 	* tests/check_discid.sh: fixed spelling typo
