@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.h,v 1.15 2003/05/23 21:10:28 airborne Exp $
+    $Id: cddb_track.h,v 1.16 2004/07/18 07:09:19 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -43,6 +43,7 @@ typedef struct cddb_track_s
     char *title;                /**< track title */
     char *artist;               /**< (optional) track artist */
     char *ext_data;             /**< (optional) extended disc data */
+    struct cddb_track_s *prev;  /**< pointer to previous track, or NULL */
     struct cddb_track_s *next;  /**< pointer to next track, or NULL */
     struct cddb_disc_s *disc;   /**< disc of which this is a track */
 } cddb_track_t;
@@ -120,12 +121,14 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
 int cddb_track_get_length(cddb_track_t *track);
 
 /**
- * Set the length of the track.
+ * Set the length of the track.  If no frame offset is yet known for
+ * this track, and it is part of a disc, then the frame offset will be
+ * calculated.
  *
- * @param track The CDDB track structure.
- * @param l     The track length in seconds.
+ * @param track  The CDDB track structure.
+ * @param length The track length in seconds.
  */
-#define cddb_track_set_length(track, l) (track)->length = l
+void cddb_track_set_length(cddb_track_t *track, int length);
 
 /**
  * Get the track title.  If no title is set for this track then NULL
