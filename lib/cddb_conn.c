@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.24 2004/03/10 03:08:48 rockyb Exp $
+    $Id: cddb_conn.c,v 1.25 2004/07/21 16:15:30 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -69,7 +69,8 @@ cddb_conn_t *cddb_new(void)
 
     c = (cddb_conn_t*)malloc(sizeof(cddb_conn_t));
     if (c) {
-        c->line = (char*)malloc(LINE_SIZE);
+        c->buf_size = DEFAULT_BUF_SIZE;
+        c->line = (char*)malloc(c->buf_size);
 
         c->cname = strdup(CLIENT_NAME);
         c->cversion = strdup(CLIENT_VERSION);
@@ -131,6 +132,13 @@ void cddb_destroy(cddb_conn_t *c)
 
 /* --- getters & setters --- */
 
+
+void cddb_set_buf_size(cddb_conn_t *c, unsigned int size)
+{
+    FREE_NOT_NULL(c->line);
+    c->buf_size = size;
+    c->line = (char*)malloc(c->buf_size);
+}
 
 void cddb_set_server_name(cddb_conn_t *c, const char *server)
 {
