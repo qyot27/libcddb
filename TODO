@@ -1,20 +1,12 @@
-$Id: TODO,v 1.16 2003/05/01 14:48:10 airborne Exp $
+$Id: TODO,v 1.17 2003/05/08 20:29:21 airborne Exp $
 
 * improved error handling
 
-* support to enable/disable category dirs in .cddbslave
+* support to enable/disable category dirs in .cddbslave ?
 
 * revision number handling for CDDB entries (if necessary)
 
 * if no disc found in .cddbslave/<category>/ try .cddbslave/ ?
-
-* unit testing
-
-* improve documentation
-
-* tilde expansion in cddb_cache_set_dir
-
-* thread safety in on cddb_conn_t structure (necesasry?)
 
 * support for extended data and playing order fields
 
