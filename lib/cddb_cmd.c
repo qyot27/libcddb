@@ -520,6 +520,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                 } else {
                     /* only title of track is specified */
                     track->title = cddb_regex_get_string(line, matches, 5);
+                    track->artist = strdup(disc->artist);
                 }
             } else {
                 /* we're done parsing */
