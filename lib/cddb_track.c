@@ -59,6 +59,22 @@ void cddb_track_set_title(cddb_track_t *track, const char *title)
     }
 }
 
+void cddb_track_append_title(cddb_track_t *track, const char *title)
+{
+    int old_len = 0, len;
+
+    if (track && title) {
+        /* only append if there is something to append */
+        if (track->title) {
+            old_len = strlen(track->title);
+        }
+        len = strlen(title);
+        track->title = realloc(track->title, old_len+len+1);
+        strcpy(track->title+old_len, title);
+        track->title[old_len+len] = '\0';
+    }
+}
+
 const char *cddb_track_get_artist(cddb_track_t *track)
 {
     const char *artist = NULL;
@@ -78,6 +94,22 @@ void cddb_track_set_artist(cddb_track_t *track, const char *artist)
     if (track) {
         FREE_NOT_NULL(track->artist);
         track->artist = strdup(artist);
+    }
+}
+
+void cddb_track_append_artist(cddb_track_t *track, const char *artist)
+{
+    int old_len = 0, len;
+
+    if (track && artist) {
+        /* only append if there is something to append */
+        if (track->artist) {
+            old_len = strlen(track->artist);
+        }
+        len = strlen(artist);
+        track->artist = realloc(track->artist, old_len+len+1);
+        strcpy(track->artist+old_len, artist);
+        track->artist[old_len+len] = '\0';
     }
 }
 

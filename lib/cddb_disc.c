@@ -150,11 +150,43 @@ void cddb_disc_set_title(cddb_disc_t *disc, const char *title)
     }
 }
 
+void cddb_disc_append_title(cddb_disc_t *disc, const char *title)
+{
+    int old_len = 0, len;
+
+    if (disc && title) {
+        /* only append if there is something to append */
+        if (disc->title) {
+            old_len = strlen(disc->title);
+        }
+        len = strlen(title);
+        disc->title = realloc(disc->title, old_len+len+1);
+        strcpy(disc->title+old_len, title);
+        disc->title[old_len+len] = '\0';
+    }
+}
+
 void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist)
 {
     if (disc) {
         FREE_NOT_NULL(disc->artist);
         disc->artist = strdup(artist);
+    }
+}
+
+void cddb_disc_append_artist(cddb_disc_t *disc, const char *artist)
+{
+    int old_len = 0, len;
+
+    if (disc && artist) {
+        /* only append if there is something to append */
+        if (disc->artist) {
+            old_len = strlen(disc->artist);
+        }
+        len = strlen(artist);
+        disc->artist = realloc(disc->artist, old_len+len+1);
+        strcpy(disc->artist+old_len, artist);
+        disc->artist[old_len+len] = '\0';
     }
 }
 

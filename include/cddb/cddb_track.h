@@ -69,6 +69,16 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
 void cddb_track_set_title(cddb_track_t *track, const char *title);
 
 /**
+ * Append to the track title.  If the track does not have a title yet,
+ * then a new one will be created from the given string, otherwise
+ * that string will be appended to the existing title.
+ *
+ * @param track The CDDB track structure.
+ * @param title Part of the track title.
+ */
+void cddb_track_append_title(cddb_track_t *track, const char *title);
+
+/**
  * Get the track artist name.  If there is no track artist defined,
  * the disc artist will be returned.  NULL will be returned if neither
  * is defined.
@@ -86,6 +96,16 @@ const char *cddb_track_get_artist(cddb_track_t *track);
  * @param artist The new track artist name.
  */
 void cddb_track_set_artist(cddb_track_t *track, const char *artist);
+
+/**
+ * Append to the track artist.  If the track does not have an artist
+ * yet, then a new one will be created from the given string,
+ * otherwise that string will be appended to the existing artist.
+ *
+ * @param track The CDDB track structure.
+ * @param title Part of the artist name.
+ */
+void cddb_track_append_artist(cddb_track_t *track, const char *artist);
 
 
 /* --- miscellaneous */

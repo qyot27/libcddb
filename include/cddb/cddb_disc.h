@@ -142,6 +142,16 @@ void cddb_disc_set_category(cddb_disc_t *disc, const char *cat);
 void cddb_disc_set_title(cddb_disc_t *disc, const char *title);
 
 /**
+ * Append to the disc title.  If the disc does not have a title yet,
+ * then a new one will be created from the given string, otherwise
+ * that string will be appended to the existing title.
+ *
+ * @param disc The CDDB disc structure.
+ * @param title Part of the disc title.
+ */
+void cddb_disc_append_title(cddb_disc_t *disc, const char *title);
+
+/**
  * Set the disc artist name.  If the disc already had an artist name,
  * then the memory for that string will be freed.  The new artist name
  * will be copied into a new chunk of memory.
@@ -150,6 +160,16 @@ void cddb_disc_set_title(cddb_disc_t *disc, const char *title);
  * @param artist The new disc artist name.
  */
 void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist);
+
+/**
+ * Append to the disc artist.  If the disc does not have an artist
+ * yet, then a new one will be created from the given string,
+ * otherwise that string will be appended to the existing artist.
+ *
+ * @param disc The CDDB disc structure.
+ * @param title Part of the artist name.
+ */
+void cddb_disc_append_artist(cddb_disc_t *disc, const char *artist);
 
 
 /* --- miscellaneous */
