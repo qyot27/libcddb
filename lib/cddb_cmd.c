@@ -532,7 +532,7 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
     cddb_disc_set_category(disc, aux);
     /* extract disc ID */
     aux = cddb_regex_get_string(line, matches, 2);
-    disc->discid = strtol(aux, NULL, 16);
+    disc->discid = strtoll(aux, NULL, 16);
     /* extract artist and title */
     if (matches[4].rm_so != -1) {
         /* both artist and title of disc are specified */
