@@ -9,7 +9,9 @@
  */
 typedef struct cddb_track_s
 {
+    int num;                    /**< track number on the disc */
     int frame_offset;           /**< frame offset of the track on the disc */
+    int length;                 /**< track length in seconds */
     char *title;                /**< track title */
     char *artist;               /**< (optional) track artist */
     char *ext_data;             /**< (optional) extended disc data  */
@@ -36,6 +38,30 @@ cddb_track_t *cddb_track_new(void);
  * @param track The CDDB track structure.
  */
 void cddb_track_destroy(cddb_track_t *track);
+
+
+/* --- getters & setters --- */
+
+
+/**
+ * Set the track title.  If the track already had a title, then the
+ * memory for that string will be freed.  The new title will be copied
+ * into a new chunk of memory.
+ *
+ * @param track The CDDB track structure.
+ * @param title The new track title.
+ */
+void cddb_track_set_title(cddb_track_t *track, const char *title);
+
+/**
+ * Set the track artist name.  If the track already had an artist
+ * name, then the memory for that string will be freed.  The new
+ * artist name will be copied into a new chunk of memory.
+ *
+ * @param track  The CDDB track structure.
+ * @param artist The new track artist name.
+ */
+void cddb_track_set_artist(cddb_track_t *track, const char *artist);
 
 
 /* --- miscellaneous */
