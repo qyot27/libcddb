@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.14 2003/04/27 08:45:17 airborne Exp $
+    $Id: cddb_disc.h,v 1.15 2003/05/04 09:28:28 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -38,7 +38,12 @@
 /**
  * This macro converts an amount of frames into an amount of seconds.
  */
-#define FRAMES_TO_SECONDS(f) (f / FRAMES_PER_SECOND)
+#define FRAMES_TO_SECONDS(f) ((f) / FRAMES_PER_SECOND)
+
+/**
+ * This macro converts an amount of seconds into an amount of frames.
+ */
+#define SECONDS_TO_FRAMES(s) ((s) * FRAMES_PER_SECOND)
 
 /**
  * The different CDDB categories.
@@ -257,6 +262,14 @@ void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre);
  * @return The disc year.
  */
 #define cddb_disc_get_year(disc) (disc)->year
+
+/**
+ * Set the year of publication for this disc.
+ *
+ * @param disc The CDDB disc structure.
+ * @param y    The disc year.
+ */
+#define cddb_disc_set_year(disc, y) (disc)->year = y
 
 /**
  * Get the number of tracks on the disc.
