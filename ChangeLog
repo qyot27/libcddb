@@ -1,3 +1,35 @@
+2002-11-07 23:44  airborne
+
+	* cddb_cmd.c:
+	conversion of 32 bit int sometimes failed with strtol, so using
+	strtoll now
+
+2002-11-07 22:12  airborne
+
+	* cddb_cmd.c:
+	close connection every time when using HTTP
+
+2002-11-07 21:45  airborne
+
+	* cddb_cmd.c:
+	intercept error code 530 (timeout)
+
+2002-11-05 00:03  airborne
+
+	* cddb_cmd.c:
+	query data parser now also extracts disc ID, necessary for inexact
+	matches
+
+2002-11-05 00:01  airborne
+
+	* cddb_disc.c, cddb_track.c:
+	null pointer prevention in debug print routine
+
+2002-11-03 11:28  airborne
+
+	* cddb_cmd.h, cddb_cmd.c:
+	let cddb_query return the number of matches found
+	
 2002-11-02 17:49  airborne
 
 	* cddb_cmd.h, cddb_cmd_ni.h, cddb_conn.h, cddb_cmd.c, cddb_conn.c:
