@@ -1,4 +1,4 @@
-$Id: TODO,v 1.12 2003/04/20 17:01:32 airborne Exp $
+$Id: TODO,v 1.13 2003/04/22 18:07:14 airborne Exp $
 
 * improved error handling
 
@@ -25,3 +25,5 @@ $Id: TODO,v 1.12 2003/04/20 17:01:32 airborne Exp $
 * handle network time-outs
 
 * create some sort of local CDDB query index?
+
+* research possible use of pkg-config
