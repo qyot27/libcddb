@@ -6,6 +6,14 @@
 #endif
 
 
+/* --- getters & setters --- */
+
+
+/**
+ */
+#define cddb_cache_file(c) (c)->cache_fp
+
+
 /* --- connecting / disconnecting --- */
 
 
