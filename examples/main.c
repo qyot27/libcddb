@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.3 2003/04/14 22:25:48 airborne Exp $
+    $Id: main.c,v 1.4 2003/04/17 22:19:11 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,12 +29,14 @@
 #define OPT_STRING ":c:d:hp:P:s:"
 
 /* parsed command-line parameters */
-#define CMD_NONE  0
-#define CMD_QUERY 1
-#define CMD_READ  2
-static int command = 0;
-static char *arg_category;
-static unsigned int arg_discid;
+#define CMD_NONE   0
+#define CMD_DISCID 1
+#define CMD_QUERY  2
+#define CMD_READ   3
+static int command = 0;         /* request command */
+static char *category;          /* category command-line argument */
+static unsigned int discid;     /* disc ID command-line argument or calculated */
+static int use_cd = 0;          /* use CD-ROM to retrieve disc data */
 
 /* print usage message */
 static void usage(void)
@@ -42,16 +44,22 @@ static void usage(void)
     fprintf(stderr, "Usage: cddb_query [OPTION] COMMAND [ARG]\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Available options:\n");
-    fprintf(stderr, "  -c <mode>       local cache mode [on|off|only] (default = on)\n");
-    fprintf(stderr, "  -D <cache dir>  directory for local cache (default = ~/.cddbslave)\n");
-    fprintf(stderr, "  -h              display this help and exit\n");
-    fprintf(stderr, "  -p <port>       port of CDDB server (default = 888)\n");
-    fprintf(stderr, "  -P <protocol>   server protocol [cddbp|http|proxy] (default = cddbp)\n");
-    fprintf(stderr, "  -s <server>     name of CDDB server (default = freedb.org)\n");
+    fprintf(stderr, "  -c <mode>        local cache mode [on|off|only] (default = on)\n");
+    fprintf(stderr, "  -D <cache dir>   directory for local cache (default = ~/.cddbslave)\n");
+    fprintf(stderr, "  -h               display this help and exit\n");
+    fprintf(stderr, "  -p <port>        port of CDDB server (default = 888)\n");
+    fprintf(stderr, "  -P <protocol>    server protocol [cddbp|http|proxy] (default = cddbp)\n");
+    fprintf(stderr, "  -s <server>      name of CDDB server (default = freedb.org)\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Available commands:\n");
-    fprintf(stderr, "  query\n");
-    fprintf(stderr, "  read <category> <hex disc id>\n");
+    fprintf(stderr, "  calc             calculate disc ID\n");
+    fprintf(stderr, "  query            query CDDB server and list all matching entries\n");
+    fprintf(stderr, "  read <cat> <id>  retrieve disc details from CDDB server, <cat> see\n");
+    fprintf(stderr, "                   below, <id> is disc ID in hexadecimal\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "If you do not specify any arguments for a command, the program\n");
+    fprintf(stderr, "will try to retrieve the needed disc data from a CD in your CD-ROM\n");
+    fprintf(stderr, "drive.\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Available CDDB categories are:\n");
     fprintf(stderr, "  data, folk, jazz, misc, rock, country, blues, newage, reggae,\n");
@@ -71,7 +79,7 @@ static void prt_error(const char *fmt, va_list ap)
 }
 
 /* print error message and die */
-static void error_exit(const char *fmt, ...)
+void error_exit(const char *fmt, ...)
 {
     va_list ap;
 
@@ -191,7 +199,15 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
 		error_usage("command missing");
     }
     /* process command */
-    if (strcmp(argv[optind], "query") == 0) {
+    if (strcmp(argv[optind], "calc") == 0) {
+        /* calculate disc ID */
+        command = CMD_DISCID;
+        use_cd = 1;
+        /* no more arguments are needed */
+        if (argc != optind + 1) {
+            error_usage("the calc command requires no arguments");
+        }
+    } else if (strcmp(argv[optind], "query") == 0) {
         /* CDDB query */
         command = CMD_QUERY;
         /* no more arguments are needed */
@@ -201,12 +217,16 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
     } else if (strcmp(argv[optind], "read") == 0) {
         /* CDDB read */
         command = CMD_READ;
-        /* two more arguments are needed */
-        if (argc != optind + 3) {
+        /* use CD-ROM ? */
+        if (argc == optind + 1) {
+            use_cd = 1;
+        } else if (argc == optind + 3) {
+            /* two more arguments are needed */
+            category = strdup(argv[optind+1]);
+            sscanf(argv[optind+2], "%x", &discid);
+        } else {
             error_usage("the read command requires two arguments");
         }
-        arg_category = strdup(argv[optind+1]);
-        sscanf(argv[optind+2], "%x", &arg_discid);
     } else {
         /* unknown command */
         error_usage("unknown command '%s'", argv[optind]);
@@ -232,10 +252,26 @@ int main(int argc, char **argv)
     /* Check command-line parameters. */
     parse_cmdline(argc, argv, conn);
 
-    /* Execute requested command */
+    /* Use CD-ROM to get some disc data? */
+    if (use_cd) {
+        /* Retrieve the disc length and track offsets from the CD in
+           the CD-ROM drive. */
+        disc = cd_read(NULL);
+        if (!disc) {
+            error_exit("could not read CD in CD-ROM drive");
+        }
+    }
+
+    /* Execute requested command. */
     switch (command) {
+    case CMD_DISCID:
+        /* Calculate the disc ID.  This function will initialize the
+           disc ID field in the disc structure. */
+        cddb_disc_calc_discid(disc);
+        printf("CD disc ID is %08x\n", cddb_disc_get_discid(disc));
+        break;
     case CMD_READ:
-        disc = do_read(conn, arg_category, arg_discid);
+        disc = do_read(conn, category, discid);
         if (!disc) {
             error_exit("could not read disc data");
         }
