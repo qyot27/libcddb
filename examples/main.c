@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.7 2003/04/20 18:54:58 airborne Exp $
+    $Id: main.c,v 1.8 2003/04/20 22:20:19 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -26,13 +26,14 @@
 #include "main.h"
 
 /* command-line option string */
-#define OPT_STRING ":c:d:hp:P:s:"
+#define OPT_STRING ":c:d:hp:P:qs:"
 
 /* parsed command-line parameters */
 #define CMD_NONE   0
 #define CMD_DISCID 1
 #define CMD_QUERY  2
 #define CMD_READ   3
+static int quiet = 0;           /* work silently, reports no errors */
 static int command = 0;         /* request command */
 static char *category = NULL;   /* category command-line argument */
 static unsigned int discid = 0; /* disc ID command-line argument or calculated */
@@ -52,6 +53,7 @@ static void usage(void)
     fprintf(stderr, "  -h               display this help and exit\n");
     fprintf(stderr, "  -p <port>        port of CDDB server (default = 888)\n");
     fprintf(stderr, "  -P <protocol>    server protocol [cddbp|http|proxy] (default = cddbp)\n");
+    fprintf(stderr, "  -q               quiet, do not print any error messages\n");
     fprintf(stderr, "  -s <server>      name of CDDB server (default = freedb.org)\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Available commands:\n");
@@ -95,9 +97,11 @@ static void usage(void)
 /* print error message */
 static void prt_error(const char *fmt, va_list ap)
 {
-    fprintf(stderr, "\nerror: ");
-    vfprintf(stderr, fmt, ap);
-    fprintf(stderr, "\n\n");
+    if (!quiet) {
+        fprintf(stderr, "\nerror: ");
+        vfprintf(stderr, fmt, ap);
+        fprintf(stderr, "\n\n");
+    }
 }
 
 /* print error message and die */
@@ -119,7 +123,9 @@ static void error_usage(const char *fmt, ...)
     va_start(ap, fmt);
     prt_error(fmt, ap);
     va_end(ap);
-    usage();
+    if (!quiet) {
+        usage();
+    }
     exit(-1);
 }
 
@@ -225,6 +231,9 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
                 /* XXX: get proxy settings from env var 'http_proxy'!! */
                 error_usage("-P, invalid server protocol '%s'", optarg);
             }
+            break;
+        case 'q':               /* quiet */
+            quiet = 1;
             break;
         case 's':               /* server name */
             if (!*optarg) {
