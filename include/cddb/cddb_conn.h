@@ -189,7 +189,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  *
  * @param c The connection structure.
  */
-#define cddb_cache_enable(c) (c)->use_cache = TRUE
+#define cddb_cache_enable(c) (c)->use_cache = 1
 
 /**
  * Disable caching of CDDB entries locally.
@@ -198,7 +198,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  *
  * @param c The connection structure.
  */
-#define cddb_cache_disable(c) (c)->use_cache = FALSE
+#define cddb_cache_disable(c) (c)->use_cache = 0
 
 /**
  * Change the directory used for caching CDDB entries locally.  The
