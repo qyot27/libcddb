@@ -11,3 +11,6 @@
 
     David Collett
         - C++ patch (similar as above :))
+
+    Rocky Bernstein
+        - patch to prevent some compiler warnings
