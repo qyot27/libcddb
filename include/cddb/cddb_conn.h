@@ -8,6 +8,11 @@
 
 #include <netinet/in.h>
 
+#define CACHE_OFF  0            /**< do not use local CDDB cache, network
+                                     only */
+#define CACHE_ON   1            /**< use local CDDB cache, if possible */
+#define CACHE_ONLY 2            /**< only use local CDDB cache, no network
+                                     access */
 
 /**
  * An opaque structure for keeping state about the connection to a
@@ -39,8 +44,8 @@ typedef struct cddb_conn_s
 
     FILE *cache_fp;             /**< a file pointer to a cached CDDB entry or
                                      NULL if no cached version is available */
-    int use_cache;              /**< boolean to specify whether to read/write
-                                     data in cache, enabled by default */
+    int use_cache;              /**< field to specify local CDDB cache behaviour, 
+                                     enabled by default (CACHE_ON) */
     char *cache_dir;            /**< CDDB slave cache, defaults to 
                                      '~/.cddbslave' */
     int cache_read;             /**< read data from cached file instead of
@@ -203,7 +208,19 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  *
  * @param c The connection structure.
  */
-#define cddb_cache_enable(c) (c)->use_cache = 1
+#define cddb_cache_enable(c) (c)->use_cache = CACHE_ON
+
+/**
+ * Enable caching of CDDB entries locally.  Caching is enabled by
+ * default.  The cache directory can be changed with the
+ * cddb_cache_set_dir function.
+ *
+ * @see cddb_cache_disable
+ * @see cddb_cache_set_dir
+ *
+ * @param c The connection structure.
+ */
+#define cddb_cache_only(c) (c)->use_cache = CACHE_ONLY
 
 /**
  * Disable caching of CDDB entries locally.
@@ -212,7 +229,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  *
  * @param c The connection structure.
  */
-#define cddb_cache_disable(c) (c)->use_cache = 0
+#define cddb_cache_disable(c) (c)->use_cache = CACHE_OFF
 
 /**
  * Change the directory used for caching CDDB entries locally.  The

@@ -149,7 +149,7 @@ int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc)
     int rv;
 
     dlog("cddb_cache_read()");
-    if (!c->use_cache) {
+    if (c->use_cache == CACHE_OFF) {
         /* don't use cache */
         return FALSE;
     }
@@ -201,7 +201,7 @@ int cddb_cache_query(cddb_conn_t *c, cddb_disc_t *disc)
     int hash;
 
     dlog("cddb_cache_query()");
-    if (!c->use_cache) {
+    if (c->use_cache == CACHE_OFF) {
         /* don't use cache */
         return FALSE;
     }
@@ -536,9 +536,10 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
 
     dlog("cddb_parse_record()");
     /* do we need to cache the processed content ? */
-    cache_content = c->use_cache && !cddb_cache_exists(c, disc);
+    cache_content = (c->use_cache != CACHE_OFF) && !cddb_cache_exists(c, disc);
     if (cache_content) {
         /* create cache directory structure */
+        /* XXX: what to do if mkdir fails? */
         cache_content = cddb_cache_mkdir(c, disc);
         cache_content &= cddb_cache_open(c, disc, "w");
     }
@@ -726,6 +727,10 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
     if (cddb_cache_read(c, disc)) {
         /* cached version found */
         return TRUE;
+    } else if (c->use_cache == CACHE_ONLY) {
+        /* no network access allowed */
+        c->errnum = CDDB_ERR_DISC_NOT_FOUND;
+        return FALSE;
     }
 
     if (!cddb_connect(c)) {
@@ -824,6 +829,10 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     if (cddb_cache_query(c, disc)) {
         /* cached version found */
         return TRUE;
+    } else if (c->use_cache == CACHE_ONLY) {
+        /* no network access allowed */
+        c->errnum = CDDB_ERR_DISC_NOT_FOUND;
+        return FALSE;
     }
 
     /* check track offsets and generate offset list */
@@ -1021,8 +1030,9 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     size = cddb_write_data(buf, sizeof(buf), disc);
     
     /* cache data if needed */
-    if (c->use_cache) {
+    if (c->use_cache != CACHE_OFF) {
         /* create cache directory structure */
+        /* XXX: what to do if mkdir fails? */
         if (cddb_cache_mkdir(c, disc)) {
             /* open file, possibly overwriting it */
             dlog("\tcaching data");

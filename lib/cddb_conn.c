@@ -46,7 +46,7 @@ cddb_conn_t *cddb_new(void)
         c->http_proxy_server = NULL;
         c->http_proxy_server_port = DEFAULT_PROXY_PORT;
 
-        c->use_cache = TRUE;
+        c->use_cache = CACHE_ON;
         /* construct cache dir '$HOME/[DEFAULT_CACHE]' */
         s = getenv("HOME");
         c->cache_dir = (char*)malloc(strlen(s) + 1 + sizeof(DEFAULT_CACHE) + 1);
