@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: check_server.sh,v 1.5 2003/05/25 13:14:34 airborne Exp $
+# $Id: check_server.sh,v 1.6 2003/05/25 18:34:29 airborne Exp $
 
 . ./settings.sh
 
@@ -76,10 +76,10 @@ cddb_query -c off -D $CDDB_CACHE -P http  read misc $DISCID
 check_read $? $DISCID
 
 start_test 'PROXY disc read '${DISCID}
-cddb_query -c off -D $CDDB_CACHE -P proxy read misc $DISCID
 if test $NO_PROXY -eq 1; then
     skip $NO_PROXY_REASON
 else
+    cddb_query -c off -D $CDDB_CACHE -P proxy read misc $DISCID
     check_read $? $DISCID
 fi
 
