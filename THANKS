@@ -5,8 +5,9 @@
 
     David Mitchell
         - initial version of multi-line support for tracks
+        - C++ patch
         - BeOS support
         - some other minor patches
 
     David Collett
-        - C++ patch
+        - C++ patch (similar as above :))
