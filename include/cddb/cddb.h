@@ -1,5 +1,5 @@
 /*
-    $Id: cddb.h,v 1.6 2003/05/01 08:12:43 airborne Exp $
+    $Id: cddb.h,v 1.7 2003/05/20 20:40:48 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -32,6 +32,8 @@
 #include <cddb/cddb_disc.h>
 #include <cddb/cddb_conn.h>
 #include <cddb/cddb_cmd.h>
+#include <cddb/cddb_log.h>
+
 
 /**
  * \mainpage libCDDB, a C API for CDDB server access
