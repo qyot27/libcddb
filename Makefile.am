@@ -1,3 +1,3 @@
 
-SUBDIRS	= include lib src
+SUBDIRS	= include lib tests examples
 EXTRA_DIST = doc/doxygen.conf
