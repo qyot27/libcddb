@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.13 2003/05/01 09:49:38 airborne Exp $
+    $Id: cddb_conn.h,v 1.14 2003/05/01 14:48:42 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -117,6 +117,8 @@ void cddb_destroy(cddb_conn_t *c);
 /**
  * Get the host name of the CDDB server that is currently being used.
  *
+ * @see cddb_set_server_name
+ *
  * @param c The connection structure.
  * @return The server host name.
  */
@@ -126,13 +128,27 @@ void cddb_destroy(cddb_conn_t *c);
  * Set the host name of the CDDB server.  The default value for the
  * server is 'freedb.org'.
  *
+ * @see cddb_get_server_name
+ *
  * @param c      The connection structure.
  * @param server The server host name.
  */
 void cddb_set_server_name(cddb_conn_t *c, const char *server);
 
 /**
+ * Get the port of the CDDB server that is currently being used.
+ *
+ * @see cddb_set_server_port
+ *
+ * @param c The connection structure.
+ * @return The server port.
+ */
+#define cddb_get_server_port(c) (c)->server_port;
+
+/**
  * Set the port of the CDDB server.  The default value is 888.
+ *
+ * @see cddb_get_server_port
  *
  * @param c    The connection structure.
  * @param port The server port.
@@ -140,8 +156,20 @@ void cddb_set_server_name(cddb_conn_t *c, const char *server);
 void cddb_set_server_port(cddb_conn_t *c, int port);
 
 /**
+ * Get the URL path for querying a CDDB server through HTTP.
+ *
+ * @see cddb_set_http_path_query
+ *
+ * @param c The connection structure.
+ * @return The URL path.
+ */
+#define cddb_get_http_path_query(c) (c)->http_path_query
+
+/**
  * Set the URL path for querying a CDDB server through HTTP.  The
  * default value is '/~cddb/cddb.cgi'.
+ *
+ * @see cddb_get_http_path_query
  *
  * @param c    The connection structure.
  * @param path The URL path.
@@ -149,8 +177,20 @@ void cddb_set_server_port(cddb_conn_t *c, int port);
 void cddb_set_http_path_query(cddb_conn_t *c, const char *path);
 
 /**
+ * Get the URL path for submitting to a CDDB server through HTTP.
+ *
+ * @see cddb_set_http_path_submit
+ *
+ * @param c The connection structure.
+ * @return The URL path.
+ */
+#define cddb_get_http_path_submit(c) (c)->http_path_submit
+
+/**
  * Set the URL path for submitting to a CDDB server through HTTP.  The
  * default value is '/~cddb/submit.cgi'.
+ *
+ * @see cddb_get_http_path_submit
  *
  * @param c The connection structure.
  * @param path The URL path.
@@ -158,8 +198,23 @@ void cddb_set_http_path_query(cddb_conn_t *c, const char *path);
 void cddb_set_http_path_submit(cddb_conn_t *c, const char *path);
 
 /**
+ * Returns true if the HTTP protocol is currently enabled and false if
+ * CDDBP is enabled.
+ *
+ * @see cddb_http_enable
+ * @see cddb_http_disable
+ *
+ * @param c The CDDB connection structure.
+ * @return True or false.
+ */
+#define cddb_is_http_enabled(c) (c)->is_http_enabled
+
+/**
  * Enable HTTP tunneling to connect to the CDDB server.  By default
  * this option is disabled.
+ *
+ * @see cddb_is_http_enabled
+ * @see cddb_http_disable
  *
  * @param c The CDDB connection structure.
  */
@@ -169,15 +224,35 @@ void cddb_http_enable(cddb_conn_t *c);
  * Disable HTTP tunneling to connect to the CDDB server.  By default this
  * option is disabled.
  *
+ * @see cddb_is_http_enabled
+ * @see cddb_http_enable
+ *
  * @param c The CDDB connection structure.
  */
 void cddb_http_disable(cddb_conn_t *c);
+
+/**
+ * Returns true if the proxy support is currently enabled and false if
+ * it is not.  This fucntion does not check whether HTTP is enabled.
+ * So it is possible that true will be returned while in reality the
+ * CDDBP protocol is being used (no proxy support).
+ *
+ * @see cddb_http_proxy_enable
+ * @see cddb_http_proxy_disable
+ *
+ * @param c The CDDB connection structure.
+ * @return True or false.
+ */
+#define cddb_is_http_proxy_enabled(c) (c)->is_http_proxy_enabled
 
 /**
  * Enable HTTP tunneling through an HTTP proxy server to connect to
  * the CDDB server.  The usage of an HTTP proxy implies normal HTTP
  * tunneling instead of connecting directly to the CDDB server.  By
  * default this option is disabled.
+ *
+ * @see cddb_is_http_proxy_enabled
+ * @see cddb_http_proxy_disable
  *
  * @param c The CDDB connection structure.
  */
@@ -187,13 +262,28 @@ void cddb_http_proxy_enable(cddb_conn_t *c);
  * Disable HTTP tunneling through an HTTP proxy server to connect to
  * the CDDB server.  By default this option is disabled.
  *
+ * @see cddb_is_http_proxy_enabled
+ * @see cddb_http_proxy_enable
+ *
  * @param c The CDDB connection structure.
  */
 void cddb_http_proxy_disable(cddb_conn_t *c);
 
 /**
+ * Get the host name of the HTTP proxy server.
+ *
+ * @see cddb_set_http_proxy_server_name
+ *
+ * @param c The connection structure.
+ * @return The proxy server host name.
+ */
+#define cddb_get_http_proxy_server_name(c) (c)->http_proxy_server
+
+/**
  * Set the host name of the HTTP proxy server.  There is no default
  * value.
+ *
+ * @see cddb_get_http_proxy_server_name
  *
  * @param c      The connection structure.
  * @param server The server host name.
@@ -201,15 +291,19 @@ void cddb_http_proxy_disable(cddb_conn_t *c);
 void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server);
 
 /**
- * Set the port of the HTTP proxy server.  The default value is 8080.
+ * Get the port of the HTTP proxy server.
  *
- * @param c    The connection structure.
- * @param port The server port.
+ * @see cddb_set_http_proxy_server_port
+ *
+ * @param c The connection structure.
+ * @return The proxy server port.
  */
-void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
+#define cddb_get_http_proxy_server_port(c) (c)->http_proxy_server_port
 
 /**
  * Set the port of the HTTP proxy server.  The default value is 8080.
+ *
+ * @see cddb_get_http_proxy_server_port
  *
  * @param c    The connection structure.
  * @param port The server port.
@@ -219,7 +313,8 @@ void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
 /**
  * Get the error number returned by the last libcddb command.
  *
- * @param c      The CDDB connection structure.
+ * @param c The CDDB connection structure.
+ * @return The error number.
  */
 #define cddb_errno(c) (c)->errnum
 
@@ -254,6 +349,9 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  * @see CACHE_ON
  * @see CACHE_ONLY
  * @see CACHE_OFF
+ * @see cddb_cache_enable
+ * @see cddb_cache_only
+ * @see cddb_cache_disable
  *
  * @param c The connection structure.
  */
@@ -264,9 +362,9 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  * default.  The cache directory can be changed with the
  * cddb_cache_set_dir function.
  *
+ * @see cddb_cache_mode
  * @see cddb_cache_disable
  * @see cddb_cache_only
- * @see cddb_cache_set_dir
  *
  * @param c The connection structure.
  */
@@ -277,9 +375,9 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  * any data.  The cache directory can be changed with the
  * cddb_cache_set_dir function.
  *
+ * @see cddb_cache_mode
  * @see cddb_cache_enable
  * @see cddb_cache_disable
- * @see cddb_cache_set_dir
  *
  * @param c The connection structure.
  */
@@ -290,9 +388,9 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  * from a CDDB server everytime and the retrieved data will not be
  * cached locally.
  *
+ * @see cddb_cache_mode
  * @see cddb_cache_enable
  * @see cddb_cache_only
- * @see cddb_cache_set_dir
  *
  * @param c The connection structure.
  */
@@ -300,6 +398,8 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
 
 /**
  * Return the directory currently being used for caching.
+ *
+ * @see cddb_cache_set_dir
  *
  * @param c The connection structure.
  * @return The directory being used for caching.
@@ -310,6 +410,8 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  * Change the directory used for caching CDDB entries locally.  The
  * default location of the cached entries is a subdirectory
  * (.cddbslave) of the user's home directory.
+ *
+ * @see cddb_cache_get_dir
  *
  * @param c   The connection structure.
  * @param dir The directory to use for caching.
