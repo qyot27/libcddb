@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.42 2003/05/23 21:17:31 airborne Exp $
+    $Id: cddb_cmd.c,v 1.43 2003/05/23 21:33:06 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -1105,6 +1105,7 @@ int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc)
 /* Appends some data to the buffer.  The first parameter is the
    number of bytes that will be added.  The other parameters are a
    format string and its arguments as in printf. */
+/* XXX: error checking on buffer size */
 #define CDDB_WRITE_APPEND(l, ...) \
             snprintf(buf, remaining, __VA_ARGS__); remaining -= l; buf += l;
 
@@ -1148,9 +1149,20 @@ int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc)
         }
     }
     /* extended data */
-    CDDB_WRITE_APPEND(6, "EXTD=\n");
-    for (i=0; i<disc->track_cnt; i++) {
-        CDDB_WRITE_APPEND(6+(i/10+1), "EXTT%d=\n", i);
+    if (disc->ext_data != NULL) {
+        CDDB_WRITE_APPEND(6+strlen(disc->ext_data), "EXTD=%s\n", disc->ext_data);
+    } else {
+        CDDB_WRITE_APPEND(6, "EXTD=\n");
+    }
+    for (track = cddb_disc_get_track_first(disc), i=0; 
+         track != NULL; 
+         track = cddb_disc_get_track_next(disc), i++) {
+        if (track->ext_data != NULL) {
+            CDDB_WRITE_APPEND(6+(i/10+1)+strlen(track->ext_data), 
+                              "EXTT%d=%s\n", i, track->ext_data);
+        } else {
+            CDDB_WRITE_APPEND(6+(i/10+1), "EXTT%d=\n", i);
+        }
     }
     /* play order */
     CDDB_WRITE_APPEND(11, "PLAYORDER=\n");
