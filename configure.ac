@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.57)
+AC_PREREQ(2.55)
 AC_INIT(configure.ac)
-AC_CONFIG_HEADERS(config.h)
+AM_CONFIG_HEADER(config.h)
 AC_CONFIG_FILES([Makefile              \
                  libcddb.pc            \
                  include/Makefile      \
