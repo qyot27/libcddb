@@ -1,4 +1,6 @@
 
+* apply BeOS patch by David Mitchell
+
 * improved error handling
 
 * support to enable/disable category dirs in .cddbslave
