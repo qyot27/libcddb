@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.27 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_cmd.c,v 1.28 2003/04/16 06:20:33 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -88,6 +88,10 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line);
 
 /**
  */
+char *cddb_cache_file_name(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ */
 int cddb_cache_exists(cddb_conn_t *c, cddb_disc_t *disc);
 
 /**
@@ -123,36 +127,62 @@ int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc);
 /* --- CDDB slave routines --- */
 
 
+char *cddb_cache_file_name(cddb_conn_t *c, cddb_disc_t *disc)
+{
+    char *fn = NULL;
+    int len;
+
+    /* calculate needed buffer size */
+    len = snprintf(fn, 0, "%s/%s/%08x", c->cache_dir, 
+                   CDDB_CATEGORY[disc->category], disc->discid);
+    /* reserve enough memory */
+    fn = (char*)malloc(len + 1);
+    /* create file name */
+    if (fn) {
+        snprintf(fn, len + 1, "%s/%s/%08x", c->cache_dir, 
+                 CDDB_CATEGORY[disc->category], disc->discid);
+    }
+    return fn;
+}
+
 int cddb_cache_exists(cddb_conn_t *c, cddb_disc_t *disc)
 {
-    char fn[LINE_SIZE];
+    int rv = FALSE;
+    char *fn = NULL;
     struct stat buf;
 
     dlog("cddb_cache_exists()");
-
     /* try to stat cache file */
-    snprintf(fn, sizeof(fn), "%s/%s/%08x", c->cache_dir, 
-             CDDB_CATEGORY[disc->category], disc->discid);
-    if ((stat(fn, &buf) == -1) || !S_ISREG(buf.st_mode)) {
-        dlog("\tnot in cache");
-        return FALSE;
+    fn = cddb_cache_file_name(c, disc);
+    if (fn) {
+        if ((stat(fn, &buf) == -1) || !S_ISREG(buf.st_mode)) {
+            dlog("\tnot in cache");
+        } else {
+            dlog("\tin cache");
+            rv = TRUE;
+            return TRUE;
+        }
     }
-    dlog("\tin cache");
-    return TRUE;
+    FREE_NOT_NULL(fn);
+    return rv;
 }
 
 int cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode)
 {
-    char fn[LINE_SIZE];
+    int rv = FALSE;
+    char *fn = NULL;
 
     dlog("cddb_cache_open()");
     /* close previous entry */
     cddb_cache_close(c);
     /* open new entry */
-    snprintf(fn, sizeof(fn), "%s/%s/%08x", c->cache_dir, 
-             CDDB_CATEGORY[disc->category], disc->discid);
-    c->cache_fp = fopen(fn, mode);
-    return (c->cache_fp != NULL);
+    fn = cddb_cache_file_name(c, disc);
+    if (fn) {
+        c->cache_fp = fopen(fn, mode);
+        rv = (c->cache_fp != NULL);
+    }
+    FREE_NOT_NULL(fn);
+    return rv;
 }
 
 void cddb_cache_close(cddb_conn_t *c)
@@ -555,7 +585,12 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     int track_no = 0, old_no = -1;
 
     dlog("cddb_parse_record()");
-    /* do we need to cache the processed content ? */
+    /* 
+     * Do we need to cache the processed content ?  We cache if:
+     *   1. caching is allowed (CACHE_ON or CACHE_ONLY) 
+     * and
+     *   2. a cached version does not yet exist
+     */
     cache_content = (c->use_cache != CACHE_OFF) && !cddb_cache_exists(c, disc);
     if (cache_content) {
         /* create cache directory structure */
@@ -720,6 +755,17 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     }
 
     if (state != STATE_STOP) {
+        /* something wrong with the CDDB entry (either the network
+           response or the cached version) */
+        if (c->cache_read) {
+            /* we're reading from the cache, remove the invalid entry */
+            char *fn = cddb_cache_file_name(c, disc);
+            if (fn) {
+                dlog("\tremoving invalid cache entry '%s'", fn);
+                unlink(fn);
+            }
+            FREE_NOT_NULL(fn);
+        }
         c->errnum = CDDB_ERR_INVALID_RESPONSE;
         return FALSE;
     }
