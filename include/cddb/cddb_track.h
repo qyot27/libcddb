@@ -39,6 +39,13 @@ cddb_track_t *cddb_track_new(void);
  */
 void cddb_track_destroy(cddb_track_t *track);
 
+/**
+ * Creates a clone of the given track.
+ *
+ * @param track The CDDB track structure.
+ */
+cddb_track_t *cddb_track_clone(cddb_track_t *track);
+
 
 /* --- getters & setters --- */
 
@@ -66,6 +73,19 @@ void cddb_track_set_artist(cddb_track_t *track, const char *artist);
 
 /* --- miscellaneous */
 
+
+/**
+ * Copy all data from one track to another.  Any fields that are
+ * unavailable in the source track structure will not result in a
+ * reset of the same field in the destination track structure; e.g. if
+ * there is no title in the source track, but there is one in the
+ * destination track, then the destination's title will remain
+ * unchanged.
+ *
+ * @param dst The destination CDDB track structure.
+ * @param src The source CDDB track structure.
+ */
+void cddb_track_copy(cddb_track_t *dst, cddb_track_t *src);
 
 /**
  * Prints information about the track on stdout.  This is just a

@@ -57,6 +57,13 @@ cddb_disc_t *cddb_disc_new(void);
  */
 void cddb_disc_destroy(cddb_disc_t *disc);
 
+/**
+ * Creates a clone of the given disc.
+ *
+ * @param disc The CDDB disc structure.
+ */
+cddb_disc_t *cddb_disc_clone(cddb_disc_t *disc);
+
 
 /* --- track manipulation */
 
@@ -143,6 +150,19 @@ void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist);
 
 
 /**
+ * Copy all data from one disc to another.  Any fields that are
+ * unavailable in the source disc structure will not result in a reset
+ * of the same field in the destination disc structure; e.g. if there
+ * is no title in the source disc, but there is one in the destination
+ * disc, then the destination's title will remain unchanged.
+ *
+ * @param dst The destination CDDB disc structure.
+ * @param src The source CDDB disc structure.
+ */
+void cddb_disc_copy(cddb_disc_t *dst, cddb_disc_t *src);
+
+/**
+ * Calculate the CDDB disc ID.
  *
  * @param disc The CDDB disc structure.
  */

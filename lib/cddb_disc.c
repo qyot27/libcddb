@@ -45,6 +45,28 @@ void cddb_disc_destroy(cddb_disc_t *disc)
     }
 }
 
+cddb_disc_t *cddb_disc_clone(cddb_disc_t *disc)
+{
+    cddb_disc_t *clone;
+    cddb_track_t *track;
+
+    dlog("cddb_disc_clone()");
+    clone = cddb_disc_new();
+    clone->discid = disc->discid;
+    clone->category = disc->category;
+    clone->title = (disc->title ? strdup(disc->title) : NULL);
+    clone->artist = (disc->artist ? strdup(disc->artist) : NULL);
+    clone->length = disc->length;
+    clone->ext_data = (disc->ext_data ? strdup(disc->ext_data) : NULL);
+    /* clone the tracks */
+    track = disc->tracks;
+    while (track) {
+        cddb_disc_add_track(clone, cddb_track_clone(track));
+        track = track->next;
+    }
+    return clone;
+}
+
 
 /* --- track manipulation */
 
@@ -133,6 +155,47 @@ void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist)
 
 /* --- miscellaneous */
 
+
+void cddb_disc_copy(cddb_disc_t *dst, cddb_disc_t *src)
+{
+    cddb_track_t *src_track, *dst_track;
+
+    dlog("cddb_disc_copy()");
+    if (src->discid != 0) {
+        dst->discid = src->discid;
+    }
+    if (src->category != CDDB_CAT_INVALID) {
+        dst->category = src->category;
+    }
+    if (src->title != NULL) {
+        FREE_NOT_NULL(dst->title);
+        dst->title = strdup(src->title);
+    }
+    if (src->artist) {
+        FREE_NOT_NULL(dst->artist);
+        dst->artist = strdup(src->artist);
+    }
+    if (src->length != 0) {
+        dst->length = src->length;
+    }
+    if (src->ext_data != NULL) {
+        FREE_NOT_NULL(dst->ext_data);
+        dst->ext_data = strdup(src->ext_data);
+    }
+    /* copy the tracks */
+    src_track = src->tracks;
+    dst_track = dst->tracks;
+    while (src_track) {
+        if (dst_track == NULL) {
+            dst_track = cddb_track_new();
+            cddb_disc_add_track(dst, dst_track);
+        }
+        cddb_track_copy(dst_track, src_track);
+        src_track = src_track->next;
+        dst_track = dst_track->next;
+    }
+    return dst;
+}
 
 int cddb_disc_calc_discid(cddb_disc_t *disc)
 {
