@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.18 2004/10/08 21:05:04 airborne Exp $
+    $Id: main.c,v 1.19 2005/03/11 21:20:10 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -501,6 +501,9 @@ int main(int argc, char **argv)
        provided pointer is not NULL before freeing it. */
     cddb_disc_destroy(disc);
     cddb_destroy(conn);
+
+    /* Also destroy any global resources reserved by the library. */
+    libcddb_shutdown();
 
     return 0;
 }
