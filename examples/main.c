@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.5 2003/04/20 14:41:29 airborne Exp $
+    $Id: main.c,v 1.6 2003/04/20 17:37:27 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -319,15 +319,32 @@ int main(int argc, char **argv)
         printf("CD disc ID is %08x\n", cddb_disc_get_discid(disc));
         break;
     case CMD_QUERY:
-        /* Query the CDDB server for possibly matches.  Next to the
-           parameters specified on the command-line or retrieved from
-           the CD, this command also requires the disc ID to be
-           initalized correctly.  So we first calculate this disc ID
-           before executing the query command. */
-        cddb_disc_calc_discid(disc);
+        /* Query the CDDB server for possibly matches. */
         do_query(conn, disc);
         break;
     case CMD_READ:
+        /* If we read the disc data from a CD, then we first have to
+           query the database for some extra information about the
+           disc before we can read the details.  For a detailed
+           description about querying see the do_query function.  Only
+           the first match that is found will be used. */
+        if (use_cd) {
+            int matches;
+
+            cddb_disc_calc_discid(disc);
+            matches = cddb_query(conn, disc);
+            if (matches == -1) {
+                error_exit("could not query");
+            } else if (matches == 0) {
+                error_exit("no matching discs found");
+            }
+            /* Get the disc information needed for the read command.
+               Afterwards we destroy the current disc because do_read
+               will return a new disc. */
+            category = strdup(cddb_disc_get_category_str(disc));
+            discid = cddb_disc_get_discid(disc);
+            cddb_disc_destroy(disc);
+        }
         disc = do_read(conn, category, discid);
         if (!disc) {
             error_exit("could not read disc data");
