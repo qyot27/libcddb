@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.c,v 1.11 2005/02/04 21:10:39 rockyb Exp $
+    $Id: cddb_regex.c,v 1.12 2005/03/11 21:19:27 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,21 +27,17 @@
 #include "cddb/cddb_regex.h"
 
 
-/**
- */
-static int initialized = 0;
-
-regex_t *REGEX_TRACK_FRAME_OFFSETS=NULL;
-regex_t *REGEX_TRACK_FRAME_OFFSET=NULL;
-regex_t *REGEX_DISC_LENGTH=NULL;
-regex_t *REGEX_DISC_TITLE=NULL;
-regex_t *REGEX_DISC_YEAR=NULL;
-regex_t *REGEX_DISC_GENRE=NULL;
-regex_t *REGEX_DISC_EXT=NULL;
-regex_t *REGEX_TRACK_TITLE=NULL;
-regex_t *REGEX_TRACK_EXT=NULL;
-regex_t *REGEX_PLAY_ORDER=NULL;
-regex_t *REGEX_QUERY_MATCH=NULL;
+regex_t *REGEX_TRACK_FRAME_OFFSETS = NULL;
+regex_t *REGEX_TRACK_FRAME_OFFSET = NULL;
+regex_t *REGEX_DISC_LENGTH = NULL;
+regex_t *REGEX_DISC_TITLE = NULL;
+regex_t *REGEX_DISC_YEAR = NULL;
+regex_t *REGEX_DISC_GENRE = NULL;
+regex_t *REGEX_DISC_EXT = NULL;
+regex_t *REGEX_TRACK_TITLE = NULL;
+regex_t *REGEX_TRACK_EXT = NULL;
+regex_t *REGEX_PLAY_ORDER = NULL;
+regex_t *REGEX_QUERY_MATCH = NULL;
 
 
 /**
@@ -60,58 +56,52 @@ void cddb_regex_init()
 {
     int rv;
 
-    if (!initialized) {
-
-        rv = cddb_regex_init_1(&REGEX_TRACK_FRAME_OFFSETS,
-                               "^#[[:blank:]]*Track frame offsets:[[:blank:]]*$");
-        rv = cddb_regex_init_1(&REGEX_TRACK_FRAME_OFFSET,
-                               "^#[[:blank:]]*([0-9]+)[[:blank:]]*$");
-        rv = cddb_regex_init_1(&REGEX_DISC_LENGTH,
-                               "^#[[:blank:]]*Disc length:[[:blank:]]+([0-9]+)( seconds)*[[:blank:]]*$");
-        rv = cddb_regex_init_1(&REGEX_DISC_TITLE,
-                               "^DTITLE=((.*) / (.*)|(.*))$");
-        rv = cddb_regex_init_1(&REGEX_DISC_YEAR,
-                               "^DYEAR=([0-9]*)$");
-        rv = cddb_regex_init_1(&REGEX_DISC_GENRE,
-                               "^DGENRE=(.*)$");
-        rv = cddb_regex_init_1(&REGEX_DISC_EXT,
-                               "^EXTD=(.*)$");
-        rv = cddb_regex_init_1(&REGEX_TRACK_TITLE,
-                               "^TTITLE([0-9]+)=((.*) / (.*)|(.*))$");
-        rv = cddb_regex_init_1(&REGEX_TRACK_EXT,
-                               "^EXTT([0-9]+)=(.*)$");
-        rv = cddb_regex_init_1(&REGEX_PLAY_ORDER,
-                               "^PLAYORDER=(.*)$");
-        rv = cddb_regex_init_1(&REGEX_QUERY_MATCH,
-                               "^([[:alpha:]]+)[[:blank:]]([[:xdigit:]]+)[[:blank:]]((.*) / (.*)|(.*))$");
-
-        initialized = 1;
-    }
+    rv = cddb_regex_init_1(&REGEX_TRACK_FRAME_OFFSETS,
+                           "^#[[:blank:]]*Track frame offsets:[[:blank:]]*$");
+    rv = cddb_regex_init_1(&REGEX_TRACK_FRAME_OFFSET,
+                           "^#[[:blank:]]*([0-9]+)[[:blank:]]*$");
+    rv = cddb_regex_init_1(&REGEX_DISC_LENGTH,
+                           "^#[[:blank:]]*Disc length:[[:blank:]]+([0-9]+)( seconds)*[[:blank:]]*$");
+    rv = cddb_regex_init_1(&REGEX_DISC_TITLE,
+                           "^DTITLE=((.*) / (.*)|(.*))$");
+    rv = cddb_regex_init_1(&REGEX_DISC_YEAR,
+                           "^DYEAR=([0-9]*)$");
+    rv = cddb_regex_init_1(&REGEX_DISC_GENRE,
+                           "^DGENRE=(.*)$");
+    rv = cddb_regex_init_1(&REGEX_DISC_EXT,
+                           "^EXTD=(.*)$");
+    rv = cddb_regex_init_1(&REGEX_TRACK_TITLE,
+                           "^TTITLE([0-9]+)=((.*) / (.*)|(.*))$");
+    rv = cddb_regex_init_1(&REGEX_TRACK_EXT,
+                           "^EXTT([0-9]+)=(.*)$");
+    rv = cddb_regex_init_1(&REGEX_PLAY_ORDER,
+                           "^PLAYORDER=(.*)$");
+    rv = cddb_regex_init_1(&REGEX_QUERY_MATCH,
+                           "^([[:alpha:]]+)[[:blank:]]([[:xdigit:]]+)[[:blank:]]((.*) / (.*)|(.*))$");
 }
 
 static inline void cddb_regfree(regex_t *regex) 
 {
-  if (regex) {
-    regfree(regex);
-    free(regex);
-    regex=NULL;
-  }
-  
+    if (regex) {
+        regfree(regex);
+        free(regex);
+        regex = NULL;
+    }
 }
 
 void cddb_regex_destroy()
 {
-  cddb_regfree (REGEX_TRACK_FRAME_OFFSETS);
-  cddb_regfree (REGEX_TRACK_FRAME_OFFSET);
-  cddb_regfree (REGEX_DISC_LENGTH);
-  cddb_regfree (REGEX_DISC_TITLE);
-  cddb_regfree (REGEX_DISC_YEAR);
-  cddb_regfree (REGEX_DISC_GENRE);
-  cddb_regfree (REGEX_DISC_EXT);
-  cddb_regfree (REGEX_TRACK_TITLE);
-  cddb_regfree (REGEX_TRACK_EXT);
-  cddb_regfree (REGEX_PLAY_ORDER);
-  cddb_regfree (REGEX_QUERY_MATCH);
+    cddb_regfree(REGEX_TRACK_FRAME_OFFSETS);
+    cddb_regfree(REGEX_TRACK_FRAME_OFFSET);
+    cddb_regfree(REGEX_DISC_LENGTH);
+    cddb_regfree(REGEX_DISC_TITLE);
+    cddb_regfree(REGEX_DISC_YEAR);
+    cddb_regfree(REGEX_DISC_GENRE);
+    cddb_regfree(REGEX_DISC_EXT);
+    cddb_regfree(REGEX_TRACK_TITLE);
+    cddb_regfree(REGEX_TRACK_EXT);
+    cddb_regfree(REGEX_PLAY_ORDER);
+    cddb_regfree(REGEX_QUERY_MATCH);
 }
 
 int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx)
