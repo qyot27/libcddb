@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.17 2004/07/18 07:25:00 airborne Exp $
+    $Id: main.c,v 1.18 2004/10/08 21:05:04 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,9 +29,9 @@
 
 #ifdef HAVE_LIBCDIO
 /* Allow -i <device> parameter */
-#define OPT_STRING ":c:D:hi:l:p:P:qs:t"
+#define OPT_STRING ":c:D:e:hi:l:p:P:qs:t"
 #else
-#define OPT_STRING ":c:D:hl:p:P:qs:t"
+#define OPT_STRING ":c:D:e:hl:p:P:qs:t"
 #endif
 
 /* other stuff */
@@ -55,6 +55,7 @@ static int use_cd = 0;          /* use CD-ROM to retrieve disc data */
 static char *device = NULL;     /* device to use if use_cd == 1. NULL means 
                                    to find a suitable CD-ROM drive. */
 static int use_time = 0;        /* use track times (in seconds) instead of frame offsets */
+static char *charset = NULL;    /* requested character set encoding */
 
 /* print usage message */
 static void usage(void)
@@ -64,6 +65,7 @@ static void usage(void)
     fprintf(stderr, "Available options:\n");
     fprintf(stderr, "  -c <mode>        local cache mode [on|off|only] (default = on)\n");
     fprintf(stderr, "  -D <cache dir>   directory for local cache (default = ~/.cddbslave)\n");
+    fprintf(stderr, "  -e <charset>     character set encoding (default = UTF-8, see iconv -l)\n");
     fprintf(stderr, "  -h               display this help and exit\n");
 #ifdef HAVE_LIBCDIO
     fprintf(stderr, "  -i <device>      use device to get disc data for commands\n");
@@ -285,12 +287,18 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
                ~/.cddbslave. */
             cddb_cache_set_dir(conn, optarg);
             break;
+        case 'e':
+            if (!*optarg) {
+                error_usage("-e, character set encoding missing");
+            }
+            charset = strdup(optarg);
+            break;
         case 'i':               /* device for arguments */
             if (!*optarg) {
                 error_usage("-i, device name missing");
             }
             use_cd = 1;
-            device=strdup(optarg);
+            device = strdup(optarg);
             break;
         case 'l':               /* log level */
             if (!*optarg) {
@@ -408,6 +416,13 @@ int main(int argc, char **argv)
 
     /* Check command-line parameters. */
     parse_cmdline(argc, argv, conn);
+
+    /* Initialize requested character set for output strings */
+    if (charset) {
+        if (!cddb_set_charset(conn, charset)) {
+            error_exit(cddb_errno(conn), "could not set character encoding");
+        }
+    }
 
     /* Use CD-ROM to get some disc data? */
     if (use_cd) {
