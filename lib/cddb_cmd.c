@@ -583,6 +583,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
         case STATE_DISC_YEAR:
             dlog("\tstate: DISC YEAR");
             if (regexec(REGEX_DISC_YEAR, line, 2, matches, 0) == 0) {
+                disc->year = cddb_regex_get_int(line, matches, 1);
                 /* expect disc genre now */
                 state = STATE_DISC_GENRE;
                 break;
@@ -865,6 +866,9 @@ int cddb_write_data(char *buf, int size, cddb_disc_t *disc)
     int i, remaining;
     cddb_track_t *track;
 
+/* Appends some datat to the buffer.  The first parameter is the
+   number of bytes that will be added.  The other parameters are a
+   format string and its arguments as in printf. */
 #define CDDB_WRITE_APPEND(l, ...) \
             snprintf(buf, remaining, __VA_ARGS__); remaining -= l; buf += l;
 
@@ -887,7 +891,11 @@ int cddb_write_data(char *buf, int size, cddb_disc_t *disc)
     CDDB_WRITE_APPEND(8+8, "DISCID=%08x\n", disc->discid);
     CDDB_WRITE_APPEND(11+strlen(disc->artist)+strlen(disc->title),
                       "DTITLE=%s / %s\n", disc->artist, disc->title);
-    //fprintf(fp, "DYEAR=%s\n",);
+    if (disc->year != 0) {
+        CDDB_WRITE_APPEND(7+4, "DYEAR=%d\n", disc->year);
+    } else {
+        CDDB_WRITE_APPEND(7, "DYEAR=\n");
+    }
     CDDB_WRITE_APPEND(8+strlen(CDDB_CATEGORY[disc->category]),
                       "DGENRE=%s\n", 
                       (disc->genre ? disc->genre : CDDB_CATEGORY[disc->category]));

@@ -55,6 +55,7 @@ cddb_disc_t *cddb_disc_clone(cddb_disc_t *disc)
     clone = cddb_disc_new();
     clone->discid = disc->discid;
     clone->category = disc->category;
+    clone->year = disc->year;
     clone->genre = (disc->genre ? strdup(disc->genre) : NULL);
     clone->title = (disc->title ? strdup(disc->title) : NULL);
     clone->artist = (disc->artist ? strdup(disc->artist) : NULL);
@@ -172,6 +173,9 @@ void cddb_disc_copy(cddb_disc_t *dst, cddb_disc_t *src)
     if (src->category != CDDB_CAT_INVALID) {
         dst->category = src->category;
     }
+    if (src->year != 0) {
+        dst->year = src->year;
+    }
     if (src->genre != NULL) {
         FREE_NOT_NULL(dst->genre);
         dst->genre = strdup(src->genre);
@@ -242,6 +246,7 @@ void cddb_disc_print(cddb_disc_t *disc)
     printf("Disc ID: %08x\n", disc->discid);
     printf("CDDB category: %s (%d)\n", CDDB_CATEGORY[disc->category], disc->category);
     printf("Music genre: '%s'\n", STR_OR_NULL(disc->genre));
+    printf("Year: %d\n", disc->year);
     printf("Artist: '%s'\n", STR_OR_NULL(disc->artist));
     printf("Title: '%s'\n", STR_OR_NULL(disc->title));
     printf("Length: %d seconds\n", disc->length);

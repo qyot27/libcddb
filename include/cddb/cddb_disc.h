@@ -33,6 +33,7 @@ typedef struct cddb_disc_s
     char *title;                /**< disc title */
     char *artist;               /**< disc artist */
     int length;                 /**< disc length in seconds */
+    int year;                   /**< (optional) disc year YYYY */
     char *ext_data;             /**< (optional) extended disc data  */
     int track_cnt;              /**< number of tracks on the disc */
     cddb_track_t *tracks;       /**< pointer to the first track */
