@@ -1,6 +1,6 @@
 # Copyright 1999-2003 Gentoo Technologies, Inc.
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /cvsroot/libcddb/libcddb/misc/libcddb.ebuild,v 1.3 2003/04/27 08:43:51 airborne Exp $
+# $Header: /cvsroot/libcddb/libcddb/misc/libcddb.ebuild,v 1.4 2003/05/06 17:51:19 airborne Exp $
 
 IUSE="doc"
 
@@ -9,8 +9,10 @@ HOMEPAGE="http://libcddb.sourceforge.net/"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 LICENSE="LGPL"
 
+DEPEND="doc? ( app-doc/doxygen )"
+
 SLOT="0"
-KEYWORDS="x86"
+KEYWORDS="~x86 ~sparc"
 
 
 src_compile() {
