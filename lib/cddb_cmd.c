@@ -508,14 +508,18 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
 #define STATE_TRACK_TITLE   6
 #define STATE_STOP          7
 
+#define MULTI_NONE          0
+#define MULTI_ARTIST        1
+#define MULTI_TITLE         2
+
 int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
 {
-    char *line;
-    int state;
+    char *line, *buf;
+    int state, multi_line = MULTI_NONE;
     regmatch_t matches[6];
     cddb_track_t *track;
     int cache_content;
-    int track_no = 0;
+    int track_no = 0, old_no = -1;
     FILE *cache = NULL;
 
     dlog("cddb_parse_record()");
@@ -573,13 +577,43 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
             break;
         case STATE_DISC_TITLE:
             dlog("\tstate: DISC TITLE");
-            if (regexec(REGEX_DISC_TITLE, line, 3, matches, 0) == 0) {
-                disc->artist = cddb_regex_get_string(line, matches, 1);
-                disc->title = cddb_regex_get_string(line, matches, 2);
-                /* expect disc year now */
-                state = STATE_DISC_YEAR;
-            }            
-            break;
+            if (regexec(REGEX_DISC_TITLE, line, 5, matches, 0) == 0) {
+                /* XXX: more error detection possible! */
+                if (matches[2].rm_so != -1) {
+                    /* both artist and title of disc are specified */
+                    buf = cddb_regex_get_string(line, matches, 2);
+                    cddb_disc_append_artist(disc, buf);
+                    free(buf);
+                    buf = cddb_regex_get_string(line, matches, 3);
+                    cddb_disc_append_title(disc, buf);
+                    free(buf);
+                    /* we should only get title continuations now */
+                    multi_line = MULTI_TITLE;
+                } else {
+                    /* only title or artist of disc on this line */
+                    if (multi_line != MULTI_TITLE) {
+                        /* this line is part of the artist name */
+                        buf = cddb_regex_get_string(line, matches, 4);
+                        cddb_disc_append_artist(disc, buf);
+                        free(buf);
+                        /* next line might be continuation of artist name */
+                        multi_line = MULTI_ARTIST;
+                    } else {
+                        /* this line is part of the title */
+                        buf = cddb_regex_get_string(line, matches, 4);
+                        cddb_disc_append_title(disc, buf);
+                        free(buf);
+                    }
+                }
+                break;
+            }
+            if (multi_line == MULTI_NONE) {
+                /* not yet parsing multi-line DTITLE */
+                /* might be comment line, just skip it */
+                break;
+            }
+            multi_line = MULTI_NONE;
+            /* fall through to end multi-line disc title */
         case STATE_DISC_YEAR:
             dlog("\tstate: DISC YEAR");
             if (regexec(REGEX_DISC_YEAR, line, 2, matches, 0) == 0) {
@@ -608,13 +642,40 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                     c->errnum = CDDB_ERR_TRACK_NOT_FOUND;
                     return FALSE;
                 }
-                if (matches[3].rm_so != -1) {
-                    /* both artist and title of track are specified */
-                    track->artist = cddb_regex_get_string(line, matches, 3);
-                    track->title = cddb_regex_get_string(line, matches, 4);
+                if (track_no != old_no) {
+                    /* reset multi-line flag, expect artist first */
+                    multi_line = MULTI_ARTIST;
+                }
+                if (matches[3].rm_so == -1) {
+                    /* only title or artist of track on this line */
+                    if (multi_line != MULTI_TITLE) {
+                        /* this line might be part of the artist,
+                           but if we don't encounter a ' / ' it's the title,
+                           so we use the title space for now and fix it later
+                           if needed (see below) */
+                        buf = cddb_regex_get_string(line, matches, 5);
+                        cddb_track_append_title(track, buf);
+                        free(buf);
+                    } else {
+                        /* this line is part of the title */
+                        buf = cddb_regex_get_string(line, matches, 5);
+                        cddb_disc_append_title(disc, buf);
+                        free(buf);
+                    }
                 } else {
-                    /* only title of track is specified */
-                    track->title = cddb_regex_get_string(line, matches, 5);
+                    /* we might have put the artist in the title space,
+                       fix this now (see artist) */
+                    track->artist = track->title;
+                    track->title = NULL;
+                    /* both artist and title of track are specified */
+                    buf = cddb_regex_get_string(line, matches, 3);
+                    cddb_track_append_artist(track, buf);
+                    free(buf);
+                    buf = cddb_regex_get_string(line, matches, 4);
+                    cddb_track_append_title(track, buf);
+                    free(buf);
+                    /* we should only get title continuations now */
+                    multi_line = MULTI_TITLE;
                 }
             } else {
                 /* we're done parsing */
