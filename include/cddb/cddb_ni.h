@@ -31,6 +31,7 @@
 
 #define FREE_NOT_NULL(p) if (p) free(p)
 #define CONNECTION_OK(c) (c->fp != NULL)
+#define STR_OR_NULL(s) ((s) ? s : "NULL")
 
 
 #endif /* CDDB_NI_H */
