@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.10 2003/04/17 17:35:24 airborne Exp $
+    $Id: cddb_ni.h,v 1.11 2003/04/17 22:18:06 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -63,8 +63,6 @@
 #define DEFAULT_PROXY_PORT  8080
 
 #define DEFAULT_PROTOCOL_VERSION 5
-
-#define FRAMES_PER_SECOND 75
 
 #define FREE_NOT_NULL(p) if (p) { free(p); p = NULL; }
 #define CONNECTION_OK(c) (c->socket != -1)
