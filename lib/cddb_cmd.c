@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.31 2003/04/21 09:07:06 airborne Exp $
+    $Id: cddb_cmd.c,v 1.32 2003/04/21 17:17:31 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -160,7 +160,6 @@ int cddb_cache_exists(cddb_conn_t *c, cddb_disc_t *disc)
         } else {
             dlog("\tin cache");
             rv = TRUE;
-            return TRUE;
         }
     }
     FREE_NOT_NULL(fn);
@@ -698,7 +697,9 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
         case STATE_DISC_GENRE:
             dlog("\tstate: DISC GENRE");
             if (regexec(REGEX_DISC_GENRE, line, 2, matches, 0) == 0) {
-                disc->genre = cddb_regex_get_string(line, matches, 1);
+                buf = cddb_regex_get_string(line, matches, 1);
+                cddb_disc_set_genre(disc, buf);
+                free(buf);
                 /* expect track title now */
                 state = STATE_TRACK_TITLE;
                 break;
@@ -873,6 +874,7 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
     /* extract category */
     aux = cddb_regex_get_string(line, matches, 1);
     cddb_disc_set_category(disc, aux);
+    free(aux);                  /* free temporary buffer */
     /* extract disc ID */
     aux = cddb_regex_get_string(line, matches, 2);
     disc->discid = strtoll(aux, NULL, 16);

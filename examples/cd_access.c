@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.4 2003/04/21 10:19:44 airborne Exp $
+    $Id: cd_access.c,v 1.5 2003/04/21 17:17:29 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,7 +29,7 @@
 #define libcdio_error_exit(...) error_exit(GENERIC_ERROR, "libcdio: " __VA_ARGS__)
 
 
-cddb_disc_t *cd_read(const char *device)
+cddb_disc_t *cd_read(char *device)
 {
     cddb_disc_t *disc = NULL;   /* libcddb disc structure */
     
@@ -43,7 +43,7 @@ cddb_disc_t *cd_read(const char *device)
     CdIo *cdio;                 /* libcdio CD access structure */
     track_t cnt, t;             /* track counters */
     lsn_t lsn;                  /* Logical Sector Number */
-    int *foffset;               /* list of frame offsets */
+    int *foffset = NULL;        /* list of frame offsets */
 
     /* Get the name of the default CD-ROM device. */
     if (!device) {
@@ -101,6 +101,10 @@ cddb_disc_t *cd_read(const char *device)
 
     /* Free all resources held by libcdio CD access structure. */
     cdio_destroy(cdio);
+
+    /* more clean up */
+    FREE_NOT_NULL(foffset);
+    FREE_NOT_NULL(device);
 
 #endif
 

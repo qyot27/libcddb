@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.9 2003/04/21 10:19:30 airborne Exp $
+    $Id: main.c,v 1.10 2003/04/21 17:17:30 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -327,6 +327,9 @@ int main(int argc, char **argv)
         if (!disc) {
             error_exit(GENERIC_ERROR, "could not create disc structure");
         }
+        /* The frame offset data is no longer needed because it is now
+           also present in the disc structure. */
+        FREE_NOT_NULL(foffset);
     }
 
     /* Execute requested command. */
@@ -369,10 +372,13 @@ int main(int argc, char **argv)
         if (!disc) {
             error_exit(cddb_errno(conn), "could not read disc data");
         }
+        /* The category string is no longer needed because it is now
+           also present in the disc structure. */
+        FREE_NOT_NULL(category);
+        /* Let's display the information that was read. */
         do_display(disc);
         break;
     }
-
     /* Finally, we have to clean up.  With the cddb_disc_destroy
        function we can easily free all memory used by a single disc.
        This function will free the memory used by the individual
@@ -382,9 +388,6 @@ int main(int argc, char **argv)
        provided pointer is not NULL before freeing it. */
     cddb_disc_destroy(disc);
     cddb_destroy(conn);
-    if (foffset) {
-        /* free foffset */
-    }
 
     return 0;
 }

@@ -1,5 +1,5 @@
 /*
-    $Id: main.h,v 1.5 2003/04/21 10:19:44 airborne Exp $
+    $Id: main.h,v 1.6 2003/04/21 17:17:30 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,6 +27,8 @@
 /* generic error code */
 #define GENERIC_ERROR -1
 
+/* free pointer when it's pointing at something */
+#define FREE_NOT_NULL(p) if (p) { free(p); p = NULL; }
 
 /**
  * Prints out an error string and exits the program with the provided
@@ -43,6 +45,6 @@ cddb_disc_t *do_read(cddb_conn_t *conn, const char *category, int discid);
 
 void do_display(cddb_disc_t *disc);
 
-cddb_disc_t *cd_read(const char *device);
+cddb_disc_t *cd_read(char *device);
 
 cddb_disc_t *cd_create(int dlength, int tcount, int *foffset);
