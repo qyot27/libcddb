@@ -27,7 +27,7 @@
 #define CHR_SPACE      ' '
 #define CHR_DOT        '.'
 
-#define LINE_SIZE      256
+#define LINE_SIZE      257
 
 #define CLIENT_NAME    PACKAGE
 #define CLIENT_VERSION VERSION
@@ -42,6 +42,8 @@
 #define DEFAULT_PROXY_PORT  8080
 
 #define DEFAULT_PROTOCOL_VERSION 5
+
+#define FRAMES_PER_SECOND 75
 
 #define FREE_NOT_NULL(p) if (p) free(p)
 #define CONNECTION_OK(c) (c->socket != -1)
