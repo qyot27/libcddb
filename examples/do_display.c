@@ -1,5 +1,5 @@
 /*
-    $Id: do_display.c,v 1.2 2003/04/14 22:25:48 airborne Exp $
+    $Id: do_display.c,v 1.3 2003/05/23 21:12:23 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,10 +27,15 @@ void do_display(cddb_disc_t *disc)
 {
     cddb_track_t *track = NULL; /* libcddb track structure */
     int length;
+    char *s;
 
-    /* 1. The artist name and disc title. */
+    /* 1. The artist name, disc title and extended data. */
     printf("Artist:   %s\n", STR_OR_NULL(cddb_disc_get_artist(disc)));
     printf("Title:    %s\n", STR_OR_NULL(cddb_disc_get_title(disc)));
+    s = cddb_disc_get_ext_data(disc);
+    if (s) {
+        printf("Ext.data: %s\n", s);
+    }
 
     /* 2. The music genre.  This field is similar to the category
        field initialized above.  It can be the same but it does not
@@ -69,9 +74,17 @@ void do_display(cddb_disc_t *disc)
         /* 5.c. The track length. */
         length = cddb_track_get_length(track);
         if (length != -1) {
-            printf(" (%d:%02d)\n", (length / 60), (length % 60));
+            printf(" (%d:%02d)", (length / 60), (length % 60));
         } else {
-            printf(" (unknown)\n");
+            printf(" (unknown)");
+        }
+
+        /* 5.d. The extended track data. */
+        s = cddb_track_get_ext_data(track);
+        if (s) {
+            printf(" [%s]\n", s);
+        } else {
+            printf("\n");
         }
     }
 }
