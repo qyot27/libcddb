@@ -11,6 +11,6 @@ TESTS = check_discid
 noinst_PROGRAMS = check_discid
 
 # Targets for individual tests
-check_discid_SOURCES = base.c check_discid.c
+check_discid_SOURCES = base.c base.h check_discid.c
 
 endif
