@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.16 2004/07/18 07:05:00 airborne Exp $
+    $Id: main.c,v 1.17 2004/07/18 07:25:00 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -349,7 +349,7 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
 
     if (argc <= optind) {
         /* no command given */
-		error_usage("command missing");
+        error_usage("command missing");
     }
 
     /* use CD-ROM ? */
@@ -403,7 +403,7 @@ int main(int argc, char **argv)
 
     /* If the pointer is NULL then an error occured (out of memory). */
     if (!conn) {
-		error_exit(GENERIC_ERROR, "unable to create connection structure");
+        error_exit(GENERIC_ERROR, "unable to create connection structure");
     }
 
     /* Check command-line parameters. */
