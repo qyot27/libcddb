@@ -2,8 +2,13 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.57)
 AC_INIT(configure.ac)
 AC_CONFIG_HEADERS(config.h)
-AC_CONFIG_FILES([Makefile include/Makefile include/cddb/Makefile \
-                 lib/Makefile examples/Makefile tests/Makefile \
+AC_CONFIG_FILES([Makefile              \
+                 libcddb.pc            \
+                 include/Makefile      \
+                 include/cddb/Makefile \
+                 lib/Makefile          \
+                 examples/Makefile     \
+                 tests/Makefile        \
                  tests/settings.sh])
 AM_INIT_AUTOMAKE(libcddb, 0.9.4)
 AM_MAINTAINER_MODE
