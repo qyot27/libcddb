@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.14 2003/04/20 19:25:42 airborne Exp $
+    $Id: cddb_conn.c,v 1.15 2003/04/30 18:55:47 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -19,6 +19,7 @@
     Boston, MA  02111-1307, USA.
 */
 
+#include <sys/types.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
