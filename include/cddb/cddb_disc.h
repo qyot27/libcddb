@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.16 2003/05/04 17:38:52 airborne Exp $
+    $Id: cddb_disc.h,v 1.17 2003/05/07 18:46:21 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -49,11 +49,20 @@
  * The different CDDB categories.
  */
 typedef enum {
-    CDDB_CAT_DATA = 0, CDDB_CAT_FOLK, CDDB_CAT_JAZZ, CDDB_CAT_MISC,
-    CDDB_CAT_ROCK, CDDB_CAT_COUNTRY, CDDB_CAT_BLUES, CDDB_CAT_NEWAGE,
-    CDDB_CAT_REGGAE, CDDB_CAT_CLASSICAL, CDDB_CAT_SOUNDTRACK,
-    CDDB_CAT_INVALID,
-    CDDB_CAT_LAST
+    CDDB_CAT_DATA = 0,          /**< data disc */
+    CDDB_CAT_FOLK,              /**< folk music */
+    CDDB_CAT_JAZZ,              /**< jazz music */
+    CDDB_CAT_MISC,              /**< miscellaneous, use if no other
+                                     category matches */
+    CDDB_CAT_ROCK,              /**< rock and pop music */
+    CDDB_CAT_COUNTRY,           /**< country music */
+    CDDB_CAT_BLUES,             /**< blues music */
+    CDDB_CAT_NEWAGE,            /**< new age music */
+    CDDB_CAT_REGGAE,            /**< reggae music */
+    CDDB_CAT_CLASSICAL,         /**< classical music */
+    CDDB_CAT_SOUNDTRACK,        /**< soundtracks */
+    CDDB_CAT_INVALID,           /**< (internal) invalid category */
+    CDDB_CAT_LAST               /**< (internal) category counter */
 } cddb_cat_t;
 
 /**
