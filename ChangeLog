@@ -1,3 +1,311 @@
+2004-07-21 18:19  airborne
+
+	* NEWS: added changes between 0.9.4 and 0.9.5
+
+2004-07-21 18:17  airborne
+
+	* lib/cddb_net.c: updated functions to use cddb_conn_t struct as
+	parameter
+
+2004-07-21 18:16  airborne
+
+	* lib/cddb_error.c: updated message for CDDB_ERR_BUFFER_SIZE
+
+2004-07-21 18:15  airborne
+
+	* lib/cddb_conn.c: add setter for buffer size updated buffer
+	allocation
+
+2004-07-21 18:14  airborne
+
+	* lib/cddb_cmd.c: buffer size now field in connection context
+	updated parameters for changed API of network functions
+
+2004-07-21 18:12  airborne
+
+	* include/cddb/cddb_conn.h: added buffer size variable to
+	connection context updated docs
+
+2004-07-21 18:11  airborne
+
+	* include/cddb/cddb_net.h: most functions now receive a cddb_conn_t
+	structure
+
+2004-07-21 18:09  airborne
+
+	* include/cddb/cddb_ni.h: inserted constant DEFAULT_BUF_SIZE
+	(previously in cddb_cmd.h as LINE_SIZE)
+
+2004-07-21 18:08  airborne
+
+	* include/cddb/cddb_cmd.h: moved LINE_SIZE constant to cdb_ni.h
+	(renamed to DEFAULT_BUF_SIZE)
+
+2004-07-21 14:33  airborne
+
+	* TODO: removed error handling item
+
+2004-07-21 14:33  airborne
+
+	* THANKS: added credits for improved Mac OS X and Win32 support
+
+2004-07-21 14:31  airborne
+
+	* README: add testing section heading
+
+2004-07-21 14:30  airborne
+
+	* include/cddb/cddb_cmd.h: increased default line buffer size from
+	257 to 1024
+
+2004-07-21 14:29  airborne
+
+	* lib/cddb_net.c: made LINE_SIZE configurable at run-time (iso at
+	compile-time)
+
+2004-07-21 14:22  airborne
+
+	* lib/cddb_cmd.c: made LINE_SIZE configurable at run-time (iso at
+	compile-time) added some buffer overflow checks
+
+2004-07-18 09:25  airborne
+
+	* examples/main.c: tab removal
+
+2004-07-18 09:23  airborne
+
+	* examples/do_query.c, examples/do_read.c, examples/main.h,
+	include/cddb/cddb.h, include/cddb/cddb_cmd.h,
+	include/cddb/cddb_cmd_ni.h, include/cddb/cddb_conn.h,
+	include/cddb/cddb_conn_ni.h, include/cddb/cddb_disc.h,
+	include/cddb/cddb_error.h, include/cddb/cddb_log.h,
+	include/cddb/cddb_log_ni.h, include/cddb/cddb_ni.h,
+	include/cddb/cddb_track.h, lib/cddb_disc.c, lib/cddb_error.c,
+	lib/cddb_log.c: updated copyright
+
+2004-07-18 09:19  airborne
+
+	* tests/settings.sh.in: print reason of failure changed cddb_query
+	check (now only checks whether there are multiple results)
+
+2004-07-18 09:15  airborne
+
+	* tests/check_discid.sh: added test for new track length feature
+
+2004-07-18 09:14  airborne
+
+	* tests/check_cache.sh: changed non-existing disc ID (the previous
+	one now exists)
+
+2004-07-18 09:14  airborne
+
+	* lib/cddb_track.c: added code to set track length (with automatic
+	calculation of frame offset)
+
+2004-07-18 09:13  airborne
+
+	* lib/cddb_net.c: added to do comment
+
+2004-07-18 09:12  airborne
+
+	* lib/cddb_error.c: added line size error message
+
+2004-07-18 09:12  airborne
+
+	* lib/cddb_disc.c: added support for doubly linked track list
+
+2004-07-18 09:11  airborne
+
+	* lib/cddb_cmd.c: added buffer overflow check in query code
+
+2004-07-18 09:09  airborne
+
+	* include/cddb/cddb_track.h: made track list, doubly linked added
+	API functions for setting/getting track length
+
+2004-07-18 09:08  airborne
+
+	* include/cddb/cddb_net.h: tab removal
+
+2004-07-18 09:07  airborne
+
+	* include/cddb/cddb_error.h: added line size error
+
+2004-07-18 09:07  airborne
+
+	* include/cddb/cddb_ni.h: moved LINE_SIZE to cddb_cmd.h
+
+2004-07-18 09:06  airborne
+
+	* include/cddb/cddb_cmd.h: moved LINE_SIZE from cddb_ni.h
+
+2004-07-18 09:05  airborne
+
+	* examples/: main.c, main.h: added option to use track length iso
+	frame offset
+
+2004-07-18 08:59  airborne
+
+	* examples/cd_access.c: added option to use track length iso frame
+	offset
+
+2004-07-18 08:57  airborne
+
+	* lib/Makefile.am: added extra include directory for people
+	building outside of source dir
+
+2004-07-18 08:55  airborne
+
+	* examples/Makefile.am: added extra include dir for people building
+	outside of source dir
+
+2004-07-18 08:53  airborne
+
+	* configure.ac: removed 'cvs' suffix from next version number (to
+	be released very soon)
+
+2004-07-07 13:52  rockyb
+
+	* lib/cddb_net.c: Yet another change to accomodate OSX 10.2 with
+	it's weird includes. (May also be relevant for various old BSD
+	systems.)
+
+2004-07-07 12:29  rockyb
+
+	* configure.ac, include/cddb/cddb_config.h.in,
+	include/cddb/cddb_net.h, lib/cddb_net.c, lib/cddb_track.c: Changes
+	to make includes work out on OS X 10.2.  OSX 10.2 headers don't
+	include all system headers that a system header needs and expects
+	it to be done by the outside included file.
+
+2004-07-06 11:50  rockyb
+
+	* include/cddb/cddb_net.h: Yet another artifact from broken OSX
+	10.2 includes.
+
+2004-07-06 10:32  rockyb
+
+	* configure.ac, lib/cddb_net.c: Test for time.h and sys/time.h. OSX
+	seems to have some weirdness in the way time.h needs to be
+	included.
+
+2004-04-23 04:17  rockyb
+
+	* include/cddb/: Makefile.am, cddb.h, cddb_conn.h: Wasn't
+	installing cddb_config.h cddb_conn.h needs unconditional #include
+	<netinet/in.h>
+
+2004-04-04 04:13  rockyb
+
+	* .cvsignore: stamp-h1 is now showing up.
+
+2004-04-04 04:13  rockyb
+
+	* include/cddb/.cvsignore: cddb_config.h is derived from
+	cddb_config.h.in.
+
+2004-04-04 04:11  rockyb
+
+	* configure.ac, include/cddb/cddb_config.h.in,
+	include/cddb/cddb_regex.h: Start public config settings. (Initial)
+	motivation
+	
+	OSX needs #include <unistd.h> before #include <regex.h> This is
+	perhaps a clean way to do this.
+
+2004-03-10 04:17  rockyb
+
+	* examples/do_display.c: Add string.h for strlen.
+
+2004-03-10 04:08  rockyb
+
+	* configure.ac, include/cddb/cddb_conn.h, include/cddb/cddb_net.h,
+	include/cddb/cddb_regex.h, lib/cddb_cmd.c, lib/cddb_conn.c,
+	lib/cddb_regex.c: Closer to having -mno-cygwin work. Also more
+	portable for wierdo non-POSIX compliant OS's.
+
+2004-03-09 13:43  rockyb
+
+	* lib/cddb_conn.c: Test for presence of various headers. Closer to
+	working on cygwin with -mno-cygwin
+
+2004-03-09 13:42  rockyb
+
+	* configure.ac: Add check for errno.h
+
+2004-03-09 02:28  rockyb
+
+	* examples/main.c: Add -i <device> option. If libcdio isn't around
+	don't suggest that a a device can be given.
+
+2004-03-09 02:26  rockyb
+
+	* examples/cd_access.c: Parameter was omitted in error message.
+
+2004-03-08 13:54  rockyb
+
+	* examples/cd_access.c: Update URL. libcdio has moved from non-GNU
+	to GNU.
+
+2004-03-08 02:30  rockyb
+
+	* configure.ac, examples/Makefile.am: *: Use pkgconfig to get
+	libcdio properties. (We now require 0.67). In particular we need
+	CFLAGS and LD_FLAGS.
+	
+	configure.ac: Bump CVS number to 0.65cvs so people do not confuse
+	with 0.64.
+
+2004-03-03 13:39  rockyb
+
+	* lib/.cvsignore: more CVS lint.
+
+2004-03-03 13:38  rockyb
+
+	* tests/.cvsignore: settings.sh is derived.
+
+2004-03-03 13:35  rockyb
+
+	* tests/check_server.sh: On some shells and "test" (like on
+	Solaris) don't like   test -z $foo gives a required argument
+	missing.
+	
+	  test -z "$foo"
+	
+	works though.
+
+2004-03-03 13:31  rockyb
+
+	* .cvsignore: libcddb.pc is a derived file.
+
+2004-03-03 13:30  rockyb
+
+	* examples/do_display.c: Remove implicit definition of strlen
+	warning.
+
+2004-03-02 01:36  rockyb
+
+	* configure.ac: automake wants AM_CONFIG_HEADER rather than
+	AC_CONFIG_HEADERS.  We can work with autoconf as far back as 2.55.
+
+2004-03-02 01:32  rockyb
+
+	* lib/cddb_net.c: Remove compiler warning of memset implicit
+	declaration. Use HAVE_...H defines in the config.h.
+
+2003-06-12 19:59  airborne
+
+	* tests/testdata/: 56c2171b89496518.txt, b2bba00e1890d659.txt:
+	updated test result data with new FreeDB server results
+
+2003-05-31 15:44  airborne
+
+	* TODO: removed pkg-config entry
+
+2003-05-31 15:40  airborne
+
+	* ChangeLog: added more 0.9.4 changes
+
 2003-05-31 15:40  airborne
 
 	* lib/Makefile.am: update library version info to 1:0:1
