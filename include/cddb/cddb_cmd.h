@@ -30,6 +30,8 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc);
  *
  * @param c    The CDDB connection structure.
  * @param disc A non-null CDDB disc structure.
+ *
+ * @return The number of matches found or -1 on error.
  */
 int cddb_query(cddb_conn_t *c, cddb_disc_t *disc);
 

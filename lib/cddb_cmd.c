@@ -540,7 +540,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 {
     const char *msg;
     char *line;
-    int code;
+    int code, count;
     char buf[LINE_SIZE], offset[32];
     cddb_track_t *track;
 
@@ -554,7 +554,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     dlog("\tdisc->track_cnt = %d", disc->track_cnt);
     if ((disc->discid == 0) || (disc->length == 0) || (disc->track_cnt == 0)) {
         c->errnum = CDDB_ERR_DATA_MISSING;
-        return FALSE;
+        return -1;
     }
 
     /* check track offsets and generate offset list */
@@ -564,7 +564,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
          track = cddb_disc_get_track_next(disc)) {
         if (track->frame_offset == -1) {
             c->errnum = CDDB_ERR_DATA_MISSING;
-            return FALSE;
+            return -1;
         }
         // XXX: buffer overflow checking
         snprintf(offset, sizeof(offset), "%d ", track->frame_offset);
@@ -573,21 +573,22 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 
     if (!cddb_connect(c)) {
         /* connection not OK */
-        return FALSE;
+        return -1;
     }
 
     /* send query command and check response */
     if (!cddb_send_cmd(c, CMD_QUERY, disc->discid, disc->track_cnt, buf, disc->length)) {
-        return FALSE;
+        return -1;
     }
     switch (code = cddb_get_response_code(c, &msg)) {
     case  -1:
-        return FALSE;
+        return -1;
     case 200:                   /* found exact match */
         dlog("\texact match");
         if (!cddb_parse_query_data(c, disc, msg)) {
-            return FALSE;
+            return -1;
         }
+        count = 1;
         break;
     case 211:                   /* found inexact match, list follows */
         dlog("\tinexact match");
@@ -603,37 +604,39 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
                 /* clone disc and fill in the blanks */
                 c->query_data[c->query_cnt] = cddb_disc_clone(disc);
                 if (!cddb_parse_query_data(c, c->query_data[c->query_cnt], line)) {
-                    return FALSE;
+                    return -1;
                 }
                 c->query_cnt++;
             }
             if (c->query_cnt == 0) {
                 /* empty result set */
                 c->errnum = CDDB_ERR_INVALID_RESPONSE;
-                return FALSE;
+                return -1;
             }
             /* return first disc in result set */
             cddb_disc_copy(disc, c->query_data[c->query_idx++]);
         }
+        count = c->query_cnt;
         break;
     case 202:                   /* no match found */
         dlog("\tno match");
-        c->errnum = CDDB_ERR_DISC_NOT_FOUND;
-        return FALSE;
+        count = 0;
+        break;
     case 403:                   /* database entry is corrupt */
         c->errnum = CDDB_ERR_SERVER_ERROR;
-        return FALSE;
+        return -1;
     case 409:                   /* no handshake */
         cddb_disconnect(c);
         c->errnum = CDDB_ERR_NOT_CONNECTED;
-        return FALSE;
+        return -1;
     default:
         c->errnum = CDDB_ERR_UNKNOWN;
-        return FALSE;
+        return -1;
     }
 
+    dlog("\tnumber of matches: %d", count);
     c->errnum = CDDB_ERR_OK;
-    return TRUE;
+    return count;
 }
 
 int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
