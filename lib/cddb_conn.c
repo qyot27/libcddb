@@ -51,6 +51,7 @@ cddb_conn_t *cddb_new(void)
         s = getenv("HOME");
         c->cache_dir = (char*)malloc(strlen(s) + 1 + sizeof(DEFAULT_CACHE) + 1);
         sprintf(c->cache_dir, "%s/%s", s, DEFAULT_CACHE);
+        c->cache_read = FALSE;
 
         /* retrieve user and host name from environment */
         s = getenv("USER");
@@ -163,6 +164,16 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email)
     dlog("\tuser name = '%s'", c->user);
     dlog("\thost name = '%s'", c->hostname);
 
+    return TRUE;
+}
+
+int cddb_cache_set_dir(cddb_conn_t *c, const char *dir)
+{
+    dlog("cddb_cache_set_dir()");
+    if (dir) {
+        FREE_NOT_NULL(c->cache_dir);
+        c->cache_dir = strdup(dir);
+    }
     return TRUE;
 }
 
@@ -282,7 +293,3 @@ void cddb_disconnect(cddb_conn_t *c)
     }
     c->errnum = CDDB_ERR_OK;
 }
-
-
-
-

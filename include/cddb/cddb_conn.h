@@ -21,8 +21,6 @@ typedef struct cddb_conn_s
     struct sockaddr_in sa;      /**< the socket address structure for
                                      connecting to the CDDB server */
     int socket;                 /**< the socket file descriptor */
-    FILE *cache_fp;             /**< a file pointer to a cached CDDB entry or
-                                     NULL if no cached version is available */
     char *server_name;          /**< host name of the CDDB server, defaults
                                      to 'freedb.org' */
     int server_port;            /**< port of the CDDB server, defaults to 888 */
@@ -39,10 +37,14 @@ typedef struct cddb_conn_s
     int http_proxy_server_port; /**< port of the HTTP proxy server,
                                      defaults to 8080 */
 
+    FILE *cache_fp;             /**< a file pointer to a cached CDDB entry or
+                                     NULL if no cached version is available */
     int use_cache;              /**< boolean to specify whether to read/write
                                      data in cache, enabled by default */
     char *cache_dir;            /**< CDDB slave cache, defaults to 
                                      '~/.cddbslave' */
+    int cache_read;             /**< (internal) read data from cached file instead
+                                     of from the network */
 
     char *user;                 /**< user name supplied to CDDB server, defaults
                                      to the value of the 'USER' environment 
@@ -66,8 +68,7 @@ typedef struct cddb_conn_s
  * Creates a new CDDB connection structure.  This structure will have
  * to be passed to all libcddb functions.
  *
- * @return The CDDB connection structure or NULL if something went
- *         wrong.
+ * @return The CDDB connection structure or NULL if something went wrong.
  */
 cddb_conn_t *cddb_new(void);
 
@@ -177,6 +178,40 @@ void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
  * @param email The e-mail address of the user.
  */
 int cddb_set_email_address(cddb_conn_t *c, const char *email);
+
+/**
+ * Enable caching of CDDB entries locally.  Caching is enabled by
+ * default.  The cache directory can be changed with the
+ * cddb_cache_set_dir function.
+ *
+ * @see cddb_cache_disable
+ * @see cddb_cache_set_dir
+ *
+ * @param c The connection structure.
+ */
+#define cddb_cache_enable(c) (c)->use_cache = TRUE
+
+/**
+ * Disable caching of CDDB entries locally.
+ *
+ * @see cddb_cache_enable
+ *
+ * @param c The connection structure.
+ */
+#define cddb_cache_disable(c) (c)->use_cache = FALSE
+
+/**
+ * Change the directory used for caching CDDB entries locally.  The
+ * default location of the cached entries is a subdirectory
+ * (.cddbslave) of the user's home directory.
+ *
+ * @see cddb_cache_enable
+ * @see cddb_cache_disable
+ *
+ * @param c   The connection structure.
+ * @param dir The directory to use for caching.
+ */
+int cddb_cache_set_dir(cddb_conn_t *c, const char *dir);
 
 
 #ifdef __cplusplus
