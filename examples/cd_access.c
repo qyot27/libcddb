@@ -1,7 +1,7 @@
 /*
-    $Id: cd_access.c,v 1.7 2004/03/08 12:54:57 rockyb Exp $
+    $Id: cd_access.c,v 1.8 2004/03/09 01:26:26 rockyb Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -75,7 +75,8 @@ cddb_disc_t *cd_read(char *device)
 
         /* We only want to process audio CDs. */
         if (cdio_get_track_format(cdio, t) != TRACK_FORMAT_AUDIO) {
-            libcdio_error_exit("track %d is not an audio track");
+            libcdio_error_exit("track %d is not an audio track", 
+			       t);
         }
 
         /* Get frame offset of next track. */
@@ -84,7 +85,7 @@ cddb_disc_t *cd_read(char *device)
             libcdio_error_exit("track %d has invalid Logical Sector Number", t);
         }
 
-        /* Add this offset to teh list.  We have to make sure that we
+        /* Add this offset to the list.  We have to make sure that we
            add two seconds of lead-in.*/
         foffset[t - 1] = lsn + SECONDS_TO_FRAMES(2);
     }
