@@ -1,6 +1,10 @@
 #ifndef CDDB_REGEX_H
 #define CDDB_REGEX_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 #include <stdlib.h>
 #include <regex.h>
@@ -30,5 +34,9 @@ int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx);
  */
 char *cddb_regex_get_string(const char *s, regmatch_t matches[], int idx);
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_REGEX_H */

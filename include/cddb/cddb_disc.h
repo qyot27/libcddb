@@ -1,6 +1,10 @@
 #ifndef CDDB_DISC_H
 #define CDDB_DISC_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 #include <cddb/cddb_track.h>
 
@@ -178,5 +182,9 @@ int cddb_disc_calc_discid(cddb_disc_t *disc);
  */
 void cddb_disc_print(cddb_disc_t *disc);
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_DISC_H */

@@ -1,6 +1,10 @@
 #ifndef CDDB_NI_H
 #define CDDB_NI_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -36,5 +40,9 @@
 #define CONNECTION_OK(c) (c->fp != NULL)
 #define STR_OR_NULL(s) ((s) ? s : "NULL")
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_NI_H */

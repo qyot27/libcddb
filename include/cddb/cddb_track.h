@@ -1,6 +1,10 @@
 #ifndef CDDB_TRACK_H
 #define CDDB_TRACK_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 /* Forward declaration of the disc structure. */
 struct cddb_disc_c;
@@ -109,5 +113,9 @@ void cddb_track_copy(cddb_track_t *dst, cddb_track_t *src);
  */
 void cddb_track_print(cddb_track_t *track);
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_TRACK_H */

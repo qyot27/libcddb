@@ -1,6 +1,10 @@
 #ifndef CDDB_CMD_NI_H
 #define CDDB_CMD_NI_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 enum { CMD_HELLO = 0,
        CMD_QUIT,
@@ -35,5 +39,9 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...);
  */
 void cddb_query_clear(cddb_conn_t *c);
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_CMD_H */

@@ -1,6 +1,10 @@
 #ifndef CDDB_ERROR_H
 #define CDDB_ERROR_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 #include <stdio.h>
 
@@ -73,5 +77,9 @@ void cddb_error_stream_print(FILE *stream, cddb_error_t errnum);
  */
 void cddb_error_print(cddb_error_t errnum);
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_ERROR_H */

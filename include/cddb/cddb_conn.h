@@ -1,6 +1,10 @@
 #ifndef CDDB_CONN_H
 #define CDDB_CONN_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 #include <netinet/in.h>
 
@@ -174,5 +178,9 @@ void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
  */
 int cddb_set_email_address(cddb_conn_t *c, const char *email);
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_CONN_H */

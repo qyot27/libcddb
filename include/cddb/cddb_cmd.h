@@ -1,6 +1,10 @@
 #ifndef CDDB_CMD_H
 #define CDDB_CMD_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 /* --- accessing data on the CDDB server --- */
 
@@ -96,5 +100,9 @@ int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc);
  */
 int cddb_write(cddb_conn_t *c, cddb_disc_t *disc);
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_CMD_H */

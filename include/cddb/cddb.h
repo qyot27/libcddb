@@ -1,6 +1,10 @@
 #ifndef CDDB_H
 #define CDDB_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 #include <cddb/cddb_error.h>
 #include <cddb/cddb_track.h>
@@ -32,5 +36,9 @@
  * \endhtmlonly
  */
 
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* CDDB_H */

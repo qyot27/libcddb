@@ -1,6 +1,10 @@
 #ifndef CDDB_DEBUG_H
 #define CDDB_DEBUG_H 1
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 
 #ifdef DEBUG
 
@@ -12,6 +16,11 @@
 
 #    define dlog(...)
 
+#endif
+
+
+#ifdef __cplusplus
+    }
 #endif
 
 #endif /* CDDB_DEBUG_H */
