@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.11 2004/03/02 00:32:48 rockyb Exp $
+    $Id: cddb_net.c,v 1.12 2004/07/06 08:32:34 rockyb Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -38,7 +38,13 @@
 #include <string.h>
 #endif
 
+#ifdef HAVE_TIME_H
 #include <time.h>
+#else 
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#endif
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
