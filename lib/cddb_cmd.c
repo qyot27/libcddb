@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.46 2004/07/18 07:11:50 airborne Exp $
+    $Id: cddb_cmd.c,v 1.47 2004/07/21 12:22:28 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -309,7 +309,7 @@ int cddb_cache_query_disc(cddb_conn_t *c, cddb_disc_t *disc)
 
 int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc)
 {
-    char fn[LINE_SIZE];
+    char *fn = NULL;
 
     cddb_log_debug("cddb_cache_mkdir()");
     /* create CDDB slave dir */
@@ -319,11 +319,14 @@ int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc)
     }
 
     /* create category dir */
-    snprintf(fn, sizeof(fn), "%s/%s", c->cache_dir, CDDB_CATEGORY[disc->category]);
+    fn = (char*)malloc(LINE_SIZE);
+    snprintf(fn, LINE_SIZE, "%s/%s", c->cache_dir, CDDB_CATEGORY[disc->category]);
     if ((MKDIR(fn, 0755) == -1) && (errno != EEXIST)) {
         cddb_log_error("could not create category directory: %s", fn);
+        free(fn);
         return FALSE;
     }
+    free(fn);
 
     return TRUE;
 }
@@ -504,8 +507,9 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
         default:
             /* anything else */
             {
-                char buf[LINE_SIZE];
-
+                char *buf;
+                int rv;
+                
                 if (c->is_http_proxy_enabled) {
                     /* use an HTTP proxy */
                     sock_fprintf(c->socket, c->timeout, "GET http://%s:%d%s", 
@@ -515,10 +519,16 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
                     sock_fprintf(c->socket, c->timeout, "GET %s", c->http_path_query);
                 }
 
-                // XXX: buffer overflow checking
-                vsnprintf(buf, sizeof(buf), CDDB_COMMANDS[cmd], args);
+                buf = (char*)malloc(LINE_SIZE);
+                rv = vsnprintf(buf, LINE_SIZE, CDDB_COMMANDS[cmd], args);
+                if (rv < 0 || rv >= LINE_SIZE) {
+                    /* buffer is too small */
+                    cddb_errno_log_crit(c, CDDB_ERR_LINE_SIZE);
+                    return FALSE;
+                }
                 url_encode(buf);
                 sock_fprintf(c->socket, c->timeout, "?cmd=%s&", buf);
+                free(buf);
 
                 sock_fprintf(c->socket, c->timeout, "hello=%s+%s+%s+%s&", 
                              c->user, c->hostname, c->cname, c->cversion);
@@ -991,7 +1001,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 {
     char *msg, *line;
     int code, count;
-    char buf[LINE_SIZE], offset[32];
+    char *buf, offset[32];
     cddb_track_t *track;
 
     cddb_log_debug("cddb_query()");
@@ -1019,6 +1029,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         return FALSE;
     }
 
+    buf = (char*)malloc(LINE_SIZE);
     /* check track offsets and generate offset list */
     buf[0] = CHR_EOS;
     for (track = cddb_disc_get_track_first(disc); 
@@ -1026,12 +1037,14 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
          track = cddb_disc_get_track_next(disc)) {
         if (track->frame_offset == -1) {
             cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
+            free(buf);
             return -1;
         }
         snprintf(offset, sizeof(offset), "%d ", track->frame_offset);
         if (strlen(buf) + strlen(offset) >= LINE_SIZE) {
             /* buffer is too small */
-            cddb_errno_log_error(c, CDDB_ERR_LINE_SIZE);
+            cddb_errno_log_crit(c, CDDB_ERR_LINE_SIZE);
+            free(buf);
             return -1;
         }
         strcat(buf, offset);
@@ -1039,13 +1052,16 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 
     if (!cddb_connect(c)) {
         /* connection not OK */
+        free(buf);
         return -1;
     }
 
     /* send query command and check response */
     if (!cddb_send_cmd(c, CMD_QUERY, disc->discid, disc->track_cnt, buf, disc->length)) {
+        free(buf);
         return -1;
     }
+    free(buf);
     switch (code = cddb_get_response_code(c, &msg)) {
         case  -1:
             return -1;
