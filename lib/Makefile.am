@@ -1,5 +1,5 @@
 
-INCLUDES	= -I$(top_srcdir)/include
+INCLUDES	= -I$(top_srcdir)/include -I$(top_builddir)/include
 
 lib_LTLIBRARIES = libcddb.la
 libcddb_la_SOURCES = cddb_track.c cddb_disc.c cddb_regex.c cddb_error.c \
