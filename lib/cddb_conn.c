@@ -40,8 +40,11 @@ cddb_conn_t *cddb_new(void)
 
         c->http_path_query = strdup(DEFAULT_PATH_QUERY);
         c->http_path_submit = strdup(DEFAULT_PATH_SUBMIT);
+
         c->is_http_enabled = FALSE;
         c->is_http_proxy_enabled = FALSE;
+        c->http_proxy_server = NULL;
+        c->http_proxy_server_port = DEFAULT_PROXY_PORT;
 
         c->use_cache = TRUE;
         /* construct cache dir '$HOME/[DEFAULT_CACHE]' */
@@ -82,7 +85,7 @@ void cddb_destroy(cddb_conn_t *c)
 }
 
 
-/* --- connection settings --- */
+/* --- getters & setters --- */
 
 
 void cddb_set_server_name(cddb_conn_t *c, const char *server)
@@ -124,9 +127,16 @@ void cddb_http_proxy_enable(cddb_conn_t *c, int enable)
     c->errnum = CDDB_ERR_OK;
 }
 
+void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server)
+{
+    FREE_NOT_NULL(c->http_proxy_server);
+    c->http_proxy_server = strdup(server);
+}
 
-/* --- getters & setters --- */
-
+void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port)
+{
+    c->http_proxy_server_port = port;
+}
 
 int cddb_set_email_address(cddb_conn_t *c, const char *email)
 {
@@ -208,14 +218,21 @@ int cddb_connect(cddb_conn_t *c)
         struct hostent *he;
 
         /* resolve host name */
-        he = gethostbyname(c->server_name);
+        if (c->is_http_proxy_enabled) {
+            /* use HTTP proxy server name */
+            he = gethostbyname(c->http_proxy_server);
+            c->sa.sin_port = htons(c->http_proxy_server_port);
+        } else {
+            /* use CDDB server name */
+            he = gethostbyname(c->server_name);
+            c->sa.sin_port = htons(c->server_port);
+        }
         if (he == NULL) {
             c->errnum = CDDB_ERR_UNKNOWN_HOST_NAME;
             return FALSE;
         }
         /* initialize socket address */
         c->sa.sin_family = AF_INET;
-        c->sa.sin_port = htons(c->server_port);
         c->sa.sin_addr = *((struct in_addr*)he->h_addr);
         bzero(&(c->sa.sin_zero), 8); /* zero the rest of the struct */
 

@@ -99,16 +99,21 @@ int main(int argc, char **argv)
 
     c = cddb_new();
     if (c) {
-        //cddb_set_email_address(c, "me@home");
-        //cddb_set_server_name(c, "my.server.com");
+        cddb_set_email_address(c, "me@home");
+        cddb_set_server_name(c, "my.server.com");
 #if 0
-        //cddb_set_server_port(c, 8880);
+        cddb_set_server_port(c, 8880);
         cddb_http_enable(c, 0);
 #else
         cddb_set_server_port(c, 80);
         cddb_http_enable(c, 1);
         cddb_set_http_path_query(c, "/~me/cddbd.cgi");
         cddb_set_http_path_submit(c, "/~me/submit.cgi");
+#   if 0
+        cddb_http_proxy_enable(c, 1);
+        cddb_set_http_proxy_server_name(c, "my.proxy.com");
+        cddb_set_http_proxy_server_port(c, 3128);
+#   endif
 #endif
         d = cddb_disc_new();
         if (d) {

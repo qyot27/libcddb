@@ -43,7 +43,11 @@ int cddb_write_data(char *buf, int size, cddb_disc_t *disc);
 
 /**
  */
-void cddb_skip_http_headers(cddb_conn_t *c);
+void cddb_http_parse_headers(cddb_conn_t *c);
+
+/**
+ */
+int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args);
 
 /**
  */
@@ -247,20 +251,79 @@ void url_encode(char *s)
     }
 }
 
-void cddb_skip_http_headers(cddb_conn_t *c)
+void cddb_http_parse_headers(cddb_conn_t *c)
 {
     char *line;
 
+    dlog("cddb_http_parse_headers()");
     while (((line = cddb_read_line(c)) != NULL) &&
            (*line != CHR_EOS)) {
         /* no-op */
     }
 }
 
+int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
+{
+    dlog("cddb_http_send_cmd()");
+    switch (cmd) {
+    case CMD_WRITE:
+        /* entry submission (POST method) */
+        {
+            char *category;
+            int discid, size;
+
+            category = va_arg(args, char *);
+            discid = va_arg(args, int);
+            size = va_arg(args, int);
+            fprintf(c->fp, "POST %s HTTP/1.0\r\n", c->http_path_submit);
+            fprintf(c->fp, "Category: %s\r\n", category);
+            fprintf(c->fp, "Discid: %08x\r\n", discid);
+            fprintf(c->fp, "User-Email: %s@%s\r\n", c->user, c->hostname);
+            fprintf(c->fp, "Submit-Mode: submit\r\n");
+            fprintf(c->fp, "Content-Length: %d\r\n", size);
+            fprintf(c->fp, "\r\n");
+        }
+        break;
+    default:
+        /* anything else */
+        {
+            char buf[LINE_SIZE];
+
+            if (c->is_http_proxy_enabled) {
+                /* use an HTTP proxy */
+                fprintf(c->fp, "GET http://%s:%d%s", c->server_name,
+                        c->server_port, c->http_path_query);
+            } else {
+                /* direct connection */
+                fprintf(c->fp, "GET %s", c->http_path_query);
+            }
+
+            vsnprintf(buf, sizeof(buf), CDDB_COMMANDS[cmd], args);
+            url_encode(buf);
+            fprintf(c->fp, "?cmd=%s&", buf);
+
+            fprintf(c->fp, "hello=%s+%s+%s+%s&", 
+                    c->user, c->hostname, CLIENT_NAME, CLIENT_VERSION);
+            fprintf(c->fp, "proto=5 HTTP/1.0\r\n");
+
+            if (c->is_http_proxy_enabled) {
+                /* insert host header */
+                fprintf(c->fp, "Host: %s:%d\r\n", c->server_name, c->server_port);
+            }
+            fprintf(c->fp, "\r\n");
+
+            /* skip HTTP response headers */
+            cddb_http_parse_headers(c);
+        }
+    }
+
+    c->errnum = CDDB_ERR_OK;
+    return TRUE;
+}
+
 int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
 {
     va_list args;
-    char buf[LINE_SIZE];
     
     dlog("cddb_send_cmd()");
     if (!CONNECTION_OK(c)) {
@@ -271,39 +334,13 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
     va_start(args, cmd);
     if (c->is_http_enabled) {
         /* HTTP */
-        switch (cmd) {
-        case CMD_WRITE:
-            {
-                char *category;
-                int discid, size;
+        if (!cddb_http_send_cmd(c, cmd, args)) {
+            int errnum;
 
-                category = va_arg(args, char *);
-                discid = va_arg(args, int);
-                size = va_arg(args, int);
-                fprintf(c->fp, "POST %s HTTP/1.0\r\n", c->http_path_submit);
-                fprintf(c->fp, "Category: %s\r\n", category);
-                fprintf(c->fp, "Discid: %08x\r\n", discid);
-                fprintf(c->fp, "User-Email: %s@%s\r\n", c->user, c->hostname);
-                fprintf(c->fp, "Submit-Mode: submit\r\n");
-                fprintf(c->fp, "Content-Length: %d\r\n", size);
-                fprintf(c->fp, "\r\n");
-            }
-            break;
-        default:
-            /* anything else */
-            fprintf(c->fp, "GET %s", c->http_path_query);
-
-            vsnprintf(buf, sizeof(buf), CDDB_COMMANDS[cmd], args);
-            url_encode(buf);
-            fprintf(c->fp, "?cmd=%s&", buf);
-
-            fprintf(c->fp, "hello=%s+%s+%s+%s&", 
-                    c->user, c->hostname, CLIENT_NAME, CLIENT_VERSION);
-            fprintf(c->fp, "proto=5 HTTP/1.0\r\n");
-            fprintf(c->fp, "\r\n");
-
-            /* skip HTTP response headers */
-            cddb_skip_http_headers(c);
+            errnum = c->errnum; /* save error number */
+            cddb_disconnect(c);
+            c->errnum = errnum; /* restore error number */
+            return FALSE;
         }
     } else {
         /* CDDBP */
@@ -804,7 +841,7 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     fwrite(buf, sizeof(char), size, c->fp);
     if (c->is_http_enabled) {
         /* skip HTTP response headers */
-        cddb_skip_http_headers(c);
+        cddb_http_parse_headers(c);
     } else {
         /* send terminating marker */
         fprintf(c->fp, ".\n");

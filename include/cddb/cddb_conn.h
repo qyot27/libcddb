@@ -28,8 +28,12 @@ typedef struct cddb_conn_s
     char *http_path_submit;     /**< URL for submitting to the server through HTTP,
                                      defaults to /~cddb/submit.cgi' */
     int is_http_enabled;        /**< use HTTP, disabled by default */
+
     int is_http_proxy_enabled;  /**< use HTTP through a proxy server,
                                      disabled by default */
+    char *http_proxy_server;    /**< host name of the HTTP proxy server */
+    int http_proxy_server_port; /**< port of the HTTP proxy server,
+                                     defaults to 8080 */
 
     int use_cache;              /**< boolean to specify whether to read/write
                                      data in cache, enabled by default */
@@ -70,7 +74,7 @@ cddb_conn_t *cddb_new(void);
 void cddb_destroy(cddb_conn_t *c);
 
 
-/* --- connection settings --- */
+/* --- getters & setters --- */
 
 
 /**
@@ -128,9 +132,22 @@ void cddb_http_enable(cddb_conn_t *c, int enable);
  */
 void cddb_http_proxy_enable(cddb_conn_t *c, int enable);
 
+/**
+ * Set the host name of the HTTP proxy server.  There is no default
+ * value.
+ *
+ * @param c      The connection structure.
+ * @param server The server host name.
+ */
+void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server);
 
-/* --- getters & setters --- */
-
+/**
+ * Set the port of the HTTP proxy server.  The default value is 8080.
+ *
+ * @param c    The connection structure.
+ * @param port The server port.
+ */
+void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
 
 /**
  * Get the error number returned by the last libcddb command.

@@ -28,6 +28,7 @@
 #define DEFAULT_PATH_QUERY  "/~cddb/cddb.cgi"
 #define DEFAULT_PATH_SUBMIT "/~cddb/submit.cgi"
 #define DEFAULT_CACHE       ".cddbslave"
+#define DEFAULT_PROXY_PORT  8080
 
 #define FREE_NOT_NULL(p) if (p) free(p)
 #define CONNECTION_OK(c) (c->fp != NULL)
