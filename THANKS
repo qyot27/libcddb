@@ -16,3 +16,7 @@
         - patch to prevent some compiler warnings
         - forc^H^H^H^Hencouraged me to write unit tests
         - some patches and hints for autoconf/automake
+
+    Manfred Tremmel
+        - creation of Suse RPMs for libcddb
+          (see http://packman.links2linux.de/index.php4?action=294)
