@@ -1,5 +1,5 @@
 /*
-    $Id: do_display.c,v 1.5 2004/03/03 12:30:25 rockyb Exp $
+    $Id: do_display.c,v 1.6 2004/03/10 03:17:01 rockyb Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -23,6 +23,10 @@
 
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
+#endif
+
+#ifdef HAVE_STRING_H
+#include <string.h> /* strlen */
 #endif
 
 #define STR_OR_NULL(s) ((s) ? s : "(null)")
