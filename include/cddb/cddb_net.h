@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.h,v 1.6 2004/03/10 03:08:48 rockyb Exp $
+    $Id: cddb_net.h,v 1.7 2004/07/06 09:50:59 rockyb Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -36,7 +36,7 @@
 #   include <ws2tcpip.h>
 #endif 
 
-#ifdef HAVE_SYS_SOCKET_H
+#if defined(CDDB_NEED_SYS_SOCKET_H) || defined(HAVE_SYS_SOCKET_H)
 #include <sys/socket.h>
 #endif
 
