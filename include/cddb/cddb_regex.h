@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.h,v 1.6 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_regex.h,v 1.7 2003/05/23 21:11:30 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -39,7 +39,10 @@ extern regex_t *REGEX_DISC_LENGTH;
 extern regex_t *REGEX_DISC_TITLE;
 extern regex_t *REGEX_DISC_YEAR;
 extern regex_t *REGEX_DISC_GENRE;
+extern regex_t *REGEX_DISC_EXT;
 extern regex_t *REGEX_TRACK_TITLE;
+extern regex_t *REGEX_TRACK_EXT;
+extern regex_t *REGEX_PLAY_ORDER;
 extern regex_t *REGEX_QUERY_MATCH;
 
 

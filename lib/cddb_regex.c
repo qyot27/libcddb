@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.c,v 1.6 2003/04/14 22:25:50 airborne Exp $
+    $Id: cddb_regex.c,v 1.7 2003/05/23 21:11:30 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -35,7 +35,10 @@ regex_t *REGEX_DISC_LENGTH;
 regex_t *REGEX_DISC_TITLE;
 regex_t *REGEX_DISC_YEAR;
 regex_t *REGEX_DISC_GENRE;
+regex_t *REGEX_DISC_EXT;
 regex_t *REGEX_TRACK_TITLE;
+regex_t *REGEX_TRACK_EXT;
+regex_t *REGEX_PLAY_ORDER;
 regex_t *REGEX_QUERY_MATCH;
 
 
@@ -69,8 +72,14 @@ void cddb_regex_init()
                                "^DYEAR=([0-9]*)$");
         rv = cddb_regex_init_1(&REGEX_DISC_GENRE,
                                "^DGENRE=(.*)$");
+        rv = cddb_regex_init_1(&REGEX_DISC_EXT,
+                               "^EXTD=(.*)$");
         rv = cddb_regex_init_1(&REGEX_TRACK_TITLE,
                                "^TTITLE([0-9]+)=((.*) / (.*)|(.*))$");
+        rv = cddb_regex_init_1(&REGEX_TRACK_EXT,
+                               "^EXTT([0-9]+)=(.*)$");
+        rv = cddb_regex_init_1(&REGEX_PLAY_ORDER,
+                               "^PLAYORDER=(.*)$");
         rv = cddb_regex_init_1(&REGEX_QUERY_MATCH,
                                "^([[:alpha:]]+)[[:blank:]]([[:xdigit:]]+)[[:blank:]]((.*) / (.*)|(.*))$");
 
