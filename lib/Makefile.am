@@ -1,6 +1,6 @@
 
 INCLUDES	= -I$(top_srcdir)/include
-AM_CFLAGS 	= -Wall
+AM_CFLAGS 	= -Wall -Werror
 
 lib_LTLIBRARIES = libcddb.la
 libcddb_la_SOURCES = cddb_track.c cddb_disc.c cddb_regex.c cddb_error.c \
