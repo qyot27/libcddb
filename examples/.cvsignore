@@ -1,1 +1,6 @@
 Makefile.in
+.deps
+.libs
+Makefile
+Makefile.in
+cddb_query
