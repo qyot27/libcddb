@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.8 2004/07/21 16:19:07 airborne Exp $
+$Id: NEWS,v 1.9 2004/10/16 14:51:56 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -8,13 +8,29 @@ change made to the code tree.  An overview of the CVS changes can be
 found in the Changelog file.
 
 
-THE FUTURE
+CHANGES 0.9.5 -> 0.9.6
 
-The 0.9.x releases will be used to stabilize the current API toward
-the big 1.0 release.  My intention is to improve the documentation,
-expand the included example code, add several regression tests and fix
-any bugs that are found.  When all this is finished, 1.0 will be
-released.
+* Libcddb now uses the FreeDB protocol version 6.  The difference with
+  version 5 is that now the responses from the FreeDB server are in
+  UTF-8 format instead of ISO8859-1.  So if the CD you query contains
+  non-US-ASCII characters the results will be different in this new
+  version of libcddb.
+
+* [NEW] It is now possible to set the character set that libcddb has
+  to use when returning disc data (see also above).  Use the
+  cddb_set_charset function to set the user's character set.  The
+  example program, cddb_query, now also has a command-line option for
+  specifying the character set.
+
+* [BUGFIX] FreeDB changed the specs of their CDDB file format.  The
+  results for certain discs failed to parse correctly because the
+  libcddb parser was too strict.  This should be fixed now.
+
+* [BUGFIX] When writing disc to cache, fill in category if genre is
+  not specified.
+
+* [BUGFIX] When in CACHE_ONLY mode, do not perform network access when
+  writing disc record.
 
 
 CHANGES 0.9.4 -> 0.9.5
@@ -35,7 +51,7 @@ CHANGES 0.9.4 -> 0.9.5
 
 * Improved support for Win32 platforms (thx to Rocky Bernstein).
 
-* improved support for Mac OS X (thx to Rocky Bernstein and Derk-Jan
+* Improved support for Mac OS X (thx to Rocky Bernstein and Derk-Jan
   Hartman).
 
 * It is now possible to specify the CD-ROM device to be used in the
