@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.36 2003/05/04 17:38:52 airborne Exp $
+    $Id: cddb_cmd.c,v 1.37 2003/05/06 20:34:07 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -904,6 +904,9 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     /* clear previous query result set */
     cddb_query_clear(c);
     
+    /* recalculate disc ID to make sure it matches the disc data */
+    cddb_disc_calc_discid(disc);
+
     /* check whether we have enough info to execute the command */
     dlog("\tdisc->discid    = %8x", disc->discid);
     dlog("\tdisc->length    = %d", disc->length);
