@@ -497,6 +497,7 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
         c->errnum = CDDB_ERR_SERVER_ERROR;
         return FALSE;
     case 409:                   /* no handshake */
+    case 530:                   /* server error, server timeout */
         cddb_disconnect(c);
         c->errnum = CDDB_ERR_NOT_CONNECTED;
         return FALSE;
@@ -630,6 +631,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         c->errnum = CDDB_ERR_SERVER_ERROR;
         return -1;
     case 409:                   /* no handshake */
+    case 530:                   /* server error, server timeout */
         cddb_disconnect(c);
         c->errnum = CDDB_ERR_NOT_CONNECTED;
         return -1;
@@ -775,6 +777,7 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
             c->errnum = CDDB_ERR_PERMISSION_DENIED;
             return FALSE;
         case 409:                   /* no handshake */
+        case 530:                   /* server error, server timeout */
             cddb_disconnect(c);
             c->errnum = CDDB_ERR_NOT_CONNECTED;
             return FALSE;
@@ -807,6 +810,10 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     case 501:                   /* (HTTP) Invalid header information */
         dlog("\tentry not accepted");
         c->errnum = CDDB_ERR_REJECTED;
+        return FALSE;
+    case 530:                   /* server error, server timeout */
+        cddb_disconnect(c);
+        c->errnum = CDDB_ERR_NOT_CONNECTED;
         return FALSE;
     default:
         c->errnum = CDDB_ERR_UNKNOWN;
