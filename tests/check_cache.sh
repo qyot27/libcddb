@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: check_cache.sh,v 1.2 2003/04/25 17:56:59 airborne Exp $
+# $Id: check_cache.sh,v 1.3 2003/05/01 08:13:33 airborne Exp $
 
 . settings.sh
 
@@ -43,4 +43,5 @@ $CDDB_QUERY -c on -D $CACHE read misc $DISCID2 | check_read $DISCID2
 #
 # Fell through all tests
 #
+rm -rf $CACHE > /dev/null 2>&1
 exit $SUCCESS
