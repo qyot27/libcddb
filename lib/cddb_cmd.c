@@ -193,11 +193,8 @@ void cddb_cache_query_init(void)
     }
 }
 
-inline static int cddb_cache_query_hash(cddb_disc_t *disc)
-{
-    /* use upper 8 bits of disc ID as hash */
-    return disc->discid >> 24;
-}
+/* use upper 8 bits of disc ID as hash */
+#define cddb_cache_query_hash(disc) ((disc)->discid >> 24)
 
 int cddb_cache_query(cddb_conn_t *c, cddb_disc_t *disc)
 {
