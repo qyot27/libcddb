@@ -16,6 +16,7 @@ cddb_track_t *cddb_track_new(void)
     track->num = -1;
     track->frame_offset = -1;
     track->length = -1;
+    track->disc = NULL;
 
     return track;
 }
@@ -42,6 +43,7 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track)
     clone->title = (track->title ? strdup(track->title) : NULL);
     clone->artist = (track->artist ? strdup(track->artist) : NULL);
     clone->ext_data = (track->ext_data ? strdup(track->ext_data) : NULL);
+    clone->disc = NULL;
     return clone;
 }
 
@@ -55,6 +57,20 @@ void cddb_track_set_title(cddb_track_t *track, const char *title)
         FREE_NOT_NULL(track->title);
         track->title = strdup(title);
     }
+}
+
+const char *cddb_track_get_artist(cddb_track_t *track)
+{
+    const char *artist = NULL;
+
+    if (track) {
+        if (track->artist) {
+            artist = track->artist;
+        } else {
+            artist =  track->disc->artist; /* might be NULL */
+        }
+    }
+    return artist;
 }
 
 void cddb_track_set_artist(cddb_track_t *track, const char *artist)
@@ -100,6 +116,6 @@ void cddb_track_print(cddb_track_t *track)
     printf("    number: %d\n", track->num);
     printf("    frame offset: %d\n", track->frame_offset);
     printf("    length: %d seconds\n", track->length);
-    printf("    artist: '%s'\n", STR_OR_NULL(track->artist));
+    printf("    artist: '%s'\n", STR_OR_NULL(cddb_track_get_artist(track)));
     printf("    title: '%s'\n", STR_OR_NULL(track->title));
 }
