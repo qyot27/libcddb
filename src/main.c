@@ -130,11 +130,11 @@ int main(int argc, char **argv)
             /* print disc info */
             cddb_disc_print(d);
         } else {
-			fprintf(stderr, "unable to create disc structure\n");
-		}
+            fprintf(stderr, "unable to create disc structure\n");
+        }
     } else {
-		fprintf(stderr, "unable to initialize libcddb\n");
-	}
+        fprintf(stderr, "unable to initialize libcddb\n");
+    }
     cddb_disc_destroy(d);
     cddb_destroy(c);
     return 0;
