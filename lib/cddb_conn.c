@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.19 2003/05/08 20:37:03 airborne Exp $
+    $Id: cddb_conn.c,v 1.20 2003/05/12 18:46:16 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -61,6 +61,7 @@ cddb_conn_t *cddb_new(void)
         c->cache_fp = NULL;
         c->server_name = strdup(DEFAULT_SERVER);
         c->server_port = DEFAULT_PORT;
+        c->timeout = DEFAULT_TIMEOUT;
 
         c->http_path_query = strdup(DEFAULT_PATH_QUERY);
         c->http_path_submit = strdup(DEFAULT_PATH_SUBMIT);
@@ -298,11 +299,11 @@ int cddb_connect(cddb_conn_t *c)
         /* resolve host name */
         if (c->is_http_proxy_enabled) {
             /* use HTTP proxy server name */
-            he = gethostbyname(c->http_proxy_server);
+            he = timeout_gethostbyname(c->http_proxy_server, c->timeout);
             c->sa.sin_port = htons(c->http_proxy_server_port);
         } else {
             /* use CDDB server name */
-            he = gethostbyname(c->server_name);
+            he = timeout_gethostbyname(c->server_name, c->timeout);
             c->sa.sin_port = htons(c->server_port);
         }
         if (he == NULL) {
@@ -319,7 +320,8 @@ int cddb_connect(cddb_conn_t *c)
             return FALSE;
         }
 
-        rv =  connect(c->socket, (struct sockaddr*)&(c->sa), sizeof(struct sockaddr));
+        rv =  timeout_connect(c->socket, (struct sockaddr*)&(c->sa), 
+                              sizeof(struct sockaddr), c->timeout);
         if (rv == -1) {
             c->errnum = CDDB_ERR_CONNECT;
             return FALSE;
