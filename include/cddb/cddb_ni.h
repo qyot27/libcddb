@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.17 2004/07/21 16:09:56 airborne Exp $
+    $Id: cddb_ni.h,v 1.18 2004/10/08 21:03:50 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -63,11 +63,29 @@
 #define DEFAULT_CACHE       ".cddbslave"
 #define DEFAULT_PROXY_PORT  8080
 
-#define DEFAULT_PROTOCOL_VERSION 5
+#define DEFAULT_PROTOCOL_VERSION 6
+#define SERVER_CHARSET           "UTF8"
+
 
 #define FREE_NOT_NULL(p) if (p) { free(p); p = NULL; }
 #define CONNECTION_OK(c) (c->socket != -1)
 #define STR_OR_NULL(s) ((s) ? s : "NULL")
+
+/**
+ * Convert a string to a new character encoding according to the given
+ * conversion descriptor.
+ */
+int cddb_str_iconv(iconv_t cd, char *in, char **out);
+
+/**
+ * Converts all disc and track strings to user character encoding.
+ */
+int cddb_disc_iconv(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ * Converts all track strings to user character encoding.
+ */
+int cddb_track_iconv(cddb_conn_t *c, cddb_track_t *track);
 
 
 #ifdef __cplusplus
