@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.h,v 1.12 2003/04/27 08:45:17 airborne Exp $
+    $Id: cddb_track.h,v 1.13 2003/05/02 18:12:33 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -118,6 +118,14 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
  * @return The track length.
  */
 int cddb_track_get_length(cddb_track_t *track);
+
+/**
+ * Set the length of the track.
+ *
+ * @param track The CDDB track structure.
+ * @param l     The track length in seconds.
+ */
+#define cddb_track_set_length(t, l) (t)->length = l
 
 /**
  * Get the track title.  If no title is set for this track then NULL
