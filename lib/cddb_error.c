@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.c,v 1.7 2004/07/21 16:16:40 airborne Exp $
+    $Id: cddb_error.c,v 1.8 2004/10/08 20:59:19 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -28,8 +28,6 @@ static const char* err_str[CDDB_ERR_LAST] = {
 
     /* CDDB_ERR_OUT_OF_MEMORY */
     "out of memory",
-    /* CDDB_ERR_BUFFER_SIZE */
-    "internal buffer too small",
     /* CDDB_ERR_NOT_IMPLEMENTED */
     "feature not implemented",
     /* CDDB_ERR_UNKNOWN */
@@ -62,6 +60,13 @@ static const char* err_str[CDDB_ERR_LAST] = {
     
     /* CDDB_ERR_EMAIL_INVALID */
     "submit e-mail address invalid",
+
+    /* CDDB_ERR_BUFFER_SIZE */
+    "internal buffer too small",
+    /* CDDB_ERR_INVALID_CHARSET */
+    "invalid character set or unsupported conversion",
+    /* CDDB_ERR_ICONV_FAIL */
+    "character set conversion failed",
 
     /** CDDB_ERR_LAST */
 };
