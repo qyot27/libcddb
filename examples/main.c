@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.13 2003/05/09 18:17:16 airborne Exp $
+    $Id: main.c,v 1.14 2003/05/20 20:38:06 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -26,7 +26,7 @@
 #include "main.h"
 
 /* command-line option string */
-#define OPT_STRING ":c:D:hp:P:qs:"
+#define OPT_STRING ":c:D:hl:p:P:qs:"
 
 /* other stuff */
 #define ENV_HTTP_PROXY "http_proxy"
@@ -56,9 +56,11 @@ static void usage(void)
     fprintf(stderr, "  -c <mode>        local cache mode [on|off|only] (default = on)\n");
     fprintf(stderr, "  -D <cache dir>   directory for local cache (default = ~/.cddbslave)\n");
     fprintf(stderr, "  -h               display this help and exit\n");
+    fprintf(stderr, "  -l <level>       log level, one of debug, info, warning, error or\n");
+    fprintf(stderr, "                   critical (default = warning)\n");
     fprintf(stderr, "  -p <port>        port of CDDB server (default = 888)\n");
     fprintf(stderr, "  -P <protocol>    server protocol [cddbp|http|proxy] (default = cddbp)\n");
-    fprintf(stderr, "  -q               quiet, do not print any error messages\n");
+    fprintf(stderr, "  -q               quiet, do not print any error or log messages\n");
     fprintf(stderr, "  -s <server>      name of CDDB server (default = freedb.org)\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Available commands:\n");
@@ -267,6 +269,24 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
                ~/.cddbslave. */
             cddb_cache_set_dir(conn, optarg);
             break;
+        case 'l':               /* log level */
+            if (!*optarg) {
+                error_usage("-l, log level missing");
+            }
+            if (strcmp(optarg, "debug") == 0) {
+                cddb_log_set_level(CDDB_LOG_DEBUG);
+            } else if (strcmp(optarg, "info") == 0) {
+                cddb_log_set_level(CDDB_LOG_INFO);
+            } else if (strcmp(optarg, "warning") == 0) {
+                cddb_log_set_level(CDDB_LOG_WARN);
+            } else if (strcmp(optarg, "error") == 0) {
+                cddb_log_set_level(CDDB_LOG_ERROR);
+            } else if (strcmp(optarg, "critical") == 0) {
+                cddb_log_set_level(CDDB_LOG_CRITICAL);
+            } else {
+                error_usage("-l, invalid log level '%s'", optarg);
+            }
+            break;
         case 'p':               /* server port */
             if (!*optarg || *optarg == '\0') {
                 error_usage("-p, server port missing");
@@ -284,6 +304,7 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
             init_protocol(conn, optarg);
             break;
         case 'q':               /* quiet */
+            cddb_log_set_level(CDDB_LOG_NONE);
             quiet = 1;
             break;
         case 's':               /* server name */
