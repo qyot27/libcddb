@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.6 2003/04/20 17:37:27 airborne Exp $
+    $Id: main.c,v 1.7 2003/04/20 18:54:58 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -77,7 +77,18 @@ static void usage(void)
     fprintf(stderr, "  classical, and soundtrack\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Examples:\n");
-    fprintf(stderr, "  To read the details of the CD Mezzanine from Massive Attack:\n");
+    fprintf(stderr, "  To calculate the disc ID of the CD 'Mezzanine' from Massive Attack:\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "\tcddb_query calc 3822 11 150 28690 51102 75910 102682 \\\n");
+    fprintf(stderr, "\t           121522 149040 175772 204387 231145 268065\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "  To query for matches of the CD 'Mezzanine' from Massive Attack:\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "\tcddb_query query 3822 11 150 28690 51102 75910 102682 \\\n");
+    fprintf(stderr, "\t           121522 149040 175772 204387 231145 268065\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "  To read the details of the CD 'Mezzanine' from Massive Attack:\n");
+    fprintf(stderr, "\n");
     fprintf(stderr, "\tcddb_query read misc 0x920ef00b\n");
 }
 
