@@ -1,5 +1,4 @@
 
-
 #include <stdlib.h>
 #include <string.h>
 #include "cddb/cddb_ni.h"
@@ -13,10 +12,12 @@ cddb_track_t *cddb_track_new(void)
     cddb_track_t *track;
 
     track = (cddb_track_t*)calloc(1, sizeof(cddb_track_t));
-    track->num = -1;
-    track->frame_offset = -1;
-    track->length = -1;
-    track->disc = NULL;
+    if (track) {
+        track->num = -1;
+        track->frame_offset = -1;
+        track->length = -1;
+        track->disc = NULL;
+    }
 
     return track;
 }
@@ -57,6 +58,39 @@ void cddb_track_set_title(cddb_track_t *track, const char *title)
         FREE_NOT_NULL(track->title);
         track->title = strdup(title);
     }
+}
+
+int cddb_track_get_length(cddb_track_t *track)
+{
+    cddb_track_t *next;
+    int start, end;
+
+    if (track) {
+        if (track->length == -1) {
+            start = track->frame_offset;
+            next = track->next;
+            if (next != NULL) {
+                /* not last track on disc, use frame offset of next track */
+                end = next->frame_offset;
+                if (end > start) {
+                    /* XXX: rounding errors */
+                    track->length = (end - start) / FRAMES_PER_SECOND;
+                }
+            } else {
+                /* last track on disc, use disc length */
+                if (track->disc != NULL) {
+                    /* XXX: rounding errors */
+                    start /= FRAMES_PER_SECOND;
+                    end = cddb_disc_get_length(track->disc);
+                    if (end > start) {
+                        track->length = end - start;
+                    }
+                }
+            }
+        }
+        return track->length;
+    }
+    return -1;
 }
 
 void cddb_track_append_title(cddb_track_t *track, const char *title)
