@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.h,v 1.8 2004/10/08 20:59:16 airborne Exp $
+    $Id: cddb_error.h,v 1.9 2004/10/16 07:58:28 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -40,6 +40,7 @@ typedef enum {
     /* --- general errors --- */
 
     CDDB_ERR_OUT_OF_MEMORY,     /**< out of memory */
+    CDDB_ERR_LINE_SIZE,         /**< internal buffer too small */
     CDDB_ERR_NOT_IMPLEMENTED,   /**< feature not (yet) implemented */
     CDDB_ERR_UNKNOWN,           /**< problem unknown */
 
@@ -67,7 +68,6 @@ typedef enum {
     CDDB_ERR_EMAIL_INVALID,     /**< the e-mail address used when
                                      submitting is invalid */
 
-    CDDB_ERR_LINE_SIZE,         /**< internal buffer too small */
     CDDB_ERR_INVALID_CHARSET,   /**< invalid character set or unsupported
                                      conversion */
     CDDB_ERR_ICONV_FAIL,        /**< character set conversion failed */
