@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.15 2003/05/08 20:27:47 airborne Exp $
+    $Id: cddb_conn.h,v 1.16 2003/05/12 18:48:31 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -50,6 +50,8 @@ typedef struct cddb_conn_s
     char *server_name;          /**< host name of the CDDB server, defaults
                                      to 'freedb.org' */
     int server_port;            /**< port of the CDDB server, defaults to 888 */
+    int timeout;                /**< time out interval (in seconds) used during
+                                     network operations, defaults to 10 seconds */
 
     char *http_path_query;      /**< URL for querying the server through HTTP,
                                      defaults to /~cddb/cddb.cgi' */
@@ -122,7 +124,7 @@ void cddb_destroy(cddb_conn_t *c);
  * @param c The connection structure.
  * @return The server host name.
  */
-#define cddb_get_server_name(c) (c)->server_name;
+#define cddb_get_server_name(c) (c)->server_name
 
 /**
  * Set the host name of the CDDB server.  The default value for the
@@ -143,7 +145,7 @@ void cddb_set_server_name(cddb_conn_t *c, const char *server);
  * @param c The connection structure.
  * @return The server port.
  */
-#define cddb_get_server_port(c) (c)->server_port;
+#define cddb_get_server_port(c) (c)->server_port
 
 /**
  * Set the port of the CDDB server.  The default value is 888.
@@ -154,6 +156,27 @@ void cddb_set_server_name(cddb_conn_t *c, const char *server);
  * @param port The server port.
  */
 void cddb_set_server_port(cddb_conn_t *c, int port);
+
+/**
+ * Get the network time out value (in seconds).
+ *
+ * @see cddb_set_timeout
+ *
+ * @param c The connection structure.
+ * @return The current time out in seconds.
+ */
+#define cddb_get_timeout(c) (c)->timeout
+
+/**
+ * Set the network time out value (in seconds).  The default is 10
+ * seconds.
+ *
+ * @see cddb_get_timeout
+ *
+ * @param c The connection structure.
+ * @param t The new time out in seconds.
+ */
+#define cddb_set_timeout(c, t) (c)->timeout = t
 
 /**
  * Get the URL path for querying a CDDB server through HTTP.

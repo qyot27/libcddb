@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.11 2003/04/17 22:18:06 airborne Exp $
+    $Id: cddb_ni.h,v 1.12 2003/05/12 18:48:31 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -57,6 +57,7 @@
 #define DEFAULT_HOST        "localhost"
 #define DEFAULT_SERVER      "freedb.org"
 #define DEFAULT_PORT        888
+#define DEFAULT_TIMEOUT     10
 #define DEFAULT_PATH_QUERY  "/~cddb/cddb.cgi"
 #define DEFAULT_PATH_SUBMIT "/~cddb/submit.cgi"
 #define DEFAULT_CACHE       ".cddbslave"
