@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.h,v 1.9 2004/07/18 07:08:07 airborne Exp $
+    $Id: cddb_net.h,v 1.10 2004/07/21 16:11:06 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -36,6 +36,7 @@
 #   include <ws2tcpip.h>
 #endif 
 
+#include <cddb/cddb_ni.h>
 #include <cddb/cddb_config.h>
 
 #if defined(CDDB_NEED_SYS_SOCKET_H) || defined(HAVE_SYS_SOCKET_H)
@@ -53,12 +54,11 @@
  *
  * @param s       The string buffer.
  * @param size    Size of the buffer.
- * @param sock    The socket to read from.
- * @param timeout Number of seconds after which to time out.
+ * @param c       The CDDB connection structure.
  * @return The string that was read or NULL on error or EOF when no
  *         characters were read.
  */
-char *sock_fgets(char *s, int size, int sock, int timeout);
+char *sock_fgets(char *s, int size, cddb_conn_t *c);
 
 /**
  * This function performs the same task as the standard fwrite except
@@ -68,24 +68,21 @@ char *sock_fgets(char *s, int size, int sock, int timeout);
  * @param ptr     Pointer to data record.
  * @param size    Size of data record.
  * @param nmemb   The number of data records to write.
- * @param sock    The socket to write to.
- * @param timeout Number of seconds after which to time out.
+ * @param c       The CDDB connection structure.
  * @return The number of records written.
  */
-size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock, 
-                   int timeout);
+size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, cddb_conn_t *c);
 
 /**
  * This function performs the same task as the standard fprintf except
  * for the fact that it might time-out if the socket write takes too
  * long.  In case of a time out, errno will be set to ETIMEDOUT.
  *
- * @param sock    The socket to write to.
- * @param timeout Number of seconds after which to time out.
+ * @param c       The CDDB connection structure.
  * @param format  Pointer to data record.
  * @return The number of characters written.
  */
-int sock_fprintf(int sock, int timeout, const char *format, ...);
+int sock_fprintf(cddb_conn_t *c, const char *format, ...);
 
 /**
  * This function performs the same task as the standard vfprintf
@@ -93,13 +90,12 @@ int sock_fprintf(int sock, int timeout, const char *format, ...);
  * takes too long.  In case of a time out, errno will be set to
  * ETIMEDOUT.
  *
- * @param sock    The socket to write to.
- * @param timeout Number of seconds after which to time out.
+ * @param c       The CDDB connection structure.
  * @param format  Pointer to data record.
  * @param ap      Variable argument list.
  * @return The number of characters written.
  */
-int sock_vfprintf(int sock, int timeout, const char *format, va_list ap);
+int sock_vfprintf(cddb_conn_t *c, const char *format, va_list ap);
 
 /* --- time-out enabled work-alikes --- */
 
