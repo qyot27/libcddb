@@ -1,4 +1,4 @@
-$Id: TODO,v 1.10 2003/04/16 19:37:50 airborne Exp $
+$Id: TODO,v 1.11 2003/04/20 14:36:29 airborne Exp $
 
 * improved error handling
 
@@ -21,3 +21,5 @@ $Id: TODO,v 1.10 2003/04/16 19:37:50 airborne Exp $
 * support for extended data and playing order fields
 
 * support for writing multi-lined fields
+
+* handle network time-outs
