@@ -107,8 +107,11 @@ AC_SUBST(LIBCDIO_CFLAGS)
 
 dnl Check for iconv
 if test x$with_iconv != xno; then
-    AC_CHECK_HEADERS([iconv.h])
+    AC_CHECK_HEADERS([iconv.h], [with_iconv=1], [with_iconv=0])
+else
+    with_iconv=0
 fi
+AC_SUBST(with_iconv)
 
 dnl Check and add some GCC specific warning flags
 dnl - we do this as the last thing so that a possible -Werror flag
