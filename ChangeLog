@@ -1,0 +1,37 @@
+2002-11-02 17:49  airborne
+
+	* cddb_cmd.h, cddb_cmd_ni.h, cddb_conn.h, cddb_cmd.c, cddb_conn.c:
+	Added support for CDDB query inexact matches.
+
+2002-11-02 17:45  airborne
+
+	* cddb_disc.h, cddb_track.h, cddb_disc.c, cddb_track.c: 
+	Added support for cloning and copying tracks and discs
+
+2002-11-02 14:18  airborne
+
+	* doxygen.conf: 
+	Only process installed header files.
+
+2002-11-02 09:49  airborne
+
+	* cddb_cmd.c: 
+	Increment track number when reading frame offsets.
+
+2002-11-02 09:13  airborne
+
+	* cddb_cmd.c: 
+	Added support for track number.  Fixed bug in cddb_read causing it
+	to add already existing tracks.
+
+2002-11-02 09:12  airborne
+
+	* cddb_disc.c, cddb_disc.h:
+	Added setter methods for disc artist and title.  Added support for
+	track number.
+
+2002-11-02 09:10  airborne
+
+	* cddb_track.c, cddb_track.h:
+	Added track number and length to track structure.  Added setter
+	methods for track artist and title.
