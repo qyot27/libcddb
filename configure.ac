@@ -3,7 +3,8 @@ AC_PREREQ(2.57)
 AC_INIT(configure.ac)
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([Makefile include/Makefile include/cddb/Makefile \
-                 lib/Makefile examples/Makefile tests/Makefile])
+                 lib/Makefile examples/Makefile tests/Makefile \
+                 tests/settings.sh])
 AM_INIT_AUTOMAKE(libcddb, 0.9.1)
 AM_MAINTAINER_MODE
 
@@ -33,8 +34,6 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 dnl Checks for libraries.
-AM_PATH_CHECK([], enable_check=yes, enable_check=no)
-AM_CONDITIONAL(REGRESSION_TESTS, test "x$enable_check" = "xyes")
 AC_CHECK_LIB([cdio], [cdio_open])
 
 dnl Checks for header files.
