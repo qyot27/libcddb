@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_regex.h,v 1.9 2004/04/04 02:11:42 rockyb Exp $
+    $Id: cddb_regex.h,v 1.10 2005/02/04 21:10:35 rockyb Exp $
 
-    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -53,6 +53,10 @@ extern regex_t *REGEX_QUERY_MATCH;
 /**
  */
 void cddb_regex_init(void);
+
+/**
+ */
+void cddb_regex_destroy(void);
 
 /**
  */

@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_conn.c,v 1.29 2004/10/15 19:43:29 airborne Exp $
+    $Id: cddb_conn.c,v 1.30 2005/02/04 21:10:39 rockyb Exp $
 
-    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -147,6 +147,7 @@ void cddb_destroy(cddb_conn_t *c)
         cddb_query_clear(c);
         cddb_close_iconv(c);
         FREE_NOT_NULL(c->charset);
+	cddb_regex_destroy();
         free(c);
     }
 }

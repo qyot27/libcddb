@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_regex.c,v 1.10 2004/10/15 18:47:07 airborne Exp $
+    $Id: cddb_regex.c,v 1.11 2005/02/04 21:10:39 rockyb Exp $
 
-    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,17 +31,17 @@
  */
 static int initialized = 0;
 
-regex_t *REGEX_TRACK_FRAME_OFFSETS;
-regex_t *REGEX_TRACK_FRAME_OFFSET;
-regex_t *REGEX_DISC_LENGTH;
-regex_t *REGEX_DISC_TITLE;
-regex_t *REGEX_DISC_YEAR;
-regex_t *REGEX_DISC_GENRE;
-regex_t *REGEX_DISC_EXT;
-regex_t *REGEX_TRACK_TITLE;
-regex_t *REGEX_TRACK_EXT;
-regex_t *REGEX_PLAY_ORDER;
-regex_t *REGEX_QUERY_MATCH;
+regex_t *REGEX_TRACK_FRAME_OFFSETS=NULL;
+regex_t *REGEX_TRACK_FRAME_OFFSET=NULL;
+regex_t *REGEX_DISC_LENGTH=NULL;
+regex_t *REGEX_DISC_TITLE=NULL;
+regex_t *REGEX_DISC_YEAR=NULL;
+regex_t *REGEX_DISC_GENRE=NULL;
+regex_t *REGEX_DISC_EXT=NULL;
+regex_t *REGEX_TRACK_TITLE=NULL;
+regex_t *REGEX_TRACK_EXT=NULL;
+regex_t *REGEX_PLAY_ORDER=NULL;
+regex_t *REGEX_QUERY_MATCH=NULL;
 
 
 /**
@@ -87,6 +87,31 @@ void cddb_regex_init()
 
         initialized = 1;
     }
+}
+
+static inline void cddb_regfree(regex_t *regex) 
+{
+  if (regex) {
+    regfree(regex);
+    free(regex);
+    regex=NULL;
+  }
+  
+}
+
+void cddb_regex_destroy()
+{
+  cddb_regfree (REGEX_TRACK_FRAME_OFFSETS);
+  cddb_regfree (REGEX_TRACK_FRAME_OFFSET);
+  cddb_regfree (REGEX_DISC_LENGTH);
+  cddb_regfree (REGEX_DISC_TITLE);
+  cddb_regfree (REGEX_DISC_YEAR);
+  cddb_regfree (REGEX_DISC_GENRE);
+  cddb_regfree (REGEX_DISC_EXT);
+  cddb_regfree (REGEX_TRACK_TITLE);
+  cddb_regfree (REGEX_TRACK_EXT);
+  cddb_regfree (REGEX_PLAY_ORDER);
+  cddb_regfree (REGEX_QUERY_MATCH);
 }
 
 int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx)
