@@ -1,5 +1,5 @@
 /*
-    $Id: do_query.c,v 1.2 2003/04/20 17:02:40 airborne Exp $
+    $Id: do_query.c,v 1.3 2003/04/20 17:24:56 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -25,6 +25,11 @@
 void do_query(cddb_conn_t *conn, cddb_disc_t *disc)
 {
     int matches, i;
+
+    /* This command also requires the disc ID to be initalized
+       correctly.  So we first calculate this disc ID before executing
+       the query command. */
+    cddb_disc_calc_discid(disc);
 
     /* Try querying the database for information about the provided
        disc.  This function will return the number of matches that
@@ -62,7 +67,7 @@ void do_query(cddb_conn_t *conn, cddb_disc_t *disc)
         i++;
 
         /* Print out the information for the current match. */
-        printf("Match %d\n", i + 1);
+        printf("Match %d\n", i);
         /* Retrieve and print the category and disc ID. */
         printf("  category: %s (%d)\t%08x\n", cddb_disc_get_category_str(disc),
                cddb_disc_get_category(disc), cddb_disc_get_discid(disc));
