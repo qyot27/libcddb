@@ -17,6 +17,7 @@
         - forc^H^H^H^Hencouraged me to write unit tests
         - some patches and hints for autoconf/automake
         - fixes for Win32 support
+        - initial regex memory leak patch
 
     Manfred Tremmel
         - creation of Suse RPMs for libcddb
