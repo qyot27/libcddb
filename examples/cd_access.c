@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.5 2003/04/21 17:17:29 airborne Exp $
+    $Id: cd_access.c,v 1.6 2003/05/04 09:27:28 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -86,7 +86,7 @@ cddb_disc_t *cd_read(char *device)
 
         /* Add this offset to teh list.  We have to make sure that we
            add two seconds of lead-in.*/
-        foffset[t - 1] = lsn + 2 * FRAMES_PER_SECOND;
+        foffset[t - 1] = lsn + SECONDS_TO_FRAMES(2);
     }
 
     /* Now all we still have to do, is calculate the length of the
