@@ -1,7 +1,7 @@
 /*
-    $Id: main.c,v 1.19 2005/03/11 21:20:10 airborne Exp $
+    $Id: main.c,v 1.20 2005/03/11 21:29:27 airborne Exp $
 
-    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

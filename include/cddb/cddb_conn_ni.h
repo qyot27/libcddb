@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_conn_ni.h,v 1.10 2004/10/15 19:42:16 airborne Exp $
+    $Id: cddb_conn_ni.h,v 1.11 2005/03/11 21:29:29 airborne Exp $
 
-    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
