@@ -1,5 +1,5 @@
 /*
-  $Id: cddb_log.c,v 1.1 2003/05/20 20:37:03 airborne Exp $
+  $Id: cddb_log.c,v 1.2 2003/05/20 21:42:07 airborne Exp $
 
   Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -23,7 +23,12 @@
 #include "cddb/cddb_ni.h"
 
 
-static int _min_level = CDDB_LOG_WARN;
+#ifdef LOGLEVEL
+    static int _min_level = LOGLEVEL;
+#else
+    static int _min_level = CDDB_LOG_WARN;
+#endif
+
 static const char *_level_str[5] = { "debug", "info", "warning", "error", "critical" };
 
 static void default_cddb_log_handler(cddb_log_level_t level, const char *message)

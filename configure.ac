@@ -9,11 +9,37 @@ AM_INIT_AUTOMAKE(libcddb, 0.9.4)
 AM_MAINTAINER_MODE
 
 dnl Process custom command-line options
-AC_ARG_ENABLE(debug,
-              [  --enable-debug          enable debug mode [default=no]],
+AC_ARG_ENABLE([loglevel],
+              AC_HELP_STRING([--enable-loglevel=LVL],
+                             [set default log level to one of debug, info, warn, ]
+                             [error, critical or none (default=warn)]),
+              default_loglevel=$enableval, default_loglevel=$enableval)
+if test x$default_loglevel = xdebug; then
+    default_loglevel="CDDB_LOG_DEBUG"
+elif test x$default_loglevel = xinfo; then
+    default_loglevel="CDDB_LOG_INFO"
+elif test x$default_loglevel = xwarn -o x$default_loglevel = xyes; then
+    default_loglevel="CDDB_LOG_WARN"
+elif test x$default_loglevel = xerror; then
+    default_loglevel="CDDB_LOG_ERROR"
+elif test x$default_loglevel = xcritical; then
+    default_loglevel="CDDB_LOG_CRITICAL"
+elif test x$default_loglevel = xnone -o x$default_loglevel = xno; then
+    default_loglevel="CDDB_LOG_NONE"
+elif test x$default_loglevel != x; then
+    AC_MSG_WARN([invalid loglevel, using default])
+fi
+
+AC_ARG_ENABLE([debug],
+              AC_HELP_STRING([--enable-debug], [enable debug mode (default=no)]),
               enable_debug=yes, enable_debug=no)
 if test x$enable_debug = xyes; then
-    AC_DEFINE([DEBUG],1,[Define to enable debug output])
+    AC_MSG_WARN([--enable-debug is deprecated, use --enable-loglevel instead])
+    default_loglevel="CDDB_LOG_DEBUG"
+fi
+
+if test x$default_loglevel != x; then
+    AC_DEFINE_UNQUOTED([LOGLEVEL],$default_loglevel,[Set to default log level])
 fi
 
 dnl Check for target
