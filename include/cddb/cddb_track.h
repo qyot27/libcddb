@@ -33,7 +33,7 @@ typedef struct cddb_track_s
 /**
  * Creates a new CDDB track structure.
  *
- * @return The CDDB track structure.
+ * @return The CDDB track structure or NULL if memory allocation failed.
  */
 cddb_track_t *cddb_track_new(void);
 
@@ -57,6 +57,38 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
 
 /* --- getters & setters --- */
 
+
+/**
+ * Get the number of this track.  This track number starts counting at
+ * 1.  If the track number is not defined -1 will be returned.
+ *
+ * @param track The CDDB track structure.
+ * @return The track number.
+ */
+#define cddb_track_get_number(track) (track)->num
+
+/**
+ * Get the length of the track in seconds.  If the track length is not
+ * defined this routine will try to calculate it using the frame
+ * offsets of the tracks and the total disc length.  These
+ * calculations will do no rounding to the nearest second.  So it is
+ * possible that the sum off all track lengths does not add up to the
+ * actual disc length.  If the length can not be calculated -1 will be
+ * returned.
+ *
+ * @param track The CDDB track structure.
+ * @return The track length.
+ */
+int cddb_track_get_length(cddb_track_t *track);
+
+/**
+ * Get the track title.  If no title is set for this track then NULL
+ * will be returned.
+ *
+ * @param disc The CDDB disc structure.
+ * @return The track title.
+ */
+#define cddb_track_get_title(disc) (disc)->title
 
 /**
  * Set the track title.  If the track already had a title, then the
@@ -102,8 +134,8 @@ void cddb_track_set_artist(cddb_track_t *track, const char *artist);
  * yet, then a new one will be created from the given string,
  * otherwise that string will be appended to the existing artist.
  *
- * @param track The CDDB track structure.
- * @param title Part of the artist name.
+ * @param track  The CDDB track structure.
+ * @param artist Part of the artist name.
  */
 void cddb_track_append_artist(cddb_track_t *track, const char *artist);
 
