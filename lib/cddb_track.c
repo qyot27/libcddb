@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.10 2003/04/17 17:28:41 airborne Exp $
+    $Id: cddb_track.c,v 1.11 2003/05/04 09:29:13 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -96,13 +96,13 @@ int cddb_track_get_length(cddb_track_t *track)
                 end = next->frame_offset;
                 if (end > start) {
                     /* XXX: rounding errors */
-                    track->length = (end - start) / FRAMES_PER_SECOND;
+                    track->length = FRAMES_TO_SECONDS(end - start);
                 }
             } else {
                 /* last track on disc, use disc length */
                 if (track->disc != NULL) {
                     /* XXX: rounding errors */
-                    start /= FRAMES_PER_SECOND;
+                    start = FRAMES_TO_SECONDS(start);
                     end = cddb_disc_get_length(track->disc);
                     if (end > start) {
                         track->length = end - start;

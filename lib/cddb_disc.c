@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.12 2003/04/17 17:28:34 airborne Exp $
+    $Id: cddb_disc.c,v 1.13 2003/05/04 09:29:13 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -293,7 +293,7 @@ int cddb_disc_calc_discid(cddb_disc_t *disc)
     for (first = track = cddb_disc_get_track_first(disc); 
          track != NULL; 
          track = cddb_disc_get_track_next(disc)) {
-        tmp = track->frame_offset / FRAMES_PER_SECOND;
+        tmp = FRAMES_TO_SECONDS(track->frame_offset);
         do {
             result += tmp % 10;
             tmp /= 10;
@@ -309,7 +309,7 @@ int cddb_disc_calc_discid(cddb_disc_t *disc)
          * last byte is nr of tracks
          */
         disc->discid = (result % 0xff) << 24 | 
-                       (disc->length - first->frame_offset / FRAMES_PER_SECOND) << 8 | 
+                       (disc->length - FRAMES_TO_SECONDS(first->frame_offset)) << 8 | 
                        disc->track_cnt;
     }
     dlog("\tDisc ID: %08x", disc->discid);
