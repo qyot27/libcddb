@@ -1,10 +1,16 @@
 #!/bin/sh
 # @configure_input@
 #
-# $Id: settings.sh.in,v 1.1 2003/04/20 22:22:27 airborne Exp $
+# $Id: settings.sh.in,v 1.2 2003/04/21 10:21:43 airborne Exp $
 
 # location of the example program used in the tests
 CDDB_QUERY='@abs_top_builddir@/examples/cddb_query -q'
+
+# location of local test cache
+CDDB_CACHE='@abs_srcdir@/testcache'
+
+# location of test data
+CDDB_DATA='@abs_srcdir@/testdata'
 
 # test result return codes
 SUCCESS=0
@@ -18,6 +24,19 @@ check_discid()
     RET_ID=`sed "/^${DISCID_STR}[0-9a-f]*\$/!d;s/${DISCID_STR}\([0-9a-f]*\)/\1/"`
     printf 'Checking disc ID %s... ' ${EXP_ID}
     if [ ${RET_ID}x != ${EXP_ID}x ]; then
+        printf 'failed.\n'
+        exit $FAILURE
+    fi
+    printf 'ok.\n'
+}
+
+check_read()
+{
+    DISC_ID=$1
+    EXP_READ="${CDDB_DATA}/${DISC_ID}.txt"
+    printf 'Checking disc read %s... ' ${DISC_ID}
+    diff - $EXP_READ > /dev/null
+    if [ $? -ne 0 ]; then
         printf 'failed.\n'
         exit $FAILURE
     fi
