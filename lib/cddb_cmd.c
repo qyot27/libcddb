@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.47 2004/07/21 12:22:28 airborne Exp $
+    $Id: cddb_cmd.c,v 1.48 2004/07/21 16:14:16 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -319,8 +319,8 @@ int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc)
     }
 
     /* create category dir */
-    fn = (char*)malloc(LINE_SIZE);
-    snprintf(fn, LINE_SIZE, "%s/%s", c->cache_dir, CDDB_CATEGORY[disc->category]);
+    fn = (char*)malloc(c->buf_size);
+    snprintf(fn, c->buf_size, "%s/%s", c->cache_dir, CDDB_CATEGORY[disc->category]);
     if ((MKDIR(fn, 0755) == -1) && (errno != EEXIST)) {
         cddb_log_error("could not create category directory: %s", fn);
         free(fn);
@@ -394,9 +394,9 @@ char *cddb_read_line(cddb_conn_t *c)
     cddb_log_debug("cddb_read_line()");
     /* read line, possibly returning NULL */
     if (c->cache_read) {
-        s = fgets(c->line, LINE_SIZE, cddb_cache_file(c));
+        s = fgets(c->line, c->buf_size, cddb_cache_file(c));
     } else {
-        s = sock_fgets(c->line, LINE_SIZE, c->socket, c->timeout);
+        s = sock_fgets(c->line, c->buf_size, c);
     }
 
     /* strip off any line-terminating characters */
@@ -485,23 +485,21 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
 
                 if (c->is_http_proxy_enabled) {
                     /* use an HTTP proxy */
-                    sock_fprintf(c->socket, c->timeout, "POST http://%s:%d%s HTTP/1.0\r\n", 
+                    sock_fprintf(c, "POST http://%s:%d%s HTTP/1.0\r\n", 
                                  c->server_name, c->server_port, c->http_path_submit);
-                    sock_fprintf(c->socket, c->timeout, "Host: %s:%d\r\n",
+                    sock_fprintf(c, "Host: %s:%d\r\n",
                                  c->server_name, c->server_port);
                 } else {
                     /* direct connection */
-                    sock_fprintf(c->socket, c->timeout, "POST %s HTTP/1.0\r\n",
-                                 c->http_path_submit);
+                    sock_fprintf(c, "POST %s HTTP/1.0\r\n", c->http_path_submit);
                 }
 
-                sock_fprintf(c->socket, c->timeout, "Category: %s\r\n", category);
-                sock_fprintf(c->socket, c->timeout, "Discid: %08x\r\n", discid);
-                sock_fprintf(c->socket, c->timeout, "User-Email: %s@%s\r\n", 
-                             c->user, c->hostname);
-                sock_fprintf(c->socket, c->timeout, "Submit-Mode: submit\r\n");
-                sock_fprintf(c->socket, c->timeout, "Content-Length: %d\r\n", size);
-                sock_fprintf(c->socket, c->timeout, "\r\n");
+                sock_fprintf(c, "Category: %s\r\n", category);
+                sock_fprintf(c, "Discid: %08x\r\n", discid);
+                sock_fprintf(c, "User-Email: %s@%s\r\n", c->user, c->hostname);
+                sock_fprintf(c, "Submit-Mode: submit\r\n");
+                sock_fprintf(c, "Content-Length: %d\r\n", size);
+                sock_fprintf(c, "\r\n");
             }
             break;
         default:
@@ -512,35 +510,35 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
                 
                 if (c->is_http_proxy_enabled) {
                     /* use an HTTP proxy */
-                    sock_fprintf(c->socket, c->timeout, "GET http://%s:%d%s", 
+                    sock_fprintf(c, "GET http://%s:%d%s", 
                                  c->server_name, c->server_port, c->http_path_query);
                 } else {
                     /* direct connection */
-                    sock_fprintf(c->socket, c->timeout, "GET %s", c->http_path_query);
+                    sock_fprintf(c, "GET %s", c->http_path_query);
                 }
 
-                buf = (char*)malloc(LINE_SIZE);
-                rv = vsnprintf(buf, LINE_SIZE, CDDB_COMMANDS[cmd], args);
-                if (rv < 0 || rv >= LINE_SIZE) {
+                buf = (char*)malloc(c->buf_size);
+                rv = vsnprintf(buf, c->buf_size, CDDB_COMMANDS[cmd], args);
+                if (rv < 0 || rv >= c->buf_size) {
                     /* buffer is too small */
                     cddb_errno_log_crit(c, CDDB_ERR_LINE_SIZE);
                     return FALSE;
                 }
                 url_encode(buf);
-                sock_fprintf(c->socket, c->timeout, "?cmd=%s&", buf);
+                sock_fprintf(c, "?cmd=%s&", buf);
                 free(buf);
 
-                sock_fprintf(c->socket, c->timeout, "hello=%s+%s+%s+%s&", 
+                sock_fprintf(c, "hello=%s+%s+%s+%s&", 
                              c->user, c->hostname, c->cname, c->cversion);
-                sock_fprintf(c->socket, c->timeout, "proto=%d", DEFAULT_PROTOCOL_VERSION);
-                sock_fprintf(c->socket, c->timeout, " HTTP/1.0\r\n");
+                sock_fprintf(c, "proto=%d", DEFAULT_PROTOCOL_VERSION);
+                sock_fprintf(c, " HTTP/1.0\r\n");
 
                 if (c->is_http_proxy_enabled) {
                     /* insert host header */
-                    sock_fprintf(c->socket, c->timeout, "Host: %s:%d\r\n",
+                    sock_fprintf(c, "Host: %s:%d\r\n",
                                  c->server_name, c->server_port);
                 }
-                sock_fprintf(c->socket, c->timeout, "\r\n");
+                sock_fprintf(c, "\r\n");
 
                 /* parse HTTP response line */
                 if (!cddb_http_parse_response(c)) {
@@ -579,8 +577,8 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
         }
     } else {
         /* CDDBP */
-        sock_vfprintf(c->socket, c->timeout, CDDB_COMMANDS[cmd], args);
-        sock_fprintf(c->socket, c->timeout, "\n");
+        sock_vfprintf(c, CDDB_COMMANDS[cmd], args);
+        sock_fprintf(c, "\n");
     }
     va_end(args);
 
@@ -1029,7 +1027,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         return FALSE;
     }
 
-    buf = (char*)malloc(LINE_SIZE);
+    buf = (char*)malloc(c->buf_size);
     /* check track offsets and generate offset list */
     buf[0] = CHR_EOS;
     for (track = cddb_disc_get_track_first(disc); 
@@ -1041,7 +1039,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
             return -1;
         }
         snprintf(offset, sizeof(offset), "%d ", track->frame_offset);
-        if (strlen(buf) + strlen(offset) >= LINE_SIZE) {
+        if (strlen(buf) + strlen(offset) >= c->buf_size) {
             /* buffer is too small */
             cddb_errno_log_crit(c, CDDB_ERR_LINE_SIZE);
             free(buf);
@@ -1302,13 +1300,13 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
 
     /* ready to send data */
     cddb_log_debug("...sending data");
-    sock_fwrite(buf, sizeof(char), size, c->socket, c->timeout);
+    sock_fwrite(buf, sizeof(char), size, c);
     if (c->is_http_enabled) {
         /* skip HTTP response headers */
         cddb_http_parse_headers(c);
     } else {
         /* send terminating marker */
-        sock_fprintf(c->socket, c->timeout, ".\n");
+        sock_fprintf(c, ".\n");
     }
 
     /* check response */
