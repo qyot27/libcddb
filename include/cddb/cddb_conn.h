@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.14 2003/05/01 14:48:42 airborne Exp $
+    $Id: cddb_conn.h,v 1.15 2003/05/08 20:27:47 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -409,7 +409,9 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
 /**
  * Change the directory used for caching CDDB entries locally.  The
  * default location of the cached entries is a subdirectory
- * (.cddbslave) of the user's home directory.
+ * (.cddbslave) of the user's home directory.  If the first character
+ * of the directory is '~', then it will be expanded to the contents
+ * of $HOME.
  *
  * @see cddb_cache_get_dir
  *

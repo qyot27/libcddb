@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.17 2003/05/01 15:24:24 airborne Exp $
+    $Id: cddb_conn.c,v 1.18 2003/05/08 20:27:48 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -211,10 +211,20 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email)
 
 int cddb_cache_set_dir(cddb_conn_t *c, const char *dir)
 {
+    char *home;
+
     dlog("cddb_cache_set_dir()");
     if (dir) {
         FREE_NOT_NULL(c->cache_dir);
-        c->cache_dir = strdup(dir);
+        if (dir[0] == '~') {
+            /* expand ~ to $HOME */
+            home = getenv("HOME");
+            c->cache_dir = (char*)malloc(strlen(home) + strlen(dir));
+            sprintf(c->cache_dir, "%s%s", home, dir + 1);
+            printf("DIR: '%s' (%d)\n", c->cache_dir, strlen(c->cache_dir));
+        } else {
+            c->cache_dir = strdup(dir);
+        }
     }
     return TRUE;
 }
