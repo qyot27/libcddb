@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.18 2004/10/08 21:03:50 airborne Exp $
+    $Id: cddb_ni.h,v 1.19 2004/10/15 18:46:11 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,6 +29,10 @@
 
 #if HAVE_CONFIG_H
 #  include <config.h>
+#endif
+
+#ifdef HAVE_ICONV_H
+#  include <iconv.h>
 #endif
 
 #include "cddb/cddb_regex.h"
@@ -80,12 +84,12 @@ int cddb_str_iconv(iconv_t cd, char *in, char **out);
 /**
  * Converts all disc and track strings to user character encoding.
  */
-int cddb_disc_iconv(cddb_conn_t *c, cddb_disc_t *disc);
+int cddb_disc_iconv(iconv_t cd, cddb_disc_t *disc);
 
 /**
  * Converts all track strings to user character encoding.
  */
-int cddb_track_iconv(cddb_conn_t *c, cddb_track_t *track);
+int cddb_track_iconv(iconv_t cd, cddb_track_t *track);
 
 
 #ifdef __cplusplus
