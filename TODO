@@ -1,4 +1,4 @@
-$Id: TODO,v 1.9 2003/04/16 18:40:38 airborne Exp $
+$Id: TODO,v 1.10 2003/04/16 19:37:50 airborne Exp $
 
 * improved error handling
 
@@ -15,3 +15,9 @@ $Id: TODO,v 1.9 2003/04/16 18:40:38 airborne Exp $
 * improve documentation
 
 * tilde expansion in cddb_cache_set_dir
+
+* thread safety in on cddb_conn_t structure (necesasry?)
+
+* support for extended data and playing order fields
+
+* support for writing multi-lined fields
