@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.28 2004/10/15 19:21:40 airborne Exp $
+    $Id: cddb_conn.c,v 1.29 2004/10/15 19:43:29 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -107,7 +107,7 @@ cddb_conn_t *cddb_new(void)
         c->query_idx = 0;
         c->query_cnt = 0;
 
-        c->charset = malloc(sizeof(cddb_iconv_t));
+        c->charset = malloc(sizeof(struct cddb_iconv_s));
         c->charset->cd_to_freedb = NULL;
         c->charset->cd_from_freedb = NULL;
     } else {
@@ -136,6 +136,8 @@ void cddb_destroy(cddb_conn_t *c)
     if (c) {
         cddb_disconnect(c);
         FREE_NOT_NULL(c->line);
+        FREE_NOT_NULL(c->cname);
+        FREE_NOT_NULL(c->cversion);
         FREE_NOT_NULL(c->server_name);
         FREE_NOT_NULL(c->http_path_query);
         FREE_NOT_NULL(c->http_path_submit);
