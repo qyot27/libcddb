@@ -1,4 +1,4 @@
-$Id: TODO,v 1.14 2003/04/30 18:02:41 airborne Exp $
+$Id: TODO,v 1.15 2003/05/01 07:21:07 airborne Exp $
 
 * improved error handling
 
@@ -29,3 +29,5 @@ $Id: TODO,v 1.14 2003/04/30 18:02:41 airborne Exp $
 * research possible use of pkg-config
 
 * full text search on CDDB server
+
+* add lscat command
