@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cddb/cddb_ni.h"
+#include "cddb/cddb_regex.h"
 
 
 /**
@@ -21,7 +22,7 @@ regex_t *REGEX_QUERY_MATCH;
 
 /**
  */
-int cddb_regex_init_1(regex_t **p, const char *regex)
+static int cddb_regex_init_1(regex_t **p, const char *regex)
 {
     if ((*p = (regex_t*)malloc(sizeof(regex_t))) == NULL) {
         // XXX: check memory alloc
@@ -58,31 +59,19 @@ void cddb_regex_init()
     }
 }
 
-int cddb_regex_get_int(char *s, regmatch_t matches[], int idx)
+int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx)
 {
-    char c;
-    int start, end, i;
+    char *buf;
+    int start, end, len, i;
 
     start = matches[idx].rm_so;
     end = matches[idx].rm_eo;
-    c = s[end];
-    s[end] = '\0';
-    i = atoi(s+start);
-    s[end] = c;
-    return i;
-}
-
-int cddb_regex_get_hex(char *s, regmatch_t matches[], int idx)
-{
-    char c;
-    int start, end, i;
-
-    start = matches[idx].rm_so;
-    end = matches[idx].rm_eo;
-    c = s[end];
-    s[end] = '\0';
-    i = strtol(s+start, NULL, 16);
-    s[end] = c;
+    len = end - start;
+    buf = (char*)malloc(len + 1);
+    strncpy(buf, s + start, len);
+    buf[len] = '\0';
+    i = atoi(buf);
+    free(buf);
     return i;
 }
 
