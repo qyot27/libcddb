@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.30 2003/04/21 08:46:08 airborne Exp $
+    $Id: cddb_cmd.c,v 1.31 2003/04/21 09:07:06 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -757,10 +757,16 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                 }
             } else {
                 /* we're done parsing */
+                dlog("\tstate: STOP");
                 state = STATE_STOP;
             }
             break;
         }
+    }
+
+    /* change state to STOP if end of stream reached */
+    if (line == NULL) {
+        state = STATE_STOP;
     }
 
     if (cache_content) {
