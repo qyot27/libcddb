@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: check_server.sh,v 1.6 2003/05/25 18:34:29 airborne Exp $
+# $Id: check_server.sh,v 1.7 2004/03/03 12:35:50 rockyb Exp $
 
 . ./settings.sh
 
@@ -11,7 +11,7 @@
 # read the requested entries from the cache.
 
 # Check whether we have proxy settings
-if test -z $http_proxy; then
+if test -z "$http_proxy"; then
     NO_PROXY=1
     NO_PROXY_REASON='$http_proxy not defined'
 else 
