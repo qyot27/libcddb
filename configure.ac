@@ -53,13 +53,13 @@ case $host in
         ;;
     *darwin*)
         AC_DEFINE([CDDB_NEED_UNISTD_H],1,
-	[Define if you have <unistd.h> and need it included. 
-	 On MacOS, <regex.h> needs this but that header doesn't
-	 include it.])
+        [Define if you have <unistd.h> and need it included. 
+         On MacOS, <regex.h> needs this but that header doesn't
+         include it.])
         AC_DEFINE([CDDB_NEED_SYS_SOCKET_H],1,
-	[Define if you have <sys/socket.h> and need it included. 
-	 On MacOS, <cddb_net.h> needs this but that header doesn't
-	 include it.])
+        [Define if you have <sys/socket.h> and need it included. 
+         On MacOS, <cddb_net.h> needs this but that header doesn't
+         include it.])
         ;;
 esac
 
@@ -108,7 +108,6 @@ AC_SUBST(LIBCDIO_CFLAGS)
 dnl Check for iconv
 if test x$with_iconv != xno; then
     AC_CHECK_HEADERS([iconv.h])
-    AC_CHECK_FUNCS([iconv_open])
 fi
 
 dnl Check and add some GCC specific warning flags
