@@ -1,6 +1,6 @@
 # Copyright 1999-2003 Gentoo Technologies, Inc.
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /cvsroot/libcddb/libcddb/misc/libcddb.ebuild,v 1.4 2003/05/06 17:51:19 airborne Exp $
+# $Header: /cvsroot/libcddb/libcddb/misc/libcddb.ebuild,v 1.5 2003/05/29 11:47:37 airborne Exp $
 
 IUSE="doc"
 
@@ -9,7 +9,8 @@ HOMEPAGE="http://libcddb.sourceforge.net/"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 LICENSE="LGPL"
 
-DEPEND="doc? ( app-doc/doxygen )"
+DEPEND=">=media-libs/libcdio-0.5
+	    doc? ( app-doc/doxygen )"
 
 SLOT="0"
 KEYWORDS="~x86 ~sparc"
@@ -29,7 +30,7 @@ src_compile() {
 src_install() {
 	make DESTDIR=${D} install
 
-	dodoc AUTHORS Changelog COPYING INSTALL NEWS README THANKS TODO
+	dodoc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS TODO
 	# Create API docs if needed and possible
 	if use doc && has_version 'app-doc/doxygen'; then
 		dohtml doc/html/*
