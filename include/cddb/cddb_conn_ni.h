@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn_ni.h,v 1.5 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_conn_ni.h,v 1.6 2003/05/20 20:42:02 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -45,6 +45,35 @@ int cddb_connect(cddb_conn_t *c);
 /**
  */
 void cddb_disconnect(cddb_conn_t *c);
+
+
+/* --- error handling --- */
+
+
+/**
+ * Set the error number for the last libcddb command.
+ *
+ * @param c The CDDB connection structure.
+ * @param n The error number
+ */
+#define cddb_errno_set(c, n) (c)->errnum = n
+
+/**
+ * Set the error number for the last libcddb command.  If this number
+ * is different from CDDB_ERR_OK, a message is also logged with the
+ * level specified.
+ *
+ * @param c The CDDB connection structure.
+ * @param n The error number
+ * @param l The log level
+ */
+#define cddb_errno_log(c, n, l) cddb_errno_set(c, n); cddb_log(l, cddb_error_str(n))
+
+#define cddb_errno_log_debug(c, n) cddb_errno_log(c, n, CDDB_LOG_DEBUG)
+#define cddb_errno_log_info(c, n) cddb_errno_log(c, n, CDDB_LOG_INFO)
+#define cddb_errno_log_warn(c, n) cddb_errno_log(c, n, CDDB_LOG_WARN)
+#define cddb_errno_log_error(c, n) cddb_errno_log(c, n, CDDB_LOG_ERROR)
+#define cddb_errno_log_crit(c, n) cddb_errno_log(c, n, CDDB_LOG_CRITICAL)
 
 
 #ifdef __cplusplus
