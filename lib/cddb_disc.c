@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.19 2004/10/08 21:09:24 airborne Exp $
+    $Id: cddb_disc.c,v 1.20 2004/10/15 19:01:30 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -19,11 +19,14 @@
     Boston, MA  02111-1307, USA.
 */
 
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "cddb/cddb_ni.h"
+
+#include <math.h>
+#include <stdlib.h>
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
 
 
 const char *CDDB_CATEGORY[CDDB_CAT_LAST] = {
@@ -36,57 +39,53 @@ const char *CDDB_CATEGORY[CDDB_CAT_LAST] = {
 /* --- private functions */
 
 
-int cddb_disc_iconv(cddb_conn_t *c, cddb_disc_t *disc)
+int cddb_disc_iconv(iconv_t cd, cddb_disc_t *disc)
 { 
-#ifdef HAVE_ICONV_H
     char *result;
     cddb_track_t *track;
 
-    if (!c->cd_from_freedb) {
+    if (!cd) {
         return TRUE;            /* no user character set defined */
     }
     if (disc->genre) {
-        if (cddb_str_iconv(c->cd_from_freedb, disc->genre, &result)) {
+        if (cddb_str_iconv(cd, disc->genre, &result)) {
             free(disc->genre);
             disc->genre = result;
         } else {
-            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
             return FALSE;
         }
     }
     if (disc->title) {
-        if (cddb_str_iconv(c->cd_from_freedb, disc->title, &result)) {
+        if (cddb_str_iconv(cd, disc->title, &result)) {
             free(disc->title);
             disc->title = result;
         } else {
-            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
             return FALSE;
         }
     }
     if (disc->artist) {
-        if (cddb_str_iconv(c->cd_from_freedb, disc->artist, &result)) {
+        if (cddb_str_iconv(cd, disc->artist, &result)) {
             free(disc->artist);
             disc->artist = result;
         } else {
-            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
             return FALSE;
         }
     }
     if (disc->ext_data) {
-        if (cddb_str_iconv(c->cd_from_freedb, disc->ext_data, &result)) {
+        if (cddb_str_iconv(cd, disc->ext_data, &result)) {
             free(disc->ext_data);
             disc->ext_data = result;
         } else {
-            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
             return FALSE;
         }
     }
     track = disc->tracks;
     while (track) {
-        cddb_track_iconv(c, track);
+        if (!cddb_track_iconv(cd, track)) {
+            return FALSE;
+        }
         track = track->next;
     }
-#endif
     return TRUE;
 }
 
