@@ -1,3 +1,300 @@
+2003-05-31 15:31  airborne
+
+	* NEWS: added some more changes between 0.9.3 and 0.9.4
+
+2003-05-31 15:29  airborne
+
+	* lib/cddb_log.c: [impl] reset log handler if NULL handler is
+	provided
+
+2003-05-31 15:26  airborne
+
+	* include/cddb/: Makefile.am, cddb_ni.h: moved non-public part of
+	cddb_log.h to cddb_log_ni.h
+
+2003-05-31 15:26  airborne
+
+	* include/cddb/cddb_log.h: added API doc, moved none public
+	functions to cddb_log_ni.h
+
+2003-05-31 15:25  airborne
+
+	* include/cddb/cddb_log_ni.h: Initial revision
+
+2003-05-29 13:49  airborne
+
+	* examples/Makefile.am: install cddb_query
+
+2003-05-29 13:47  airborne
+
+	* misc/libcddb.ebuild: added libcdio dependency, fixed ChangeLog
+	file name
+
+2003-05-29 13:46  airborne
+
+	* Makefile.am, configure.ac: added pkg-config rules
+
+2003-05-29 13:44  airborne
+
+	* libcddb.pc.in: Initial revision
+
+2003-05-29 12:34  airborne
+
+	* NEWS: added changes between 0.9.3 and 0.9.4
+
+2003-05-29 12:14  airborne
+
+	* lib/cddb_conn.c: only expand ~ if $HOME is set
+
+2003-05-26 20:47  airborne
+
+	* configure.ac: marked --enable-debug as deprecated
+
+2003-05-25 20:34  airborne
+
+	* tests/check_server.sh: fixed skipping for proxy read test
+
+2003-05-25 20:33  airborne
+
+	* TODO: removed extended data item
+
+2003-05-25 20:31  airborne
+
+	* lib/cddb_cmd.c: [impl] added play order parsing state, cleaned up
+	end parsing detection
+
+2003-05-25 16:25  airborne
+
+	* lib/cddb_net.c: removed a debug log line (too many lines being
+	logged)
+
+2003-05-25 16:24  airborne
+
+	* examples/do_display.c: only display extended track data if there
+	is any
+
+2003-05-25 16:23  airborne
+
+	* tests/testdata/: 920ef00b.txt, 920ef00c.txt: updated test data
+	after implementing extended data functionality
+
+2003-05-25 15:14  airborne
+
+	* tests/: check_cache.sh, check_discid.sh, check_parse.sh,
+	check_server.sh, settings.sh.in: added support to skip certain
+	tests
+
+2003-05-23 23:33  airborne
+
+	* lib/cddb_cmd.c: [impl] added support for submitting extended disc
+	and track data
+
+2003-05-23 23:24  airborne
+
+	* tests/Makefile.am: added OVEVIEW.txt to distribution
+
+2003-05-23 23:22  airborne
+
+	* tests/: OVERVIEW.txt, testcache/misc/12345674,
+	testcache/misc/12345675, testcache/misc/12345676,
+	testcache/misc/12345677, testdata/12345674.txt,
+	testdata/12345675.txt, testdata/12345676.txt,
+	testdata/12345677.txt: Initial revision
+
+2003-05-23 23:19  airborne
+
+	* tests/: testcache/misc/12345678, testdata/12345678.txt: added
+	extended track data tests and some extra track tests
+
+2003-05-23 23:18  airborne
+
+	* tests/check_parse.sh: more parsing tests
+
+2003-05-23 23:17  airborne
+
+	* lib/cddb_cmd.c: [impl] if DTITLE does not contain both artist and
+	title, assume they are equal
+
+2003-05-23 23:15  airborne
+
+	* lib/cddb_cmd.c: [iface] added support to parse extended data
+
+2003-05-23 23:12  airborne
+
+	* examples/do_display.c: also display extended disc and track data
+	if present
+
+2003-05-23 23:11  airborne
+
+	* include/cddb/cddb_regex.h, lib/cddb_regex.c: added extended data
+	and play order regular expressions
+
+2003-05-23 23:10  airborne
+
+	* include/cddb/cddb_disc.h, include/cddb/cddb_track.h,
+	lib/cddb_disc.c, lib/cddb_track.c: [iface] added extended data
+	setters and getters
+
+2003-05-23 22:40  airborne
+
+	* THANKS: added Götz Wasch for his Mandrake RPMs
+
+2003-05-20 23:42  airborne
+
+	* configure.ac, lib/cddb_log.c: added support to specify default
+	log level as configure argument
+
+2003-05-20 22:53  airborne
+
+	* lib/cddb_cmd.c: [impl] switched to new logging framework,
+	re-indented switch blocks
+
+2003-05-20 22:47  airborne
+
+	* lib/cddb_net.c: updated some debug logging statements
+
+2003-05-20 22:45  airborne
+
+	* lib/cddb_conn.c: [impl] switched to new logging framework,
+	re-indented switch blocks
+
+2003-05-20 22:43  airborne
+
+	* lib/: cddb_disc.c, cddb_net.c, cddb_track.c: [impl] switched to
+	new logging framework
+
+2003-05-20 22:42  airborne
+
+	* include/cddb/cddb_conn_ni.h: added functions for setting/logging
+	libcddb errors
+
+2003-05-20 22:41  airborne
+
+	* include/cddb/cddb_ni.h: removed obsoleted debug.h from includes
+
+2003-05-20 22:40  airborne
+
+	* include/cddb/cddb.h: added logging framework include file
+
+2003-05-20 22:39  airborne
+
+	* include/cddb/Makefile.am, lib/Makefile.am: added files for
+	logging framework
+
+2003-05-20 22:38  airborne
+
+	* examples/main.c: added logging support
+
+2003-05-20 22:37  airborne
+
+	* include/cddb/cddb_log.h, lib/cddb_log.c: Initial revision
+
+2003-05-20 22:28  airborne
+
+	* tests/testdata/56c2171b89496518.txt: more entries added to
+	multiple result query test
+
+2003-05-20 22:27  airborne
+
+	* include/cddb/debug.h: dlog has been replaced by actual logging
+	framework
+
+2003-05-13 22:46  airborne
+
+	* TODO: removed network time-out action point
+
+2003-05-13 22:43  airborne
+
+	* configure.ac: added some checks suggested by autoscan (after
+	adding network timeout code)
+
+2003-05-13 22:29  airborne
+
+	* lib/cddb_cmd.c: [impl] added timeouts to network I/O
+
+2003-05-13 22:27  airborne
+
+	* include/cddb/cddb_net.h, lib/cddb_net.c: [impl] added timeout
+	support to network read/write functions
+
+2003-05-12 21:17  airborne
+
+	* lib/cddb_net.c: [impl] added BeOS specific code to
+	timeout_connect (hope this works)
+
+2003-05-12 20:48  airborne
+
+	* include/cddb/: cddb_conn.h, cddb_ni.h: [iface] added time-out
+	support
+
+2003-05-12 20:47  airborne
+
+	* lib/cddb_net.c, include/cddb/cddb_net.h: added connect and
+	gethostbyname functions supporting time-out (thanks Google)
+
+2003-05-12 20:46  airborne
+
+	* lib/cddb_conn.c: [impl] added DNS query and connect time-out
+	support
+
+2003-05-09 20:17  airborne
+
+	* examples/: do_query.c, main.c, main.h: be quiet in query mode if
+	required
+
+2003-05-09 20:09  airborne
+
+	* tests/check_cache.sh: report failure if cp fails
+
+2003-05-08 22:40  airborne
+
+	* tests/check_cache.sh: added tests to check changing of cache dir
+
+2003-05-08 22:37  airborne
+
+	* lib/cddb_conn.c: removed some debug output
+
+2003-05-08 22:29  airborne
+
+	* TODO: removed some obsoleted entries
+
+2003-05-08 22:28  airborne
+
+	* configure.ac: version bump to 0.9.4
+
+2003-05-08 22:27  airborne
+
+	* include/cddb/cddb_conn.h, lib/cddb_conn.c: [impl] added ~
+	expansion support in setting of cache dir
+
+2003-05-08 21:43  airborne
+
+	* tests/settings.sh.in: remove test result file when finished
+
+2003-05-08 21:40  airborne
+
+	* tests/: check_cache.sh, check_discid.sh, check_parse.sh,
+	check_server.sh, settings.sh.in: report failures correctly
+
+2003-05-08 20:09  airborne
+
+	* lib/cddb_cmd.c: alternate length calculation, snprintf does not
+	return required length on Solaris
+
+2003-05-08 19:39  airborne
+
+	* tests/: check_cache.sh, check_discid.sh, check_parse.sh,
+	check_server.sh: make sure sourced file is found on Solaris
+
+2003-05-08 19:27  airborne
+
+	* configure.ac: fix for Solaris compilation (thx to Rocky
+	Bernstein)
+
+2003-05-07 21:02  airborne
+
+	* ChangeLog: added 0.9.3 changes
+
 2003-05-07 21:01  airborne
 
 	* NEWS: added changes between 0.9.2 and 0.9.3
