@@ -8,3 +8,5 @@
 * client name and version customization
 
 * parse HTTP response status code (200, 403, 404, 500, ...)
+
+* if no disc found in .cddbslave/<category>/ try .cddbslave/ ?
