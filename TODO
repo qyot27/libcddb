@@ -1,6 +1,4 @@
-$Id: TODO,v 1.20 2003/05/31 13:44:12 airborne Exp $
-
-* improved error handling
+$Id: TODO,v 1.21 2004/07/21 12:33:52 airborne Exp $
 
 * support to enable/disable category dirs in .cddbslave ?
 
