@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_regex.c,v 1.7 2003/05/23 21:11:30 airborne Exp $
+    $Id: cddb_regex.c,v 1.8 2004/03/10 03:08:48 rockyb Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,9 +19,11 @@
     Boston, MA  02111-1307, USA.
 */
 
+#include "cddb/cddb_ni.h"
+
+#ifdef HAVE_REGEX_H
 #include <stdlib.h>
 #include <string.h>
-#include "cddb/cddb_ni.h"
 #include "cddb/cddb_regex.h"
 
 
@@ -116,3 +118,5 @@ char *cddb_regex_get_string(const char *s, regmatch_t matches[], int idx)
     result[len] = '\0';
     return result;
 }
+
+#endif /*HAVE_REGEX_H*/

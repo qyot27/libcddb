@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.h,v 1.5 2003/05/13 20:27:06 airborne Exp $
+    $Id: cddb_net.h,v 1.6 2004/03/10 03:08:48 rockyb Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -28,7 +28,17 @@
 
 
 #include <stdarg.h>
+
+#if defined( UNDER_CE )
+#   include <winsock.h>
+#elif defined( WIN32 )
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#endif 
+
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
 
 
 /* --- socket-based work-alikes --- */

@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.16 2003/05/12 18:48:31 airborne Exp $
+    $Id: cddb_conn.h,v 1.17 2004/03/10 03:08:48 rockyb Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,7 +27,9 @@
 #endif
 
 
+#ifdef HAVE_NETINET_IN_H 
 #include <netinet/in.h>
+#endif
 
 #define CACHE_OFF  0            /**< do not use local CDDB cache, network
                                      only */

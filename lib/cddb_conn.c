@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.23 2004/03/09 12:43:57 rockyb Exp $
+    $Id: cddb_conn.c,v 1.24 2004/03/10 03:08:48 rockyb Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -25,14 +25,6 @@
 #include <sys/types.h>
 #endif
 
-#if defined( UNDER_CE )
-#   include <winsock.h>
-#elif defined( WIN32 )
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   define close closesocket
-#endif 
-
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #endif
@@ -41,11 +33,7 @@
 #include <arpa/inet.h>
 #endif
 
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-
-#ifdef HAVE_STLIB_H
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif 
 
@@ -75,7 +63,9 @@ cddb_conn_t *cddb_new(void)
     cddb_conn_t *c;
     const char *s;
 
+#ifdef HAVE_REGEX_H
     cddb_regex_init();
+#endif
 
     c = (cddb_conn_t*)malloc(sizeof(cddb_conn_t));
     if (c) {

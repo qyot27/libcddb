@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_cmd.c,v 1.44 2003/05/25 18:31:44 airborne Exp $
+    $Id: cddb_cmd.c,v 1.45 2004/03/10 03:08:48 rockyb Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -301,20 +301,26 @@ int cddb_cache_query_disc(cddb_conn_t *c, cddb_disc_t *disc)
     return FALSE;
 }
 
+#if defined( WIN32 )
+#define MKDIR(dir, mode)  mkdir(dir)
+#else
+#define MKDIR(dir, mode)  mkdir(dir, mode)
+#endif 
+
 int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc)
 {
     char fn[LINE_SIZE];
 
     cddb_log_debug("cddb_cache_mkdir()");
     /* create CDDB slave dir */
-    if ((mkdir(c->cache_dir, 0755) == -1) && (errno != EEXIST)) {
+    if ((MKDIR(c->cache_dir, 0755) == -1) && (errno != EEXIST)) {
         cddb_log_error("could not create cache directory: %s", c->cache_dir);
         return FALSE;
     }
 
     /* create category dir */
     snprintf(fn, sizeof(fn), "%s/%s", c->cache_dir, CDDB_CATEGORY[disc->category]);
-    if ((mkdir(fn, 0755) == -1) && (errno != EEXIST)) {
+    if ((MKDIR(fn, 0755) == -1) && (errno != EEXIST)) {
         cddb_log_error("could not create category directory: %s", fn);
         return FALSE;
     }
@@ -593,7 +599,9 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
 {
     char *line, *buf;
     int state, multi_line = MULTI_NONE;
+#ifdef HAVE_REGEX_H
     regmatch_t matches[6];
+#endif
     cddb_track_t *track;
     int cache_content;
     int track_no = 0, old_no = -1;
