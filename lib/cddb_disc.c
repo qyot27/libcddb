@@ -194,7 +194,6 @@ void cddb_disc_copy(cddb_disc_t *dst, cddb_disc_t *src)
         src_track = src_track->next;
         dst_track = dst_track->next;
     }
-    return dst;
 }
 
 int cddb_disc_calc_discid(cddb_disc_t *disc)
