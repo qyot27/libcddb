@@ -13,6 +13,7 @@ configure.scan
 depcomp
 install-sh
 libtool
+libcddb.pc
 ltmain.sh
 missing
 mkinstalldirs
