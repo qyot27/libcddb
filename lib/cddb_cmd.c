@@ -10,12 +10,6 @@
 #include "cddb/cddb_ni.h"
 
 
-#define CHR_CR         '\r'
-#define CHR_LF         '\n'
-#define CHR_EOS        '\0'
-#define CHR_SPACE      ' '
-#define CHR_DOT        '.'
-
 static const char *CDDB_COMMANDS[CMD_LAST] = {
     "cddb hello %s %s %s %s",
     "quit",
@@ -27,6 +21,8 @@ static const char *CDDB_COMMANDS[CMD_LAST] = {
 
 #define WRITE_BUF_SIZE 4096
 #define QUERY_RESULT_SET_INC 10
+
+#define USE_CACHED_ENTRY(c) (c->cache_fp != NULL)
 
 /*
  * Small memory cache for querying local database.
@@ -77,7 +73,11 @@ int cddb_cache_exists(cddb_conn_t *c, cddb_disc_t *disc);
 
 /**
  */
-FILE *cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode);
+int cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode);
+
+/**
+ */
+void cddb_cache_close(cddb_conn_t *c);
 
 /**
  */
@@ -122,19 +122,31 @@ int cddb_cache_exists(cddb_conn_t *c, cddb_disc_t *disc)
     return TRUE;
 }
 
-FILE *cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode)
+int cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode)
 {
     char fn[LINE_SIZE];
 
     dlog("cddb_cache_open()");
+    /* close previous entry */
+    cddb_cache_close(c);
+    /* open new entry */
     snprintf(fn, sizeof(fn), "%s/%s/%08x", c->cache_dir, 
              CDDB_CATEGORY[disc->category], disc->discid);
-    return fopen(fn, mode);
+    c->cache_fp = fopen(fn, mode);
+    return (c->cache_fp != NULL);
+}
+
+void cddb_cache_close(cddb_conn_t *c)
+{
+    dlog("cddb_cache_close()");
+    if (c->cache_fp != NULL) {
+        fclose(c->cache_fp);
+        c->cache_fp = NULL;
+    }
 }
 
 int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc)
 {
-    FILE *fp, *old_fp;
     int rv;
 
     dlog("cddb_cache_read()");
@@ -151,8 +163,7 @@ int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc)
     }
 
     /* try to open cache file */
-    fp = cddb_cache_open(c, disc, "r");
-    if (fp == NULL) {
+    if (!cddb_cache_open(c, disc, "r")) {
         /* cached version not readable */
         dlog("\tcached version not readable");
         return FALSE;
@@ -160,10 +171,10 @@ int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc)
 
     /* parse CDDB record */
     dlog("\tcached version found");
-    old_fp = c->fp;
-    c->fp = fp;
     rv = cddb_parse_record(c, disc);
-    c->fp = old_fp;
+
+    /* close cache entry */
+    cddb_cache_close(c);
 
     return rv;
 }
@@ -318,9 +329,13 @@ char *cddb_read_line(cddb_conn_t *c)
 
     dlog("cddb_read_line()");
     /* read line, possibly returning NULL */
-    s = fgets(c->line, LINE_SIZE, c->fp);
+    if (USE_CACHED_ENTRY(c)) {
+        s = fgets(c->line, LINE_SIZE, cddb_cache_file(c));
+    } else {
+        s = sock_fgets(c->line, LINE_SIZE, c->socket);
+    }
 
-    /* strip off any line terminating characters */
+    /* strip off any line-terminating characters */
     if (s) {
         s = s + strlen(s) - 1;
         while ((s >= c->line) && 
@@ -406,20 +421,20 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
 
             if (c->is_http_proxy_enabled) {
                 /* use an HTTP proxy */
-                fprintf(c->fp, "POST http://%s:%d%s HTTP/1.0\r\n", c->server_name, 
-                        c->server_port, c->http_path_submit);
-                fprintf(c->fp, "Host: %s:%d\r\n", c->server_name, c->server_port);
+                sock_fprintf(c->socket, "POST http://%s:%d%s HTTP/1.0\r\n", 
+                             c->server_name, c->server_port, c->http_path_submit);
+                sock_fprintf(c->socket, "Host: %s:%d\r\n", c->server_name, c->server_port);
             } else {
                 /* direct connection */
-                fprintf(c->fp, "POST %s HTTP/1.0\r\n", c->http_path_submit);
+                sock_fprintf(c->socket, "POST %s HTTP/1.0\r\n", c->http_path_submit);
             }
 
-            fprintf(c->fp, "Category: %s\r\n", category);
-            fprintf(c->fp, "Discid: %08x\r\n", discid);
-            fprintf(c->fp, "User-Email: %s@%s\r\n", c->user, c->hostname);
-            fprintf(c->fp, "Submit-Mode: submit\r\n");
-            fprintf(c->fp, "Content-Length: %d\r\n", size);
-            fprintf(c->fp, "\r\n");
+            sock_fprintf(c->socket, "Category: %s\r\n", category);
+            sock_fprintf(c->socket, "Discid: %08x\r\n", discid);
+            sock_fprintf(c->socket, "User-Email: %s@%s\r\n", c->user, c->hostname);
+            sock_fprintf(c->socket, "Submit-Mode: submit\r\n");
+            sock_fprintf(c->socket, "Content-Length: %d\r\n", size);
+            sock_fprintf(c->socket, "\r\n");
         }
         break;
     default:
@@ -429,27 +444,27 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
 
             if (c->is_http_proxy_enabled) {
                 /* use an HTTP proxy */
-                fprintf(c->fp, "GET http://%s:%d%s", c->server_name, 
-                        c->server_port, c->http_path_query);
+                sock_fprintf(c->socket, "GET http://%s:%d%s", c->server_name, 
+                             c->server_port, c->http_path_query);
             } else {
                 /* direct connection */
-                fprintf(c->fp, "GET %s", c->http_path_query);
+                sock_fprintf(c->socket, "GET %s", c->http_path_query);
             }
 
             vsnprintf(buf, sizeof(buf), CDDB_COMMANDS[cmd], args);
             url_encode(buf);
-            fprintf(c->fp, "?cmd=%s&", buf);
+            sock_fprintf(c->socket, "?cmd=%s&", buf);
 
-            fprintf(c->fp, "hello=%s+%s+%s+%s&", 
-                    c->user, c->hostname, CLIENT_NAME, CLIENT_VERSION);
-            fprintf(c->fp, "proto=%d", DEFAULT_PROTOCOL_VERSION);
-            fprintf(c->fp, " HTTP/1.0\r\n");
+            sock_fprintf(c->socket, "hello=%s+%s+%s+%s&", 
+                         c->user, c->hostname, CLIENT_NAME, CLIENT_VERSION);
+            sock_fprintf(c->socket, "proto=%d", DEFAULT_PROTOCOL_VERSION);
+            sock_fprintf(c->socket, " HTTP/1.0\r\n");
 
             if (c->is_http_proxy_enabled) {
                 /* insert host header */
-                fprintf(c->fp, "Host: %s:%d\r\n", c->server_name, c->server_port);
+                sock_fprintf(c->socket, "Host: %s:%d\r\n", c->server_name, c->server_port);
             }
-            fprintf(c->fp, "\r\n");
+            sock_fprintf(c->socket, "\r\n");
 
             /* parse HTTP response line */
             if (!cddb_http_parse_response(c)) {
@@ -488,8 +503,8 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
         }
     } else {
         /* CDDBP */
-        vfprintf(c->fp, CDDB_COMMANDS[cmd], args);
-        fprintf(c->fp, "\n");
+        sock_vfprintf(c->socket, CDDB_COMMANDS[cmd], args);
+        sock_fprintf(c->socket, "\n");
     }
     va_end(args);
 
@@ -520,7 +535,6 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     cddb_track_t *track;
     int cache_content;
     int track_no = 0, old_no = -1;
-    FILE *cache = NULL;
 
     dlog("cddb_parse_record()");
     /* do we need to cache the processed content ? */
@@ -528,10 +542,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     if (cache_content) {
         /* create cache directory structure */
         cache_content = cddb_cache_mkdir(c, disc);
-        if (cache_content) {
-            cache = cddb_cache_open(c, disc, "w");
-            cache_content = (cache != NULL);
-        }
+        cache_content &= cddb_cache_open(c, disc, "w");
     }
     dlog("\tcache_content: %s", (cache_content ? "yes" : "no"));
 
@@ -539,7 +550,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     while (NEXT_LINE(c, line)) {
 
         if (cache_content) {
-            fprintf(cache, "%s\n", line);
+            fprintf(cddb_cache_file(c), "%s\n", line);
         }
 
         switch (state) {
@@ -686,7 +697,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     }
 
     if (cache_content) {
-        fclose(cache);
+        cddb_cache_close(c);
     }
 
     if (state != STATE_STOP) {
@@ -926,7 +937,7 @@ int cddb_write_data(char *buf, int size, cddb_disc_t *disc)
     int i, remaining;
     cddb_track_t *track;
 
-/* Appends some datat to the buffer.  The first parameter is the
+/* Appends some data to the buffer.  The first parameter is the
    number of bytes that will be added.  The other parameters are a
    format string and its arguments as in printf. */
 #define CDDB_WRITE_APPEND(l, ...) \
@@ -987,7 +998,6 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     char *msg;
     int code, size;
     cddb_track_t *track;
-    FILE *cache;
     char buf[WRITE_BUF_SIZE];
 
     dlog("cddb_write()");
@@ -1018,9 +1028,9 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
         if (cddb_cache_mkdir(c, disc)) {
             /* open file, possibly overwriting it */
             dlog("\tcaching data");
-            cache = cddb_cache_open(c, disc, "w");
-            fwrite(buf, sizeof(char), size, cache);
-            fclose(cache);
+            cddb_cache_open(c, disc, "w");
+            fwrite(buf, sizeof(char), size, cddb_cache_file(c));
+            cddb_cache_close(c);
         }
     }
 
@@ -1058,13 +1068,13 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
 
     /* ready to send data */
     dlog("\tsending data");
-    fwrite(buf, sizeof(char), size, c->fp);
+    sock_fwrite(buf, sizeof(char), size, c->socket);
     if (c->is_http_enabled) {
         /* skip HTTP response headers */
         cddb_http_parse_headers(c);
     } else {
         /* send terminating marker */
-        fprintf(c->fp, ".\n");
+        sock_fprintf(c->socket, ".\n");
     }
 
     /* check response */
