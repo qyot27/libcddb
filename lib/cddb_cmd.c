@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.37 2003/05/06 20:34:07 airborne Exp $
+    $Id: cddb_cmd.c,v 1.38 2003/05/08 18:09:02 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -132,9 +132,9 @@ char *cddb_cache_file_name(cddb_conn_t *c, cddb_disc_t *disc)
     char *fn = NULL;
     int len;
 
-    /* calculate needed buffer size */
-    len = snprintf(fn, 0, "%s/%s/%08x", c->cache_dir, 
-                   CDDB_CATEGORY[disc->category], disc->discid);
+    /* calculate needed buffer size (+11 for two slashes, disc id and
+       terminating zero */
+    len = strlen(c->cache_dir) + strlen(CDDB_CATEGORY[disc->category]) + 11;
     /* reserve enough memory */
     fn = (char*)malloc(len + 1);
     /* create file name */
