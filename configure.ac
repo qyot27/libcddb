@@ -33,6 +33,7 @@ AC_PROG_MAKE_SET
 dnl Checks for libraries.
 AM_PATH_CHECK([], enable_check=yes, enable_check=no)
 AM_CONDITIONAL(REGRESSION_TESTS, test "x$enable_check" = "xyes")
+AC_CHECK_LIB([cdio], [cdio_open])
 
 dnl Checks for header files.
 AC_HEADER_STDC
