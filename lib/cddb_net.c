@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.8 2003/05/20 20:43:34 airborne Exp $
+    $Id: cddb_net.c,v 1.9 2003/05/20 20:47:29 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -117,11 +117,11 @@ char *sock_fgets(char *s, int size, int sock, int timeout)
         size--;
     }
     if (p == s) {
-        cddb_log_debug("\tread = Empty");
+        cddb_log_debug("...read = Empty");
         return NULL;
     }
     *p = CHR_EOS;
-    cddb_log_debug("\tread = '%s'", s);
+    cddb_log_debug("...read = '%s'", s);
     return s;
 }
 
@@ -181,7 +181,7 @@ int sock_vfprintf(int sock, int timeout, const char *format, va_list ap)
    
     cddb_log_debug("sock_vfprintf()");
     rv = vsnprintf(buf, sizeof(buf), format, ap);
-    cddb_log_debug("\tbuf = '%s'", buf);
+    cddb_log_debug("...buf = '%s'", buf);
     if (rv >= sizeof(buf)) {
         /* buffer too small */
         cddb_log_crit("internal sock_vfprintf buffer too small");
