@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.h,v 1.7 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_cmd.h,v 1.8 2003/04/20 14:44:05 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -85,9 +85,9 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc);
  * tracks and for each track its frame offset on the CD should be
  * valid.
  *
- * If there are multiple matches then only the first one will * be
- * returned by this function.  For other matches you will have to *
- * use the cddb_query_next function.
+ * If there are multiple matches then only the first one will be
+ * returned by this function.  For other matches you will have to use
+ * the cddb_query_next function.
  *
  * @see cddb_query_next
  *
