@@ -1,6 +1,4 @@
 
-* apply BeOS patch by David Mitchell
-
 * improved error handling
 
 * support to enable/disable category dirs in .cddbslave
@@ -10,3 +8,7 @@
 * client name and version customization
 
 * if no disc found in .cddbslave/<category>/ try .cddbslave/ ?
+
+* unit testing
+
+* improve documentation
