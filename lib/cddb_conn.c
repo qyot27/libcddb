@@ -56,6 +56,10 @@ cddb_conn_t *cddb_new(void)
         c->hostname = s ? strdup(s) : strdup(DEFAULT_HOST);
 
         c->errnum = CDDB_ERR_OK;
+
+        c->query_data = NULL;
+        c->query_idx = 0;
+        c->query_cnt = 0;
     }
 
     return c;
@@ -72,6 +76,7 @@ void cddb_destroy(cddb_conn_t *c)
         FREE_NOT_NULL(c->cache_dir);
         FREE_NOT_NULL(c->user);
         FREE_NOT_NULL(c->hostname);
+        cddb_query_clear(c);
         free(c);
     }
 }

@@ -44,6 +44,10 @@ typedef struct cddb_conn_s
                                      variable or 'localhost' if undefined */
 
     cddb_error_t errnum;        /**< error number of last CDDB command */
+
+    cddb_disc_t **query_data;   /**< data structure to keep CDDB query results */
+    int query_idx;              /**< iterator index for query result set */
+    int query_cnt;              /**< number of entries in query result set */
 } cddb_conn_t;
 
 

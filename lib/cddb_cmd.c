@@ -25,6 +25,7 @@ static const char *CDDB_COMMANDS[5] = {
 };
 
 #define WRITE_BUF_SIZE 4096
+#define QUERY_RESULT_SET_INC 10
 
 
 /* --- prototypes --- */
@@ -47,6 +48,10 @@ void cddb_skip_http_headers(cddb_conn_t *c);
 /**
  */
 int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ */
+int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line);
 
 /**
  */
@@ -149,6 +154,25 @@ int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc)
     }
 
     return TRUE;
+}
+
+
+/* --- miscellaneous --- */
+
+
+void cddb_query_clear(cddb_conn_t *c)
+{
+    int i;
+
+    if (c->query_data != NULL) {
+        for (i = 0; i < c->query_cnt; i++) {
+            cddb_disc_destroy(c->query_data[i]);
+        }
+        free(c->query_data);
+        c->query_data = NULL;
+        c->query_idx = 0;
+        c->query_cnt = 0;
+    }
 }
 
 
@@ -309,7 +333,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     regmatch_t matches[6];
     cddb_track_t *track;
     int cache_content;
-    int track_no;
+    int track_no = 0;
     FILE *cache = NULL;
 
     dlog("cddb_parse_record()");
@@ -337,7 +361,6 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
             dlog("\tstate: START");
             if (regexec(REGEX_TRACK_FRAME_OFFSETS, line, 0, NULL, 0) == 0) {
                 /* expect a list of track frame offsets now */
-                track_no = 0;
                 state = STATE_TRACK_OFFSETS;
             }
             break;
@@ -485,16 +508,46 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
     return cddb_parse_record(c, disc);
 }
 
+int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
+{
+    char *cat;
+    regmatch_t matches[7];
+
+    if (regexec(REGEX_QUERY_MATCH, line, 7, matches, 0) == REG_NOMATCH) {
+        /* invalid repsponse */
+        c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        return FALSE;
+    }
+    /* extract category */
+    cat = cddb_regex_get_string(line, matches, 1);
+    cddb_disc_set_category(disc, cat);
+    free(cat);
+    /* extract artist and title */
+    if (matches[4].rm_so != -1) {
+        /* both artist and title of disc are specified */
+        disc->artist = cddb_regex_get_string(line, matches, 4);
+        disc->title = cddb_regex_get_string(line, matches, 5);
+    } else {
+        /* only title of disc is specified */
+        disc->title = cddb_regex_get_string(line, matches, 6);
+    }        
+
+    c->errnum = CDDB_ERR_OK;
+    return TRUE;
+}
+
 int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 {
     const char *msg;
     char *line;
     int code;
     char buf[LINE_SIZE], offset[32];
-    regmatch_t matches[7];
     cddb_track_t *track;
 
     dlog("cddb_query()");
+    /* clear previous query result set */
+    cddb_query_clear(c);
+    
     /* check whether we have enough info to execute the command */
     dlog("\tdisc->discid    = %8x", disc->discid);
     dlog("\tdisc->length    = %d", disc->length);
@@ -532,29 +585,36 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         return FALSE;
     case 200:                   /* found exact match */
         dlog("\texact match");
-        if (regexec(REGEX_QUERY_MATCH, msg, 7, matches, 0) == REG_NOMATCH) {
-            /* invalid repsponse */
-            c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        if (!cddb_parse_query_data(c, disc, msg)) {
             return FALSE;
         }
-        /* extract category */
-        line = cddb_regex_get_string(msg, matches, 1);
-        cddb_disc_set_category(disc, line);
-        free(line);
-        /* extract artist and title */
-        if (matches[4].rm_so != -1) {
-            /* both artist and title of disc are specified */
-            disc->artist = cddb_regex_get_string(msg, matches, 4);
-            disc->title = cddb_regex_get_string(msg, matches, 5);
-        } else {
-            /* only title of disc is specified */
-            disc->title = cddb_regex_get_string(msg, matches, 6);
-        }        
         break;
     case 211:                   /* found inexact match, list follows */
         dlog("\tinexact match");
-        c->errnum = CDDB_ERR_NOT_IMPLEMENTED;
-        return FALSE;
+        {
+            int query_max = 0;
+            while (NEXT_LINE(c, line)) {
+                /* check whether there is enough space in query result set */
+                if (c->query_idx >= query_max) {
+                    /* realloc */
+                    query_max += QUERY_RESULT_SET_INC;
+                    c->query_data = realloc(c->query_data, query_max*sizeof(cddb_disc_t*));
+                }
+                /* clone disc and fill in the blanks */
+                c->query_data[c->query_cnt] = cddb_disc_clone(disc);
+                if (!cddb_parse_query_data(c, c->query_data[c->query_cnt], line)) {
+                    return FALSE;
+                }
+                c->query_cnt++;
+            }
+            if (c->query_cnt == 0) {
+                /* empty result set */
+                c->errnum = CDDB_ERR_INVALID_RESPONSE;
+                return FALSE;
+            }
+            /* return first disc in result set */
+            cddb_disc_copy(disc, c->query_data[c->query_idx++]);
+        }
         break;
     case 202:                   /* no match found */
         dlog("\tno match");
@@ -571,6 +631,20 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         c->errnum = CDDB_ERR_UNKNOWN;
         return FALSE;
     }
+
+    c->errnum = CDDB_ERR_OK;
+    return TRUE;
+}
+
+int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
+{
+    if ((c->query_cnt == 0) || (c->query_idx >= c->query_cnt)) {
+        /* no more discs */
+        c->errnum = CDDB_ERR_DISC_NOT_FOUND;
+        return FALSE;
+    }
+    /* return next disc in result set */
+    cddb_disc_copy(disc, c->query_data[c->query_idx++]);
 
     c->errnum = CDDB_ERR_OK;
     return TRUE;

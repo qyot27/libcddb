@@ -22,12 +22,27 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc);
  * tracks and for each track its frame offset on the CD should be
  * valid.
  *
- * \todo support for multiple matches
+ * If there are multiple matches then only the first one will * be
+ * returned by this function.  For other matches you will have to *
+ * use the cddb_query_next function.
+ *
+ * @see cddb_query_next
  *
  * @param c    The CDDB connection structure.
  * @param disc A non-null CDDB disc structure.
  */
 int cddb_query(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ * Returns the next match in a CDDB query result set.  This function
+ * should be used in conjunction with cddb_query.
+ *
+ * @see cddb_query
+ *
+ * @param c    The CDDB connection structure.
+ * @param disc A non-null CDDB disc structure.
+ */
+int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc);
 
 /**
  * Submit a new or updated disc to the CDDB database.  This function

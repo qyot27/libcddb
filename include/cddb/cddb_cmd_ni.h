@@ -27,6 +27,9 @@ int cddb_get_response_code(cddb_conn_t *c, const char **msg);
  */
 int cddb_send_cmd(cddb_conn_t *c, int cmd, ...);
 
+/**
+ */
+void cddb_query_clear(cddb_conn_t *c);
 
 
 #endif /* CDDB_CMD_H */
