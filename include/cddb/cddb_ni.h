@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.16 2004/07/18 07:23:09 airborne Exp $
+    $Id: cddb_ni.h,v 1.17 2004/07/21 16:09:56 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -32,9 +32,9 @@
 #endif
 
 #include "cddb/cddb_regex.h"
-#include "cddb/cddb_net.h"
 #include "cddb/cddb.h"
 #include "cddb/cddb_conn_ni.h"
+#include "cddb/cddb_net.h"
 #include "cddb/cddb_cmd_ni.h"
 #include "cddb/cddb_log_ni.h"
 
@@ -47,6 +47,8 @@
 #define CHR_EOS        '\0'
 #define CHR_SPACE      ' '
 #define CHR_DOT        '.'
+
+#define DEFAULT_BUF_SIZE 1024
 
 #define CLIENT_NAME    PACKAGE
 #define CLIENT_VERSION VERSION
