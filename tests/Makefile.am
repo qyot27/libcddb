@@ -1,16 +1,8 @@
 
-# Only compile if the check library and header fiels are present
-if REGRESSION_TESTS
-
-# Some extra options for all test code
-INCLUDES = -I$(top_srcdir)/include @CHECK_CFLAGS@
-LDADD = $(top_builddir)/lib/libcddb.la @CHECK_LIBS@
-
 # The list of available tests
-TESTS = check_discid
-noinst_PROGRAMS = check_discid
+check_SCRIPTS = check_discid.sh
+check_DATA = 
 
-# Targets for individual tests
-check_discid_SOURCES = base.c base.h check_discid.c
+EXTRA_DIST = $(check_SCRIPTS) $(check_DATA) settings.sh.in
 
-endif
+TESTS = $(check_SCRIPTS)
