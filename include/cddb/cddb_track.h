@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.h,v 1.10 2003/04/17 17:28:51 airborne Exp $
+    $Id: cddb_track.h,v 1.11 2003/04/17 22:16:59 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -89,6 +89,22 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
 #define cddb_track_get_number(track) (track)->num
 
 /**
+ * Get the frame offset of this track on the disc.
+ *
+ * @param track The CDDB track structure.
+ * @return The frame offset.
+ */
+#define cddb_track_get_frame_offset(track) (track)->frame_offset
+
+/**
+ * Set the frame offset of this track on the disc.
+ *
+ * @param track The CDDB track structure.
+ * @return The frame offset.
+ */
+#define cddb_track_set_frame_offset(track, offset) (track)->frame_offset = offset
+
+/**
  * Get the length of the track in seconds.  If the track length is not
  * defined this routine will try to calculate it using the frame
  * offsets of the tracks and the total disc length.  These
@@ -106,10 +122,10 @@ int cddb_track_get_length(cddb_track_t *track);
  * Get the track title.  If no title is set for this track then NULL
  * will be returned.
  *
- * @param disc The CDDB disc structure.
+ * @param track The CDDB track structure.
  * @return The track title.
  */
-#define cddb_track_get_title(disc) (disc)->title
+#define cddb_track_get_title(track) (track)->title
 
 /**
  * Set the track title.  If the track already had a title, then the

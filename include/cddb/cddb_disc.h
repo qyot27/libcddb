@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.12 2003/04/17 17:28:51 airborne Exp $
+    $Id: cddb_disc.h,v 1.13 2003/04/17 22:16:58 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,6 +29,16 @@
 
 #include <cddb/cddb_track.h>
 
+
+/**
+ * The number of frames that fit into one second.
+ */
+#define FRAMES_PER_SECOND 75
+
+/**
+ * This macro converts an amount of frames into an amount of seconds.
+ */
+#define FRAMES_TO_SECONDS(f) (f / FRAMES_PER_SECOND)
 
 /**
  * The different CDDB categories.
@@ -142,8 +152,19 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc);
 
 
 /**
- * Set the ID of the disc.  The disc ID is not known yet, then it can
- * be calculated with the cddb_disc_calc_discid function.
+ * Get the ID of the disc.  If this disc ID is not yet initialized 0
+ * will be returned.
+ *
+ * @param disc The CDDB disc structure.
+ * @param id The disc ID.
+ */
+#define cddb_disc_get_discid(disc) (disc)->discid
+
+/**
+ * Set the ID of the disc.  When the disc ID is not known yet, then it
+ * can be calculated with the cddb_disc_calc_discid function (which
+ * will automatically initialize the correct field in the disc
+ * structure).
  *
  * @see cddb_disc_calc_discid
  *
@@ -220,6 +241,14 @@ void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre);
  * @return The disc length in seconds.
  */
 #define cddb_disc_get_length(disc) (disc)->length
+
+/**
+ * Set the disc length.
+ *
+ * @param disc The CDDB disc structure.
+ * @param l    The disc length in seconds.
+ */
+#define cddb_disc_set_length(disc, l) (disc)->length = l
 
 /**
  * Get the year of publication for this disc.  If no year is defined 0
@@ -315,9 +344,14 @@ void cddb_disc_append_artist(cddb_disc_t *disc, const char *artist);
 void cddb_disc_copy(cddb_disc_t *dst, cddb_disc_t *src);
 
 /**
- * Calculate the CDDB disc ID.
+ * Calculate the CDDB disc ID.  To calculate a disc ID the provided
+ * disc needs to have its length set, and every track in the disc
+ * structure needs to have its frame offset initialized.  The disc ID
+ * field will be set in the disc structure.
  *
  * @param disc The CDDB disc structure.
+ * @return A non-zero value if the calculation succeeded, zero
+ *         otherwise.
  */
 int cddb_disc_calc_discid(cddb_disc_t *disc);
 
