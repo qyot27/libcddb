@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.4 2003/04/14 22:25:50 airborne Exp $
+    $Id: cddb_net.c,v 1.5 2003/05/12 18:47:15 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -19,7 +19,15 @@
     Boston, MA  02111-1307, USA.
 */
 
+#include <errno.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <setjmp.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/select.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include "cddb/cddb_ni.h"
 
 
@@ -94,4 +102,92 @@ int sock_vfprintf(int sock, const char *format, va_list ap)
 
     rv = send(sock, buf, rv, 0);
     return rv;
+}
+
+/* Time-out enabled work-alikes */
+
+/* time-out jump buffer */
+static jmp_buf timeout_expired;
+
+/* time-out signal handler */
+static void alarm_handler(int signum)
+{
+    longjmp(timeout_expired, 1);
+}
+
+struct hostent *timeout_gethostbyname(const char *hostname, int timeout)
+{
+    struct hostent *he = NULL;
+    struct sigaction action;
+    struct sigaction old;
+
+    /* no signal before setjmp */
+    alarm(0);
+
+    /* register signal handler */
+    memset(&action, 0, sizeof(action));
+    action.sa_handler = alarm_handler;
+    sigaction(SIGALRM, &action, &old);
+
+    /* save stack state */
+    if (!setjmp(timeout_expired)) {
+        alarm(timeout);         /* set time-out alarm */
+        he = gethostbyname(hostname); /* execute DNS query */
+        alarm(0);               /* reset alarm timer */
+    } else {
+        errno = ETIMEDOUT;
+    }
+    sigaction(SIGALRM, &old, NULL); /* restore previous signal handler */
+
+    return he;
+}
+
+int timeout_connect(int sockfd, const struct sockaddr *addr, 
+                    socklen_t len, int timeout)
+{
+    int old, got_error = 0;
+
+    old = fcntl(sockfd, F_GETFL, 0); /* get current flags */
+    fcntl(sockfd, F_SETFL, old | O_NONBLOCK); /* add non-blocking flag */
+    /* try connecting */
+    if (connect(sockfd, addr, len) == -1) {
+        /* check whether we can continue */
+        if (errno == EINPROGRESS) {
+            int rv;
+            fd_set wfds;
+            struct timeval tv;
+            socklen_t l;
+
+            /* set up select time out */
+            tv.tv_sec = timeout;
+            tv.tv_usec = 0;
+
+            /* set up file descriptor set */
+            FD_ZERO(&wfds);
+            FD_SET(sockfd, &wfds);
+
+            /* wait for connect to finish */
+            rv = select(sockfd + 1, NULL, &wfds, NULL, &tv);
+            switch (rv) {
+            case 0:             /* time out */
+                errno = ETIMEDOUT;
+            case -1:            /* select error */
+                got_error = -1;
+            default:
+                /* we got connected, check error condition */
+                l = sizeof(rv);
+                getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &rv, &l);
+                if (rv) {
+                    /* something went wrong, simulate normal connect behaviour */
+                    errno = rv;
+                    got_error = -1;
+                }
+            }
+        }
+    } else {
+        /* connect failed */
+        got_error = -1;
+    }
+    fcntl(sockfd, F_SETFL, old); /* restore old flags */
+    return got_error;
 }
