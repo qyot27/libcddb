@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# $Id: check_parse.sh,v 1.2 2003/04/21 11:04:56 airborne Exp $
+# $Id: check_parse.sh,v 1.3 2003/05/08 17:39:04 airborne Exp $
 
-. settings.sh
+. ./settings.sh
 
 # Test parsing of some locally cached entries.  These entries are
 # designed to test the parsing of all supported fields.  Mutli-line

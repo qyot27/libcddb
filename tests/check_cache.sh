@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# $Id: check_cache.sh,v 1.3 2003/05/01 08:13:33 airborne Exp $
+# $Id: check_cache.sh,v 1.4 2003/05/08 17:39:04 airborne Exp $
 
-. settings.sh
+. ./settings.sh
 
 # This script implements a set of tests to check whether the local
 # CDDB cache functionality is working correctly.

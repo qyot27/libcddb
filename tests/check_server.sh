@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# $Id: check_server.sh,v 1.2 2003/04/24 19:18:53 airborne Exp $
+# $Id: check_server.sh,v 1.3 2003/05/08 17:39:04 airborne Exp $
 
-. settings.sh
+. ./settings.sh
 
 # This script implements a set of tests to check whether the CDDB
 # server access functionality is working correctly.  It tests all

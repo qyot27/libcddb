@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# $Id: check_discid.sh,v 1.2 2003/04/20 22:23:44 airborne Exp $
+# $Id: check_discid.sh,v 1.3 2003/05/08 17:39:04 airborne Exp $
 
-. settings.sh
+. ./settings.sh
 
 #
 # Check disc ID calculation of empty disc
