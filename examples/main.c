@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.10 2003/04/21 17:17:30 airborne Exp $
+    $Id: main.c,v 1.11 2003/04/24 18:47:33 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,6 +27,11 @@
 
 /* command-line option string */
 #define OPT_STRING ":c:D:hp:P:qs:"
+
+/* other stuff */
+#define ENV_HTTP_PROXY "http_proxy"
+#define HTTP_PREFIX "http://"
+#define HTTP_PREFIX_LEN 7
 
 /* parsed command-line parameters */
 #define CMD_NONE   0
@@ -153,6 +158,70 @@ static void parse_disc_data(int cmd, int argc, char **argv, int idx)
     }
 }
 
+static void init_protocol(cddb_conn_t *conn, const char *proto)
+{
+    int len, port;
+    char *aux, *host, *portstr;
+
+    if (!*optarg) {
+        error_usage("-P, server protocol missing");
+    }
+    if (strcmp(optarg, "cddbp") == 0) {
+        /* Enable the CDDBP protocol, i.e. disable the usage of HTTP.
+           This is the default so actually this function call is not
+           needed. */
+        cddb_http_disable(conn);
+    } else if (strcmp(optarg, "http") == 0) {
+        /* Enable the HTTP protocol.  We will also set the server port
+           to 80, i.e. the default HTTP port. */
+        cddb_http_enable(conn);
+        cddb_set_server_port(conn, 80);
+    } else if (strcmp(optarg, "proxy") == 0) {
+        /* Enable the HTTP protocol through a proxy server.  Enabling
+           the proxy will automatically enable HTTP.  We will also set
+           the server port to 80, i.e. the default HTTP port.  */
+        cddb_http_proxy_enable(conn);
+        cddb_set_server_port(conn, 80);
+        /* We will retrieve the proxy settings from the environment
+           variable 'http_proxy'.  If these do not exist, an error
+           will be signaled. */
+        aux = getenv(ENV_HTTP_PROXY);
+        if (aux == NULL) {
+            error_exit(GENERIC_ERROR, "environment variable 'http_proxy' not set");
+        }
+        /* Check the prefix.  It should be 'http://'. */
+        if (strncmp(aux, HTTP_PREFIX, HTTP_PREFIX_LEN) != 0) {
+            error_exit(GENERIC_ERROR, "environment variable 'http_proxy' invalid");
+        }
+        host = aux + HTTP_PREFIX_LEN;
+        /* Check if a proxy port is specified. */
+        portstr = strchr(host, ':');
+        if (portstr == NULL) {
+            /* No port, set proxy server name and use default port
+               80. */
+            cddb_set_http_proxy_server_name(conn, host);
+            cddb_set_http_proxy_server_port(conn, 80);
+        } else {
+            /* A proxy port is present.  Parse it and initialize the
+               connection structure with it. */
+            portstr++;          /*  Skip colon. */
+            port = strtol(portstr, &aux, 10);
+            if (*aux != '\0' && *aux != '/') {
+                error_exit(GENERIC_ERROR, "environment variable 'http_proxy' port invalid");
+            }
+            len = portstr - host - 1;
+            aux = malloc(len + 1);
+            strncpy(aux, host, len);
+            aux[len] = '\0';
+            cddb_set_http_proxy_server_name(conn, aux);
+            cddb_set_http_proxy_server_port(conn, port);
+        }
+    } else {
+        /* XXX: get proxy settings from env var 'http_proxy'!! */
+        error_usage("-P, invalid server protocol '%s'", optarg);
+    }
+}
+
 static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
 {
     int arg, port;
@@ -212,25 +281,7 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
             cddb_set_server_port(conn, port);
             break;
         case 'P':               /* server protocol */
-            if (!*optarg) {
-                error_usage("-P, server protocol missing");
-            }
-            if (strcmp(optarg, "cddbp") == 0) {
-                /* Enable the CDDBP protocol, i.e. disable the usage
-                   of HTTP.  This is the default so actually this
-                   function call is not needed. */
-                cddb_http_disable(conn);
-            } else if (strcmp(optarg, "http") == 0) {
-                /* Enable the HTTP protocol.  We will also set the
-                   server port to 80, i.e. the default HTTP port. */
-                cddb_http_enable(conn);
-                cddb_set_server_port(conn, 80);
-            } else if (strcmp(optarg, "proxy") == 0) {
-                error_exit(GENERIC_ERROR, "-P, server protocol 'proxy' not yet supported");
-            } else {
-                /* XXX: get proxy settings from env var 'http_proxy'!! */
-                error_usage("-P, invalid server protocol '%s'", optarg);
-            }
+            init_protocol(conn, optarg);
             break;
         case 'q':               /* quiet */
             quiet = 1;
