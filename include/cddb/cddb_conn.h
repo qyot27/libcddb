@@ -43,8 +43,8 @@ typedef struct cddb_conn_s
                                      data in cache, enabled by default */
     char *cache_dir;            /**< CDDB slave cache, defaults to 
                                      '~/.cddbslave' */
-    int cache_read;             /**< (internal) read data from cached file instead
-                                     of from the network */
+    int cache_read;             /**< read data from cached file instead of
+                                     from the network */
 
     char *user;                 /**< user name supplied to CDDB server, defaults
                                      to the value of the 'USER' environment 
@@ -118,24 +118,38 @@ void cddb_set_http_path_query(cddb_conn_t *c, const char *path);
 void cddb_set_http_path_submit(cddb_conn_t *c, const char *path);
 
 /**
- * Enable HTTP tunneling to connect the CDDB server.  By default this
- * option is disabled.
+ * Enable HTTP tunneling to connect to the CDDB server.  By default
+ * this option is disabled.
  *
- * @param c      The CDDB connection structure.
- * @param enable 0 to disable, anything else to enable.
+ * @param c The CDDB connection structure.
  */
-void cddb_http_enable(cddb_conn_t *c, int enable);
+void cddb_http_enable(cddb_conn_t *c);
 
 /**
- * Enable HTTP tunneling through an HTTP proxy server to connect the
- * CDDB server.  The usage of an HTTP proxy implies normal HTTP
+ * Disable HTTP tunneling to connect to the CDDB server.  By default this
+ * option is disabled.
+ *
+ * @param c The CDDB connection structure.
+ */
+void cddb_http_disable(cddb_conn_t *c);
+
+/**
+ * Enable HTTP tunneling through an HTTP proxy server to connect to
+ * the CDDB server.  The usage of an HTTP proxy implies normal HTTP
  * tunneling instead of connecting directly to the CDDB server.  By
  * default this option is disabled.
  *
- * @param c      The CDDB connection structure.
- * @param enable 0 to disable, anything else to enable.
+ * @param c The CDDB connection structure.
  */
-void cddb_http_proxy_enable(cddb_conn_t *c, int enable);
+void cddb_http_proxy_enable(cddb_conn_t *c);
+
+/**
+ * Disable HTTP tunneling through an HTTP proxy server to connect to
+ * the CDDB server.  By default this option is disabled.
+ *
+ * @param c The CDDB connection structure.
+ */
+void cddb_http_proxy_disable(cddb_conn_t *c);
 
 /**
  * Set the host name of the HTTP proxy server.  There is no default

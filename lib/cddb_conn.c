@@ -112,19 +112,29 @@ void cddb_set_http_path_submit(cddb_conn_t *c, const char *path)
     c->http_path_submit = strdup(path);
 }
 
-void cddb_http_enable(cddb_conn_t *c, int enable)
+void cddb_http_enable(cddb_conn_t *c)
 {
-    c->is_http_enabled = enable;
+    c->is_http_enabled = TRUE;
     c->errnum = CDDB_ERR_OK;
 }
 
-void cddb_http_proxy_enable(cddb_conn_t *c, int enable)
+void cddb_http_disable(cddb_conn_t *c)
 {
-    if (enable) {
-        /* enabling HTTP proxy implies HTTP, but not vice versa */
-        cddb_http_enable(c, enable);
-    }
-    c->is_http_proxy_enabled = enable;
+    c->is_http_enabled = FALSE;
+    c->errnum = CDDB_ERR_OK;
+}
+
+void cddb_http_proxy_enable(cddb_conn_t *c)
+{
+    /* enabling HTTP proxy implies HTTP, but not vice versa */
+    cddb_http_enable(c);
+    c->is_http_proxy_enabled = TRUE;
+    c->errnum = CDDB_ERR_OK;
+}
+
+void cddb_http_proxy_disable(cddb_conn_t *c)
+{
+    c->is_http_proxy_enabled = FALSE;
     c->errnum = CDDB_ERR_OK;
 }
 
