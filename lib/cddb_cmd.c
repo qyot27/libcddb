@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.34 2003/05/01 09:50:20 airborne Exp $
+    $Id: cddb_cmd.c,v 1.35 2003/05/01 15:42:55 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -1095,6 +1095,13 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     char buf[WRITE_BUF_SIZE];
 
     dlog("cddb_write()");
+    /* check whether the default e-mail address has been changed, the
+       freedb spec requires this */
+    if (strcmp(c->user, DEFAULT_USER) == 0 ||
+        strcmp(c->hostname, DEFAULT_HOST) == 0) {
+        c->errnum = CDDB_ERR_EMAIL_INVALID;
+        return FALSE;
+    }
     /* check whether we have enough disc data to execute the command */
     if ((disc->discid == 0) || (disc->category == CDDB_CAT_INVALID) || 
         (disc->length == 0) || (disc->track_cnt == 0) ||
