@@ -1,5 +1,5 @@
 /*
-    $Id: do_query.c,v 1.1 2003/04/20 15:04:08 airborne Exp $
+    $Id: do_query.c,v 1.2 2003/04/20 17:02:40 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -24,7 +24,7 @@
 
 void do_query(cddb_conn_t *conn, cddb_disc_t *disc)
 {
-    int matches;
+    int matches, i;
 
     /* Try querying the database for information about the provided
        disc.  This function will return the number of matches that
@@ -47,5 +47,42 @@ void do_query(cddb_conn_t *conn, cddb_disc_t *disc)
     }
 
     printf("Number of matches: %d\n", matches);
-    /* XXX: print category, disc ID, disc title and artist name */
+    /* A CDDB query command will not return the all the disc
+       informatioon.  It will return a subset that can afterwards be
+       used to do a CDDB read.  This enables you to first show a
+       pop-up listing the found matches before doing further reads for
+       the full data.  The data that is returned for each match is:
+       the disc CDDB category, the disc ID as known by the server, the
+       disc title and the artist's name. */
+
+    /* Let's loop over the matches. */
+    i = 0;
+    while (i < matches) {
+        /* Increment the match counter. */
+        i++;
+
+        /* Print out the information for the current match. */
+        printf("Match %d\n", i + 1);
+        /* Retrieve and print the category and disc ID. */
+        printf("  category: %s (%d)\t%08x\n", cddb_disc_get_category_str(disc),
+               cddb_disc_get_category(disc), cddb_disc_get_discid(disc));
+        /* Retrieve and print the disc title and artist name. */
+        printf("  '%s' by %s\n", cddb_disc_get_title(disc),
+               cddb_disc_get_artist(disc));
+
+        /* Get the next match, if there is one left. */
+        if (i < matches) {
+            /* If there are multiple matches, then you can use the
+               following function to retrieve the matches beyond the
+               first.  This function will overwrite any data that
+               might be present in the disc structure passed to it.
+               So if you still need that disc for anything else, then
+               first create a new disc and use that to call this
+               function.  If there are no more matches left, false
+               (i.e. 0) will be returned. */
+            if (!cddb_query_next(conn, disc)) {
+                error_exit("query index out of bounds");
+            }
+        }
+    }
 }
