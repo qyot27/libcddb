@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.15 2003/05/04 09:28:28 airborne Exp $
+    $Id: cddb_disc.h,v 1.16 2003/05/04 17:38:52 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -183,12 +183,30 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc);
  * representation of the category use the cddb_disc_get_category_str
  * function.
  *
+ * @see cddb_disc_set_category
  * @see cddb_disc_get_category_str
+ * @see cddb_disc_set_category_str
+ * @see cddb_cat_t
+ * @see CDDB_CATEGORY
  *
  * @param disc The CDDB disc structure.
  * @return The CDDB category ID.
  */
 #define cddb_disc_get_category(disc) (disc)->category
+
+/**
+ * Set the disc CDDB category ID.
+ *
+ * @see cddb_disc_get_category
+ * @see cddb_disc_get_category_str
+ * @see cddb_disc_set_category_str
+ * @see cddb_cat_t
+ * @see CDDB_CATEGORY
+ *
+ * @param disc The CDDB disc structure.
+ * @param cat  The CDDB category ID.
+ */
+#define cddb_disc_set_category(disc, cat) (disc)->category = cat
 
 /**
  * Get the disc CDDB category as a string.  If no category is set for
@@ -197,6 +215,8 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc);
  * category use the cddb_disc_get_category function.
  *
  * @see cddb_disc_get_category
+ * @see cddb_disc_set_category
+ * @see cddb_disc_set_category_str
  *
  * @param disc The CDDB disc structure.
  * @return The CDDB category ID.
@@ -207,12 +227,15 @@ const char *cddb_disc_get_category_str(cddb_disc_t *disc);
  * Sets the category of the disc.  If the specified category is
  * an invalid CDDB category, then CDDB_CAT_MISC will be used.
  *
- * @see cddb_cat_t, CDDB_CATEGORY
+ * @see cddb_disc_get_category
+ * @see cddb_disc_set_category
+ * @see cddb_disc_get_category_str
+ * @see CDDB_CATEGORY
  *
  * @param disc The CDDB disc structure.
  * @param cat The category string.
  */
-void cddb_disc_set_category(cddb_disc_t *disc, const char *cat);
+void cddb_disc_set_category_str(cddb_disc_t *disc, const char *cat);
 
 /**
  * Get the disc genre.  If no genre is set for this disc then NULL

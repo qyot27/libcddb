@@ -1,5 +1,5 @@
 /*
-    $Id: do_read.c,v 1.5 2003/04/25 17:55:05 airborne Exp $
+    $Id: do_read.c,v 1.6 2003/05/04 17:38:52 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -37,7 +37,7 @@ cddb_disc_t *do_read(cddb_conn_t *conn, const char *category, int discid, int qu
            converts a string into a category ID as used by libcddb.
            If the specified string does not match any of the known
            categories, then the category is set to 'misc'. */
-        cddb_disc_set_category(disc, category);
+        cddb_disc_set_category_str(disc, category);
 
         /* Initialize the ID of the disc. */
         cddb_disc_set_discid(disc, discid);

@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.13 2003/05/04 09:29:13 airborne Exp $
+    $Id: cddb_disc.c,v 1.14 2003/05/04 17:38:52 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -157,7 +157,7 @@ const char *cddb_disc_get_category_str(cddb_disc_t *disc)
     }
 }
 
-void cddb_disc_set_category(cddb_disc_t *disc, const char *cat)
+void cddb_disc_set_category_str(cddb_disc_t *disc, const char *cat)
 {
     int i;
 

@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.35 2003/05/01 15:42:55 airborne Exp $
+    $Id: cddb_cmd.c,v 1.36 2003/05/04 17:38:52 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -873,7 +873,7 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
     }
     /* extract category */
     aux = cddb_regex_get_string(line, matches, 1);
-    cddb_disc_set_category(disc, aux);
+    cddb_disc_set_category_str(disc, aux);
     free(aux);                  /* free temporary buffer */
     /* extract disc ID */
     aux = cddb_regex_get_string(line, matches, 2);
