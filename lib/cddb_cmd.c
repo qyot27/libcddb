@@ -275,7 +275,17 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
             category = va_arg(args, char *);
             discid = va_arg(args, int);
             size = va_arg(args, int);
-            fprintf(c->fp, "POST %s HTTP/1.0\r\n", c->http_path_submit);
+
+            if (c->is_http_proxy_enabled) {
+                /* use an HTTP proxy */
+                fprintf(c->fp, "POST http://%s:%d%s HTTP/1.0\r\n", c->server_name, 
+                        c->server_port, c->http_path_submit);
+                fprintf(c->fp, "Host: %s:%d\r\n", c->server_name, c->server_port);
+            } else {
+                /* direct connection */
+                fprintf(c->fp, "POST %s HTTP/1.0\r\n", c->http_path_submit);
+            }
+
             fprintf(c->fp, "Category: %s\r\n", category);
             fprintf(c->fp, "Discid: %08x\r\n", discid);
             fprintf(c->fp, "User-Email: %s@%s\r\n", c->user, c->hostname);
@@ -291,7 +301,7 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
 
             if (c->is_http_proxy_enabled) {
                 /* use an HTTP proxy */
-                fprintf(c->fp, "GET http://%s:%d%s", c->server_name,
+                fprintf(c->fp, "GET http://%s:%d%s", c->server_name, 
                         c->server_port, c->http_path_query);
             } else {
                 /* direct connection */
