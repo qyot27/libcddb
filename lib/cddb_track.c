@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.15 2004/07/18 07:14:08 airborne Exp $
+    $Id: cddb_track.c,v 1.16 2004/10/08 21:11:00 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -18,9 +18,6 @@
     Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA  02111-1307, USA.
 */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
@@ -28,7 +25,50 @@
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
+
 #include "cddb/cddb_ni.h"
+
+
+/* --- private functions */
+
+int cddb_track_iconv(cddb_conn_t *c, cddb_track_t *track)
+{ 
+#ifdef HAVE_ICONV_H
+    char *result;
+
+    if (!c->cd_from_freedb) {
+        return TRUE;            /* no user character set defined */
+    }
+    if (track->title) {
+        if (cddb_str_iconv(c->cd_from_freedb, track->title, &result)) {
+            free(track->title);
+            track->title = result;
+        } else {
+            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+            return FALSE;
+        }
+    }
+    if (track->artist) {
+        if (cddb_str_iconv(c->cd_from_freedb, track->artist, &result)) {
+            free(track->artist);
+            track->artist = result;
+        } else {
+            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+            return FALSE;
+        }
+    }
+    if (track->ext_data) {
+        if (cddb_str_iconv(c->cd_from_freedb, track->ext_data, &result)) {
+            free(track->ext_data);
+            track->ext_data = result;
+        } else {
+            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+            return FALSE;
+        }
+    }
+#endif
+    return TRUE;
+}
 
 
 /* --- construction / destruction */

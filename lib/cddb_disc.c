@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.18 2004/07/18 07:23:09 airborne Exp $
+    $Id: cddb_disc.c,v 1.19 2004/10/08 21:09:24 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -31,6 +31,64 @@ const char *CDDB_CATEGORY[CDDB_CAT_LAST] = {
     "reggae", "classical", "soundtrack",
     "invalid"
 };
+
+
+/* --- private functions */
+
+
+int cddb_disc_iconv(cddb_conn_t *c, cddb_disc_t *disc)
+{ 
+#ifdef HAVE_ICONV_H
+    char *result;
+    cddb_track_t *track;
+
+    if (!c->cd_from_freedb) {
+        return TRUE;            /* no user character set defined */
+    }
+    if (disc->genre) {
+        if (cddb_str_iconv(c->cd_from_freedb, disc->genre, &result)) {
+            free(disc->genre);
+            disc->genre = result;
+        } else {
+            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+            return FALSE;
+        }
+    }
+    if (disc->title) {
+        if (cddb_str_iconv(c->cd_from_freedb, disc->title, &result)) {
+            free(disc->title);
+            disc->title = result;
+        } else {
+            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+            return FALSE;
+        }
+    }
+    if (disc->artist) {
+        if (cddb_str_iconv(c->cd_from_freedb, disc->artist, &result)) {
+            free(disc->artist);
+            disc->artist = result;
+        } else {
+            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+            return FALSE;
+        }
+    }
+    if (disc->ext_data) {
+        if (cddb_str_iconv(c->cd_from_freedb, disc->ext_data, &result)) {
+            free(disc->ext_data);
+            disc->ext_data = result;
+        } else {
+            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+            return FALSE;
+        }
+    }
+    track = disc->tracks;
+    while (track) {
+        cddb_track_iconv(c, track);
+        track = track->next;
+    }
+#endif
+    return TRUE;
+}
 
 
 /* --- construction / destruction */
