@@ -150,6 +150,14 @@ void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server);
 void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
 
 /**
+ * Set the port of the HTTP proxy server.  The default value is 8080.
+ *
+ * @param c    The connection structure.
+ * @param port The server port.
+ */
+void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
+
+/**
  * Get the error number returned by the last libcddb command.
  *
  * @param c      The CDDB connection structure.
