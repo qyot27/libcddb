@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_log.h,v 1.1 2003/05/20 20:37:01 airborne Exp $
+    $Id: cddb_log.h,v 1.2 2003/05/31 13:26:05 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -26,35 +26,58 @@
     extern "C" {
 #endif
 
-
+/**
+ * The different log levels supported by libcddb.
+ */
 typedef enum {
-    CDDB_LOG_DEBUG = 1,
-    CDDB_LOG_INFO,
-    CDDB_LOG_WARN,
-    CDDB_LOG_ERROR,
-    CDDB_LOG_CRITICAL,
-    CDDB_LOG_NONE = 99
+    CDDB_LOG_DEBUG = 1,         /**< Debug-level messages. */
+    CDDB_LOG_INFO,              /**< Informational. */
+    CDDB_LOG_WARN,              /**< Warning conditions. */
+    CDDB_LOG_ERROR,             /**< Error conditions.  */
+    CDDB_LOG_CRITICAL,          /**< Critical conditions. */
+    CDDB_LOG_NONE = 99          /**< No log messages. */
 } cddb_log_level_t;
 
-    
+
+/**
+ * This type defines the signature of a libcddb log handler.  For
+ * every message being logged by libcddb, the handler will receive the
+ * log level and the message string.
+ *
+ * @see cddb_log_set_handler
+ * @see cddb_log_level_t
+ *
+ * @param level   The log level.
+ * @param message The log message.
+ */
 typedef void (*cddb_log_handler_t)(cddb_log_level_t level, const char *message);
 
+/**
+ * Set a custom log handler for libcddb.  The return value is the log
+ * handler being replaced.  If the provided parameter is NULL, then
+ * the handler will be reset to the default handler.
+ *
+ * @see cddb_log_handler_t
+ *
+ * @param new_handler The new log handler.
+ * @return The previous log handler.
+ */
 cddb_log_handler_t cddb_log_set_handler(cddb_log_handler_t new_handler);
 
-
+/**
+ * Set the minimum log level.  This function is only useful in
+ * conjunction with the default log handler.  The default log handler
+ * will print any log messages that have a log level equal or higher
+ * than this minimum log level to stderr.  By default the minimum log
+ * level is set to CDDB_LOG_WARN.  This means that only warning, error
+ * and critical messages will be printed.  You can silence the default
+ * log handler by setting the minimum log level to CDDB_LOG_NONE.
+ *
+ * @see cddb_log_level_t
+ *
+ * @param level The minimum log level.
+ */
 void cddb_log_set_level(cddb_log_level_t level);
-
-void cddb_log(cddb_log_level_t level, const char *format, ...);
-
-#define cddb_log_debug(...) cddb_log(CDDB_LOG_DEBUG, __VA_ARGS__)
-
-#define cddb_log_info(...) cddb_log(CDDB_LOG_INFO, __VA_ARGS__)
-
-#define cddb_log_warn(...) cddb_log(CDDB_LOG_WARN, __VA_ARGS__)
-
-#define cddb_log_error(...) cddb_log(CDDB_LOG_ERROR, __VA_ARGS__)
-
-#define cddb_log_crit(...) cddb_log(CDDB_LOG_CRITICAL, __VA_ARGS__)
 
 
 #ifdef __cplusplus
