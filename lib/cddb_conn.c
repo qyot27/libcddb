@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.25 2004/07/21 16:15:30 airborne Exp $
+    $Id: cddb_conn.c,v 1.26 2004/10/08 21:08:02 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -106,6 +106,11 @@ cddb_conn_t *cddb_new(void)
         c->query_data = NULL;
         c->query_idx = 0;
         c->query_cnt = 0;
+
+#ifdef HAVE_ICONV_H
+        c->cd_to_freedb = NULL;
+        c->cd_from_freedb = NULL;
+#endif /* HAVE_ICONV_H */
     } else {
         cddb_log_crit(cddb_error_str(CDDB_ERR_OUT_OF_MEMORY));
     }
@@ -132,6 +137,22 @@ void cddb_destroy(cddb_conn_t *c)
 
 /* --- getters & setters --- */
 
+
+#ifdef HAVE_ICONV_H
+int cddb_set_charset(cddb_conn_t *c, const char *charset)
+{
+    c->cd_to_freedb = iconv_open(SERVER_CHARSET, charset);
+    c->cd_from_freedb = iconv_open(charset, SERVER_CHARSET);
+    if ((c->cd_to_freedb == (iconv_t)-1) || (c->cd_from_freedb == (iconv_t)-1)) {
+        c->cd_to_freedb = NULL;
+        c->cd_from_freedb = NULL;
+        cddb_errno_set(c, CDDB_ERR_INVALID_CHARSET);
+        return FALSE;
+    }
+    cddb_errno_set(c, CDDB_ERR_OK);
+    return TRUE;
+}
+#endif /* HAVE_ICONV_H */
 
 void cddb_set_buf_size(cddb_conn_t *c, unsigned int size)
 {
