@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.h,v 1.11 2003/04/17 22:16:59 airborne Exp $
+    $Id: cddb_track.h,v 1.12 2003/04/27 08:45:17 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -100,6 +100,7 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
  * Set the frame offset of this track on the disc.
  *
  * @param track The CDDB track structure.
+ * @param offset The frame offset.
  * @return The frame offset.
  */
 #define cddb_track_set_frame_offset(track, offset) (track)->frame_offset = offset

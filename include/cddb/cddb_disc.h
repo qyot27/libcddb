@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.13 2003/04/17 22:16:58 airborne Exp $
+    $Id: cddb_disc.h,v 1.14 2003/04/27 08:45:17 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -156,7 +156,6 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc);
  * will be returned.
  *
  * @param disc The CDDB disc structure.
- * @param id The disc ID.
  */
 #define cddb_disc_get_discid(disc) (disc)->discid
 
