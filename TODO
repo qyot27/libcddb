@@ -1,6 +1,8 @@
 
 * HTTP proxy support
 
+* support to enable/disable category dirs in .cddbslave
+
 * revision number handling for CDDB entries (if necessary)
 
 * client name and version customization
