@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.17 2003/05/07 18:46:21 airborne Exp $
+    $Id: cddb_disc.h,v 1.18 2003/05/23 21:10:28 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -370,6 +370,38 @@ void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist);
  * @param artist Part of the artist name.
  */
 void cddb_disc_append_artist(cddb_disc_t *disc, const char *artist);
+
+/**
+ * Get the extended disc data.  If no extended data is set for this
+ * disc then NULL will be returned.
+ *
+ * @param disc The CDDB disc structure.
+ * @return The extended data.
+ */
+#define cddb_disc_get_ext_data(disc) (disc)->ext_data
+
+/**
+ * Set the extended data for the disc.  If the disc already had
+ * extended data, then the memory for that string will be freed.  The
+ * new extended data will be copied into a new chunk of memory.  If
+ * the given extended data is NULL, then the existing data will be
+ * deleted.
+ *
+ * @param disc     The CDDB disc structure.
+ * @param ext_data The new extended data.
+ */
+void cddb_disc_set_ext_data(cddb_disc_t *disc, const char *ext_data);
+
+/**
+ * Append to the extended disc data.  If the disc does not have an
+ * extended data section yet, then a new one will be created from the
+ * given string, otherwise that string will be appended to the
+ * existing data.
+ *
+ * @param disc     The CDDB disc structure.
+ * @param ext_data Part of the extended disc data.
+ */
+void cddb_disc_append_ext_data(cddb_disc_t *disc, const char *ext_data);
 
 
 /* --- miscellaneous */

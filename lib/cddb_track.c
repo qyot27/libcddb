@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.12 2003/05/20 20:43:34 airborne Exp $
+    $Id: cddb_track.c,v 1.13 2003/05/23 21:10:30 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -173,6 +173,32 @@ void cddb_track_append_artist(cddb_track_t *track, const char *artist)
     }
 }
 
+void cddb_track_set_ext_data(cddb_track_t *track, const char *ext_data)
+{
+    if (track) {
+        FREE_NOT_NULL(track->ext_data);
+        if (ext_data) {
+            track->ext_data = strdup(ext_data);
+        }
+    }
+}
+
+void cddb_track_append_ext_data(cddb_track_t *track, const char *ext_data)
+{
+    int old_len = 0, len;
+
+    if (track && ext_data) {
+        /* only append if there is something to append */
+        if (track->ext_data) {
+            old_len = strlen(track->ext_data);
+        }
+        len = strlen(ext_data);
+        track->ext_data = realloc(track->ext_data, old_len+len+1);
+        strcpy(track->ext_data+old_len, ext_data);
+        track->ext_data[old_len+len] = '\0';
+    }
+}
+
 
 /* --- miscellaneous */
 
@@ -210,4 +236,5 @@ void cddb_track_print(cddb_track_t *track)
     printf("    length: %d seconds\n", cddb_track_get_length(track));
     printf("    artist: '%s'\n", STR_OR_NULL(cddb_track_get_artist(track)));
     printf("    title: '%s'\n", STR_OR_NULL(track->title));
+    printf("    extended data: '%s'\n", STR_OR_NULL(track->ext_data));
 }

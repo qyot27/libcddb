@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.h,v 1.14 2003/05/04 17:37:23 airborne Exp $
+    $Id: cddb_track.h,v 1.15 2003/05/23 21:10:28 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -186,6 +186,38 @@ void cddb_track_set_artist(cddb_track_t *track, const char *artist);
  * @param artist Part of the artist name.
  */
 void cddb_track_append_artist(cddb_track_t *track, const char *artist);
+
+/**
+ * Get the extended track data.  If no extended data is set for this
+ * track then NULL will be returned.
+ *
+ * @param track The CDDB track structure.
+ * @return The extended data.
+ */
+#define cddb_track_get_ext_data(track) (track)->ext_data
+
+/**
+ * Set the extended data for the track.  If the track already had
+ * extended data, then the memory for that string will be freed.  The
+ * new extended data will be copied into a new chunk of memory.  If
+ * the given extended data is NULL, then the existing data will be
+ * deleted.
+ *
+ * @param track    The CDDB track structure.
+ * @param ext_data The new extended data.
+ */
+void cddb_track_set_ext_data(cddb_track_t *track, const char *ext_data);
+
+/**
+ * Append to the extended track data.  If the track does not have an
+ * extended data section yet, then a new one will be created from the
+ * given string, otherwise that string will be appended to the
+ * existing data.
+ *
+ * @param track    The CDDB track structure.
+ * @param ext_data Part of the extended track data.
+ */
+void cddb_track_append_ext_data(cddb_track_t *track, const char *ext_data);
 
 
 /* --- miscellaneous */

@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.15 2003/05/20 20:43:34 airborne Exp $
+    $Id: cddb_disc.c,v 1.16 2003/05/23 21:10:30 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -234,6 +234,32 @@ void cddb_disc_append_artist(cddb_disc_t *disc, const char *artist)
     }
 }
 
+void cddb_disc_set_ext_data(cddb_disc_t *disc, const char *ext_data)
+{
+    if (disc) {
+        FREE_NOT_NULL(disc->ext_data);
+        if (ext_data) {
+            disc->ext_data = strdup(ext_data);
+        }
+    }
+}
+
+void cddb_disc_append_ext_data(cddb_disc_t *disc, const char *ext_data)
+{
+    int old_len = 0, len;
+
+    if (disc && ext_data) {
+        /* only append if there is something to append */
+        if (disc->ext_data) {
+            old_len = strlen(disc->ext_data);
+        }
+        len = strlen(ext_data);
+        disc->ext_data = realloc(disc->ext_data, old_len+len+1);
+        strcpy(disc->ext_data+old_len, ext_data);
+        disc->ext_data[old_len+len] = '\0';
+    }
+}
+
 
 /* --- miscellaneous */
 
@@ -330,6 +356,7 @@ void cddb_disc_print(cddb_disc_t *disc)
     printf("Year: %d\n", disc->year);
     printf("Artist: '%s'\n", STR_OR_NULL(disc->artist));
     printf("Title: '%s'\n", STR_OR_NULL(disc->title));
+    printf("Extended data: '%s'\n", STR_OR_NULL(disc->ext_data));
     printf("Length: %d seconds\n", disc->length);
     printf("Number of tracks: %d\n", disc->track_cnt);
     track = disc->tracks;
