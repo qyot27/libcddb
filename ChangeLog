@@ -1,3 +1,13 @@
+2002-11-10 17:32  airborne
+
+	* cddb_cmd.c: 
+	added HTTP response code parsing
+
+2002-11-10 17:20  airborne
+
+	* cddb_conn.h, cddb_ni.h, cddb_cmd.c, cddb_conn.c, main.c:
+	added HTTP proxy support
+
 2002-11-07 23:44  airborne
 
 	* cddb_cmd.c:
