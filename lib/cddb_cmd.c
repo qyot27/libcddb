@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.49 2004/10/08 21:12:05 airborne Exp $
+    $Id: cddb_cmd.c,v 1.50 2004/10/15 19:05:06 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -892,7 +892,8 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
         return FALSE;
     }
 
-    if (!cddb_disc_iconv(c, disc)) {
+    if (!cddb_disc_iconv(c->charset->cd_from_freedb, disc)) {
+        cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
         return FALSE;
     }
 
@@ -1153,6 +1154,7 @@ int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc)
 {
     int i, remaining;
     cddb_track_t *track;
+    const char *s;
 
 /* Appends some data to the buffer.  The first parameter is the
    number of bytes that will be added.  The other parameters are a
@@ -1185,9 +1187,12 @@ int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc)
     } else {
         CDDB_WRITE_APPEND(7, "DYEAR=\n");
     }
-    CDDB_WRITE_APPEND(8+strlen(CDDB_CATEGORY[disc->category]),
-                      "DGENRE=%s\n", 
-                      (disc->genre ? disc->genre : CDDB_CATEGORY[disc->category]));
+    if (disc->genre && (*disc->genre != '\0')) {
+        s = disc->genre;
+    } else {
+        s = CDDB_CATEGORY[disc->category];
+    }
+    CDDB_WRITE_APPEND(8+strlen(s), "DGENRE=%s\n", s);
     /* track data */
     for (track = cddb_disc_get_track_first(disc), i=0; 
          track != NULL; 
@@ -1255,6 +1260,12 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
         }
     }
 
+    /* convert to FreeDB character set */
+    if (!cddb_disc_iconv(c->charset->cd_to_freedb, disc)) {
+        cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+        return FALSE;
+    }
+
     /* create CDDB entry */
     size = cddb_write_data(c, buf, sizeof(buf), disc);
     
@@ -1271,6 +1282,12 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
         }
     }
 
+    /* stop if no network access is allowed */
+    if (c->use_cache == CACHE_ONLY) {
+        cddb_errno_set(c, CDDB_ERR_OK);
+        return TRUE;
+    }
+    
     if (!cddb_connect(c)) {
         /* connection not OK */
         return FALSE;
