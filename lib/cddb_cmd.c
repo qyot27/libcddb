@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.45 2004/03/10 03:08:48 rockyb Exp $
+    $Id: cddb_cmd.c,v 1.46 2004/07/18 07:11:50 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -515,6 +515,7 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
                     sock_fprintf(c->socket, c->timeout, "GET %s", c->http_path_query);
                 }
 
+                // XXX: buffer overflow checking
                 vsnprintf(buf, sizeof(buf), CDDB_COMMANDS[cmd], args);
                 url_encode(buf);
                 sock_fprintf(c->socket, c->timeout, "?cmd=%s&", buf);
@@ -1001,7 +1002,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     cddb_disc_calc_discid(disc);
 
     /* check whether we have enough info to execute the command */
-    cddb_log_debug("...disc->discid    = %8x", disc->discid);
+    cddb_log_debug("...disc->discid    = %08x", disc->discid);
     cddb_log_debug("...disc->length    = %d", disc->length);
     cddb_log_debug("...disc->track_cnt = %d", disc->track_cnt);
     if ((disc->discid == 0) || (disc->length == 0) || (disc->track_cnt == 0)) {
@@ -1027,8 +1028,12 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
             cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
             return -1;
         }
-        // XXX: buffer overflow checking
         snprintf(offset, sizeof(offset), "%d ", track->frame_offset);
+        if (strlen(buf) + strlen(offset) >= LINE_SIZE) {
+            /* buffer is too small */
+            cddb_errno_log_error(c, CDDB_ERR_LINE_SIZE);
+            return -1;
+        }
         strcat(buf, offset);
     }
 
