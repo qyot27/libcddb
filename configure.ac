@@ -71,7 +71,7 @@ AC_CHECK_LIB([socket], [connect])
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h unistd.h errno.h])
 AC_CHECK_HEADERS([fcntl.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
