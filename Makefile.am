@@ -1,5 +1,5 @@
 
-SUBDIRS	= include lib tests examples
+SUBDIRS	= include lib examples tests
 EXTRA_DIST = doc/doxygen.conf
 
 dist-hook:
