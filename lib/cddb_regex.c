@@ -44,7 +44,7 @@ void cddb_regex_init()
         rv = cddb_regex_init_1(&REGEX_DISC_LENGTH,
                                "^#[[:blank:]]*Disc length: ([0-9]+) seconds[[:blank:]]*$");
         rv = cddb_regex_init_1(&REGEX_DISC_TITLE,
-                               "^DTITLE=(.*) / (.*)$");
+                               "^DTITLE=((.*) / (.*)|(.*))$");
         rv = cddb_regex_init_1(&REGEX_DISC_YEAR,
                                "^DYEAR=([0-9]*)$");
         rv = cddb_regex_init_1(&REGEX_DISC_GENRE,
