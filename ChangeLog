@@ -1,3 +1,199 @@
+2003-04-21 00:23  airborne
+
+	* tests/check_discid.sh: fixed spelling typo
+
+2003-04-21 00:22  airborne
+
+	* tests/: check_discid.sh, settings.sh.in: Initial revision
+
+2003-04-21 00:21  airborne
+
+	* tests/Makefile.am: switched tests from native code to shell
+	scripts
+
+2003-04-21 00:20  airborne
+
+	* examples/main.c: added -q option to suppress error messages
+
+2003-04-21 00:19  airborne
+
+	* configure.ac: remove dependency on check library, added
+	settings.sh to output files
+
+2003-04-21 00:17  airborne
+
+	* tests/: base.c, base.h, check_discid.c: tests now performed with
+	shell script and example program
+
+2003-04-20 21:30  airborne
+
+	* .cvsignore: added configure.scan
+
+2003-04-20 21:28  airborne
+
+	* configure.ac: added -O0 compiler flag in maintainer-mode because
+	-Wpointer-arith and -O generates too many warnings (compiler/libc
+	problem (not libcddb code))
+
+2003-04-20 21:25  airborne
+
+	* lib/cddb_conn.c: [impl] changed deprecated bzero into memset
+
+2003-04-20 20:55  airborne
+
+	* configure.ac: added some stuff as suggested by autoscan
+
+2003-04-20 20:54  airborne
+
+	* examples/main.c: added some more usage info
+
+2003-04-20 19:37  airborne
+
+	* examples/main.c: added read support for CD data read from CD-ROM
+	drive
+
+2003-04-20 19:24  airborne
+
+	* examples/do_query.c: fixed match counter, moved disc ID to this
+	function
+
+2003-04-20 19:12  airborne
+
+	* examples/cd_access.c: moved disc creation code to separate
+	function
+
+2003-04-20 19:02  airborne
+
+	* examples/do_query.c: added code to retrieve and print query
+	results
+
+2003-04-20 19:01  airborne
+
+	* TODO: added one entry
+
+2003-04-20 17:04  airborne
+
+	* examples/do_query.c: Initial revision
+
+2003-04-20 16:44  airborne
+
+	* include/cddb/cddb_cmd.h: fixed doc comment
+
+2003-04-20 16:43  airborne
+
+	* examples/cd_access.c: added initial version of cd_create()
+
+2003-04-20 16:41  airborne
+
+	* examples/main.c: added query support and extra command-line
+	parameters
+
+2003-04-20 16:40  airborne
+
+	* examples/main.h: added do_query() and cd_create()
+
+2003-04-20 16:40  airborne
+
+	* examples/Makefile.am: added do_query.c
+
+2003-04-20 16:36  airborne
+
+	* TODO: added one entry
+
+2003-04-20 16:31  airborne
+
+	* examples/cd_access.c: Initial revision
+
+2003-04-18 00:19  airborne
+
+	* examples/: main.c, main.h: [impl] added support for reading CD
+	info from CD-ROM and calculating disc IDs
+
+2003-04-18 00:18  airborne
+
+	* include/cddb/cddb_ni.h: [iface] FRAMES_PER_SECOND now externally
+	visible in cddb_disc.h
+
+2003-04-18 00:16  airborne
+
+	* include/cddb/: cddb_disc.h, cddb_track.h: [iface] added some
+	getters and setters, updated docs
+
+2003-04-18 00:14  airborne
+
+	* misc/libcddb.ebuild: install Changelog in doc directory
+
+2003-04-18 00:13  airborne
+
+	* examples/Makefile.am: add new cd_access.c source file
+
+2003-04-18 00:12  airborne
+
+	* configure.ac: added check for libcdio, used by example program if
+	present
+
+2003-04-17 19:54  airborne
+
+	* misc/: libcddb-0.9.0.ebuild, libcddb.ebuild: renamed ebuild to
+	have no version info in the file name
+
+2003-04-17 19:53  airborne
+
+	* Makefile.am: package Gentoo ebuild file in distribution archive
+
+2003-04-17 19:36  airborne
+
+	* configure.ac: version bump to 0.9.1
+
+2003-04-17 19:35  airborne
+
+	* include/cddb/cddb_ni.h: [bugfix] FREE_NOT_NULL macro now resets
+	ptr to NULL after freeing it
+
+2003-04-17 19:33  airborne
+
+	* lib/cddb_cmd.c: [bugfix] clear title and artist name before
+	setting new data (avoids appending to old strings)
+
+2003-04-17 19:28  airborne
+
+	* lib/cddb_disc.c, lib/cddb_track.c, include/cddb/cddb_disc.h,
+	include/cddb/cddb_track.h: [impl] deleting artist name and title
+	possible by setting it to NULL
+
+2003-04-16 23:01  airborne
+
+	* misc/libcddb-0.9.0.ebuild: Initial revision
+
+2003-04-16 21:38  airborne
+
+	* NEWS: initial text inserted, includes changes between 0.1.6 and
+	0.9.0
+
+2003-04-16 21:37  airborne
+
+	* TODO: added several entries
+
+2003-04-16 20:40  airborne
+
+	* TODO, doc/doxygen.conf: added CVS Id tag
+
+2003-04-16 20:39  airborne
+
+	* README: added doc instructions and contact info
+
+2003-04-16 20:23  airborne
+
+	* README: [no log message]
+
+2003-04-16 20:19  airborne
+
+	* TODO: [no log message]
+
+2003-04-16 20:14  airborne
+
+	* ChangeLog: added 0.9.0 changes
+
 2003-04-16 19:40  airborne
 
 	* configure.ac: version bump to 0.9.0
