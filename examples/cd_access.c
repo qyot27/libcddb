@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.2 2003/04/20 14:43:11 airborne Exp $
+    $Id: cd_access.c,v 1.3 2003/04/20 17:12:17 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -19,6 +19,7 @@
     Boston, MA  02111-1307, USA.
 */
 
+#include <stdlib.h>
 #include "main.h"
 
 #ifdef HAVE_LIBCDIO
@@ -42,7 +43,7 @@ cddb_disc_t *cd_read(const char *device)
     CdIo *cdio;                 /* libcdio CD access structure */
     track_t cnt, t;             /* track counters */
     lsn_t lsn;                  /* Logical Sector Number */
-    cddb_track_t *track;        /* libcddb track structure */
+    int *foffset;               /* list of frame offsets */
 
     /* Get the name of the default CD-ROM device. */
     if (!device) {
@@ -66,50 +67,37 @@ cddb_disc_t *cd_read(const char *device)
     }
     printf("CD contains %d track(s)\n", cnt);
 
-    /* Create a new disc structure. */
-    disc = cddb_disc_new();
+    /* Reserve some memory for the frame offsets. */
+    foffset = calloc(cnt, sizeof(int));
+    
+    /* Now we go and fetch the track data. */
+    for (t = 1; t <= cnt; t++) {
 
-    /* If the pointer is NULL then an error occured (out of memory).
-       Otherwise we continue. */
-    if (disc) {
-        /* Now we go and fetch the track data. */
-        for (t = 1; t <= cnt; t++) {
-
-            /* We only want to process audio CDs. */
-            if (cdio_get_track_format(cdio, t) != TRACK_FORMAT_AUDIO) {
-                libcdio_error_exit("track %d is not an audio track");
-            }
-
-            /* Get frame offset of next track. */
-            lsn = cdio_get_track_lsn(cdio, t);
-            if (lsn == CDIO_INVALID_LSN) {
-                libcdio_error_exit("track %d has invalid Logical Sector Number", t);
-            }
-
-            /* Create a new libcddb track structure for this track. */
-            track = cddb_track_new();
-            if (!track) {
-                error_exit("unable to create track structure");
-            }
-
-            /* Set frame offset in track structure.  But we have to
-               add two seconds of lead-in. */
-            cddb_track_set_frame_offset(track, lsn + 2 * FRAMES_PER_SECOND);
-
-            /* And add the track to the disc. */
-            cddb_disc_add_track(disc, track);
+        /* We only want to process audio CDs. */
+        if (cdio_get_track_format(cdio, t) != TRACK_FORMAT_AUDIO) {
+            libcdio_error_exit("track %d is not an audio track");
         }
 
-        /* Now all we still have to do, is calculate the length of the
-           disc in seconds.  We use the LEADOUT_TRACK for this. */
-        lsn = cdio_get_track_lsn(cdio, CDIO_CDROM_LEADOUT_TRACK);
+        /* Get frame offset of next track. */
+        lsn = cdio_get_track_lsn(cdio, t);
         if (lsn == CDIO_INVALID_LSN) {
-            libcdio_error_exit("LEADOUT_TRACK has invalid Logical Sector Number");
+            libcdio_error_exit("track %d has invalid Logical Sector Number", t);
         }
 
-        /* Initialize the disc length in the structure. */
-        cddb_disc_set_length(disc, FRAMES_TO_SECONDS(lsn));
+        /* Add this offset to teh list.  We have to make sure that we
+           add two seconds of lead-in.*/
+        foffset[t - 1] = lsn + 2 * FRAMES_PER_SECOND;
     }
+
+    /* Now all we still have to do, is calculate the length of the
+       disc in seconds.  We use the LEADOUT_TRACK for this. */
+    lsn = cdio_get_track_lsn(cdio, CDIO_CDROM_LEADOUT_TRACK);
+    if (lsn == CDIO_INVALID_LSN) {
+        libcdio_error_exit("LEADOUT_TRACK has invalid Logical Sector Number");
+    }
+
+    /* Now we have to create the libcddb disc structure. */
+    disc = cd_create(FRAMES_TO_SECONDS(lsn), cnt, foffset);
 
     /* Free all resources held by libcdio CD access structure. */
     cdio_destroy(cdio);
@@ -125,12 +113,35 @@ cddb_disc_t *cd_create(int dlength, int tcount, int *foffset)
     cddb_disc_t *disc;
     cddb_track_t *track;
 
+    /* Create a new disc structure. */
     disc = cddb_disc_new();
-    cddb_disc_set_length(disc, dlength);
-    for (i = 0; i < tcount; i++) {
-        track = cddb_track_new();
-        cddb_track_set_frame_offset(track, foffset[i]);
-        cddb_disc_add_track(disc, track);
+
+    /* If the pointer is NULL then an error occured (out of memory).
+       Otherwise we continue. */
+    if (disc) { 
+        /* Initialize the disc length in the structure. */
+        cddb_disc_set_length(disc, dlength);
+
+        /* Now we have to add the basic track data. */
+        for (i = 0; i < tcount; i++) {
+            /* Create a new libcddb track structure for this track. */
+            track = cddb_track_new();
+
+            /* If the pointer is NULL then an error occured (out of
+               memory).  Otherwise we continue. */
+            if (!track) { 
+                /* Destroy the disc because we can not return half of
+                   it.  Return NULL to signal failure. */
+                cddb_disc_destroy(disc);
+                return NULL;
+            }
+
+            /* Set frame offset in track structure. */
+            cddb_track_set_frame_offset(track, foffset[i]);
+
+            /* And add the track to the disc. */
+            cddb_disc_add_track(disc, track);
+        }
     }
     return disc;
 }
