@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_track.c,v 1.14 2004/07/07 10:29:24 rockyb Exp $
+    $Id: cddb_track.c,v 1.15 2004/07/18 07:14:08 airborne Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -122,6 +122,29 @@ int cddb_track_get_length(cddb_track_t *track)
         return track->length;
     }
     return -1;
+}
+
+void cddb_track_set_length(cddb_track_t *track, int length)
+{
+    cddb_track_t *prev;
+
+    if (track && (length >= 0)) {
+        track->length = length;
+        /* calculate frame offset if possible and not yet set */
+        if (track->disc && (track->frame_offset == -1)) {
+            prev = track->prev;
+            if (prev) {
+                /* not first track on disc */
+                if ((prev->frame_offset != -1) && (prev->length != -1)) {
+                    track->frame_offset = prev->frame_offset + SECONDS_TO_FRAMES(prev->length);
+                }
+            } else {
+                /* first track, let it start at frame offset 150 */
+                track->frame_offset = 150;
+            }
+            cddb_log_debug("frame offset set to %d", track->frame_offset);
+        }
+    }
 }
 
 void cddb_track_append_title(cddb_track_t *track, const char *title)
