@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.15 2004/07/18 07:13:20 airborne Exp $
+    $Id: cddb_net.c,v 1.16 2004/07/21 12:29:23 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -206,20 +206,21 @@ int sock_fprintf(int sock, int timeout, const char *format, ...)
 
 int sock_vfprintf(int sock, int timeout, const char *format, va_list ap)
 {
-    char buf[1024];
+    char *buf;
     int rv;
    
     cddb_log_debug("sock_vfprintf()");
-    // XXX: use LINE_SIZE for buffer size??
-    rv = vsnprintf(buf, sizeof(buf), format, ap);
+    buf = (char*)malloc(LINE_SIZE);
+    rv = vsnprintf(buf, LINE_SIZE, format, ap);
     cddb_log_debug("...buf = '%s'", buf);
-    if (rv >= sizeof(buf)) {
+    if (rv < 0 || rv >= LINE_SIZE) {
         /* buffer too small */
         cddb_log_crit("internal sock_vfprintf buffer too small");
+        free(buf);
         return -1;
     }
-
     rv = sock_fwrite(buf, sizeof(char), rv, sock, timeout);
+        free(buf);
     return rv;
 }
 
