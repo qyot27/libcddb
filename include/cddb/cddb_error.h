@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.h,v 1.4 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_error.h,v 1.5 2003/05/01 15:41:24 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -64,6 +64,8 @@ typedef enum {
                                      a certain command */
     CDDB_ERR_TRACK_NOT_FOUND,   /**< specified track is not present */
     CDDB_ERR_REJECTED,          /**< posted data rejected */
+    CDDB_ERR_EMAIL_INVALID,     /**< the e-mail address used when
+                                     submitting is invalid */
 
     /* --- terminator --- */
 

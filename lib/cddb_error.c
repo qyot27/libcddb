@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.c,v 1.3 2003/04/14 22:25:50 airborne Exp $
+    $Id: cddb_error.c,v 1.4 2003/05/01 15:41:27 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -58,6 +58,9 @@ static const char* err_str[CDDB_ERR_LAST] = {
     /* CDDB_ERR_REJECTED */
     "posted data rejected",
     
+    /* CDDB_ERR_EMAIL_INVALID */
+    "submit e-mail address invalid",
+
     /** CDDB_ERR_LAST */
 };
 
