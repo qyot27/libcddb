@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.32 2003/04/21 17:17:31 airborne Exp $
+    $Id: cddb_cmd.c,v 1.33 2003/04/22 18:14:43 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -878,6 +878,7 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
     /* extract disc ID */
     aux = cddb_regex_get_string(line, matches, 2);
     disc->discid = strtoll(aux, NULL, 16);
+    free(aux);                  /* free temporary buffer */
     /* extract artist and title */
     if (matches[4].rm_so != -1) {
         /* both artist and title of disc are specified */
@@ -888,7 +889,6 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
         disc->title = cddb_regex_get_string(line, matches, 6);
     }        
 
-    free(aux);
     c->errnum = CDDB_ERR_OK;
     return TRUE;
 }
