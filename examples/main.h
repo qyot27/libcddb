@@ -1,5 +1,5 @@
 /*
-    $Id: main.h,v 1.8 2003/05/09 18:17:16 airborne Exp $
+    $Id: main.h,v 1.9 2004/07/18 07:05:27 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -47,4 +47,4 @@ void do_display(cddb_disc_t *disc);
 
 cddb_disc_t *cd_read(char *device);
 
-cddb_disc_t *cd_create(int dlength, int tcount, int *foffset);
+cddb_disc_t *cd_create(int dlength, int tcount, int *foffset, int use_time);

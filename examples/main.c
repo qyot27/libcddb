@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.15 2004/03/09 01:28:38 rockyb Exp $
+    $Id: main.c,v 1.16 2004/07/18 07:05:00 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,9 +29,9 @@
 
 #ifdef HAVE_LIBCDIO
 /* Allow -i <device> parameter */
-#define OPT_STRING ":c:D:hi:l:p:P:qs:"
+#define OPT_STRING ":c:D:hi:l:p:P:qs:t"
 #else
-#define OPT_STRING ":c:D:hl:p:P:qs:"
+#define OPT_STRING ":c:D:hl:p:P:qs:t"
 #endif
 
 /* other stuff */
@@ -53,7 +53,8 @@ static int tcount = 0;          /* track count command-line parameter */
 static int *foffset = NULL;     /* frame offset list command-line parameter */
 static int use_cd = 0;          /* use CD-ROM to retrieve disc data */
 static char *device = NULL;     /* device to use if use_cd == 1. NULL means 
-				   to find a suitable CD-ROM drive. */
+                                   to find a suitable CD-ROM drive. */
+static int use_time = 0;        /* use track times (in seconds) instead of frame offsets */
 
 /* print usage message */
 static void usage(void)
@@ -73,6 +74,7 @@ static void usage(void)
     fprintf(stderr, "  -P <protocol>    server protocol [cddbp|http|proxy] (default = cddbp)\n");
     fprintf(stderr, "  -q               quiet, do not print any error or log messages\n");
     fprintf(stderr, "  -s <server>      name of CDDB server (default = freedb.org)\n");
+    fprintf(stderr, "  -t               use track times (in seconds) instead of frame offsets\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Available commands:\n");
     fprintf(stderr, "  calc <len> <n> <fo_1> ... <fo_n>\n");
@@ -83,7 +85,8 @@ static void usage(void)
     fprintf(stderr, "\n");
     fprintf(stderr, "Command arguments\n");
     fprintf(stderr, "  <cat>            disc category (see below)\n");
-    fprintf(stderr, "  <fo_i>           frame offset of track i\n");
+    fprintf(stderr, "  <fo_i>           without -t: frame offset of track i\n");
+    fprintf(stderr, "                   with -t:    length of track i in seconds\n");
     fprintf(stderr, "  <id>             disc ID in hexadecimal\n");
     fprintf(stderr, "  <len>            disc length in seconds\n");
     fprintf(stderr, "  <n>              track count\n");
@@ -286,9 +289,9 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
             if (!*optarg) {
                 error_usage("-i, device name missing");
             }
-	    use_cd = 1;
-	    device=strdup(optarg);
-	    break;
+            use_cd = 1;
+            device=strdup(optarg);
+            break;
         case 'l':               /* log level */
             if (!*optarg) {
                 error_usage("-l, log level missing");
@@ -337,6 +340,9 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
                the default is OK for you, then you can skip this
                step. */
             cddb_set_server_name(conn, optarg);
+            break;
+        case 't':               /* use track time */
+            use_time = 1;
             break;
         }
     }
@@ -415,7 +421,7 @@ int main(int argc, char **argv)
         /* The disc ID calculation and query command both need a disc
            structure.  We will initialize a new disc with the data
            provided on the command-line. */
-        disc = cd_create(dlength, tcount, foffset);
+        disc = cd_create(dlength, tcount, foffset, use_time);
         if (!disc) {
             error_exit(GENERIC_ERROR, "could not create disc structure");
         }
