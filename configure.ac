@@ -36,17 +36,14 @@ elif test x$default_loglevel != x; then
     AC_MSG_WARN([invalid loglevel, using default])
 fi
 
-AC_ARG_ENABLE([debug],
-              AC_HELP_STRING([--enable-debug], [deprecated, use --enable-loglevel=debug instead]),
-              enable_debug=yes, enable_debug=no)
-if test x$enable_debug = xyes; then
-    AC_MSG_WARN([--enable-debug is deprecated, use --enable-loglevel instead])
-    default_loglevel="CDDB_LOG_DEBUG"
-fi
-
 if test x$default_loglevel != x; then
     AC_DEFINE_UNQUOTED([LOGLEVEL],$default_loglevel,[Set to default log level])
 fi
+
+AC_ARG_WITH([iconv],
+            AC_HELP_STRING([--without-iconv],
+                           [do not include character set conversion support using ]
+                           [the iconv library (default = enabled if found)]))
 
 dnl Check for target
 AC_CANONICAL_HOST
@@ -82,8 +79,8 @@ AC_CHECK_LIB([socket], [connect])
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h regex.h stdlib.h string.h sys/socket.h unistd.h errno.h time.h sys/time.h])
-AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h regex.h stdlib.h string.h sys/socket.h])
+AC_CHECK_HEADERS([unistd.h errno.h time.h sys/time.h fcntl.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -95,7 +92,7 @@ AC_FUNC_REALLOC
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
 AC_FUNC_SELECT_ARGTYPES
-AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr memset alarm select])
+AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr memset alarm select realloc])
 AC_CHECK_FUNC([gethostbyname], , AC_CHECK_LIB([nsl], [gethostbyname]))
 
 PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.67, [
@@ -107,6 +104,12 @@ PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.67, [
 
 AC_SUBST(LIBCDIO_LIBS)
 AC_SUBST(LIBCDIO_CFLAGS)
+
+dnl Check for iconv
+if test x$with_iconv != xno; then
+    AC_CHECK_HEADERS([iconv.h])
+    AC_CHECK_FUNCS([iconv_open])
+fi
 
 dnl Check and add some GCC specific warning flags
 dnl - we do this as the last thing so that a possible -Werror flag
@@ -120,7 +123,8 @@ else
     WARN_CFLAGS="-Wall -Wchar-subscripts -Wmissing-prototypes -Wmissing-declarations"
     WARN_CFLAGS="$WARN_CFLAGS -Wunused -Wpointer-arith -Wwrite-strings -Wnested-externs"
     WARN_CFLAGS="$WARN_CFLAGS -Wno-sign-compare"
-    MAINTAINER_CFLAGS="-std=c99 -pedantic -Werror -O0"
+dnl MAINTAINER_CFLAGS="-std=c99 -pedantic -Werror -O0"
+    MAINTAINER_CFLAGS="-Werror -O0"
 
     if test "x$enable_maintainer_mode" = "xyes"; then
         maintainer_flags=""
