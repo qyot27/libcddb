@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.c,v 1.9 2004/10/08 19:55:49 airborne Exp $
+    $Id: cddb_regex.c,v 1.10 2004/10/15 18:47:07 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -67,7 +67,7 @@ void cddb_regex_init()
         rv = cddb_regex_init_1(&REGEX_TRACK_FRAME_OFFSET,
                                "^#[[:blank:]]*([0-9]+)[[:blank:]]*$");
         rv = cddb_regex_init_1(&REGEX_DISC_LENGTH,
-                               "^#[[:blank:]]*Disc length: ([0-9]+)( seconds)*[[:blank:]]*$");
+                               "^#[[:blank:]]*Disc length:[[:blank:]]+([0-9]+)( seconds)*[[:blank:]]*$");
         rv = cddb_regex_init_1(&REGEX_DISC_TITLE,
                                "^DTITLE=((.*) / (.*)|(.*))$");
         rv = cddb_regex_init_1(&REGEX_DISC_YEAR,
