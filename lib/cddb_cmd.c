@@ -309,6 +309,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     regmatch_t matches[6];
     cddb_track_t *track;
     int cache_content;
+    int track_no;
     FILE *cache = NULL;
 
     dlog("cddb_parse_record()");
@@ -336,15 +337,21 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
             dlog("\tstate: START");
             if (regexec(REGEX_TRACK_FRAME_OFFSETS, line, 0, NULL, 0) == 0) {
                 /* expect a list of track frame offsets now */
+                track_no = 0;
                 state = STATE_TRACK_OFFSETS;
             }
             break;
         case STATE_TRACK_OFFSETS:
             dlog("\tstate: TRACK OFFSETS");
             if (regexec(REGEX_TRACK_FRAME_OFFSET, line, 2, matches, 0) == 0) {
-                track = cddb_track_new();
+                track = cddb_disc_get_track(disc, track_no);
+                if (!track) {
+                    /* no such track present in disc structure yet */
+                    track = cddb_track_new();
+                    /* XXX: insert at track_no pos?? */
+                    cddb_disc_add_track(disc, track);
+                }
                 track->frame_offset = cddb_regex_get_int(line, matches, 1);
-                cddb_disc_add_track(disc, track);
             } else {
                 /* expect disc length now */
                 state = STATE_DISC_LENGTH;
@@ -386,8 +393,6 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
         case STATE_TRACK_TITLE:
             dlog("\tstate: TRACK TITLE");
             if (regexec(REGEX_TRACK_TITLE, line, 6, matches, 0) == 0) {
-                int track_no;
-
                 state = STATE_TRACK_TITLE;
                 track_no = cddb_regex_get_int(line, matches, 1);
                 track = cddb_disc_get_track(disc, track_no);
@@ -490,6 +495,9 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 
     dlog("cddb_query()");
     /* check whether we have enough info to execute the command */
+    dlog("\tdisc->discid    = %8x", disc->discid);
+    dlog("\tdisc->length    = %d", disc->length);
+    dlog("\tdisc->track_cnt = %d", disc->track_cnt);
     if ((disc->discid == 0) || (disc->length == 0) || (disc->track_cnt == 0)) {
         c->errnum = CDDB_ERR_DATA_MISSING;
         return FALSE;
