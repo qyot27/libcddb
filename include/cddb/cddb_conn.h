@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.21 2004/10/08 21:01:23 airborne Exp $
+    $Id: cddb_conn.h,v 1.22 2004/10/15 18:40:08 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,10 +27,6 @@
 #endif
 
 
-#ifdef HAVE_ICONV_H
-#include <iconv.h>
-#endif /* HAVE_ICONV_H */
-
 #include <stdio.h>
 #include <netinet/in.h>
 
@@ -39,6 +35,12 @@
 #define CACHE_ON   1            /**< use local CDDB cache, if possible */
 #define CACHE_ONLY 2            /**< only use local CDDB cache, no network
                                      access */
+
+/**
+ * Forward declaration of opaque structure used for character set
+ * conversions.
+ */
+typedef struct cddb_iconv_s *cddb_iconv_t;
 
 /**
  * An opaque structure for keeping state about the connection to a
@@ -102,12 +104,7 @@ typedef struct cddb_conn_s
     int query_idx;              /**< iterator index for query result set */
     int query_cnt;              /**< number of entries in query result set */
 
-#ifdef HAVE_ICONV_H
-    iconv_t cd_to_freedb;       /**< character set conversion descriptor for
-                                     converting from user to FreeDB format */
-    iconv_t cd_from_freedb;     /**< character set conversion descriptor for
-                                     converting from FreeDB to user format */
-#endif /* HAVE_ICONV_H */
+    cddb_iconv_t charset;       /**< character set conversion settings */
 } cddb_conn_t;
 
 
@@ -134,7 +131,6 @@ void cddb_destroy(cddb_conn_t *c);
 /* --- getters & setters --- */
 
 
-#ifdef HAVE_ICONV_H
 /**
  * Set the character set.  By default the FreeDB server uses UTF-8 when
  * providing CD data.  When a character set is defined with this function
@@ -147,7 +143,6 @@ void cddb_destroy(cddb_conn_t *c);
  *         from/to UTF-8 is available.  TRUE otherwise.
  */
 int cddb_set_charset(cddb_conn_t *c, const char *cs);
-#endif /* HAVE_ICONV_H */
 
 /**
  * Change the size of the internal buffer.
