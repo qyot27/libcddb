@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: check_server.sh,v 1.3 2003/05/08 17:39:04 airborne Exp $
+# $Id: check_server.sh,v 1.4 2003/05/08 19:40:40 airborne Exp $
 
 . ./settings.sh
 
@@ -16,9 +16,14 @@
 QUERY_DATA='2259 8 155 25947 47357 66630 91222 110355 124755 148317'
 QUERY_HASH='b2bba00e1890d659'
 
-$CDDB_QUERY -c off -D $CDDB_CACHE -P cddbp query $QUERY_DATA | check_query $QUERY_HASH
-$CDDB_QUERY -c off -D $CDDB_CACHE -P http  query $QUERY_DATA | check_query $QUERY_HASH
-$CDDB_QUERY -c off -D $CDDB_CACHE -P proxy query $QUERY_DATA | check_query $QUERY_HASH
+cddb_query -c off -D $CDDB_CACHE -P cddbp query $QUERY_DATA
+check_query $? $QUERY_HASH
+
+cddb_query -c off -D $CDDB_CACHE -P http  query $QUERY_DATA
+check_query $? $QUERY_HASH
+
+cddb_query -c off -D $CDDB_CACHE -P proxy query $QUERY_DATA
+check_query $? $QUERY_HASH
 
 #
 # Query disc with multiple matches
@@ -26,20 +31,30 @@ $CDDB_QUERY -c off -D $CDDB_CACHE -P proxy query $QUERY_DATA | check_query $QUER
 QUERY_DATA='3822 11 150 28690 51102 75910 102682 121522 149040 175772 204387 231145 268065'
 QUERY_HASH='56c2171b89496518'
 
-$CDDB_QUERY -c off -D $CDDB_CACHE -P cddbp query $QUERY_DATA | check_query $QUERY_HASH
-$CDDB_QUERY -c off -D $CDDB_CACHE -P http  query $QUERY_DATA | check_query $QUERY_HASH
-$CDDB_QUERY -c off -D $CDDB_CACHE -P proxy query $QUERY_DATA | check_query $QUERY_HASH
+cddb_query -c off -D $CDDB_CACHE -P cddbp query $QUERY_DATA
+check_query $? $QUERY_HASH
+
+cddb_query -c off -D $CDDB_CACHE -P http  query $QUERY_DATA
+check_query $? $QUERY_HASH
+
+cddb_query -c off -D $CDDB_CACHE -P proxy query $QUERY_DATA
+check_query $? $QUERY_HASH
 
 #
 # Read disc data from server
 #
 DISCID='920ef00b'
 
-$CDDB_QUERY -c off -D $CDDB_CACHE -P cddbp read misc $DISCID | check_read $DISCID
-$CDDB_QUERY -c off -D $CDDB_CACHE -P http  read misc $DISCID | check_read $DISCID
-$CDDB_QUERY -c off -D $CDDB_CACHE -P proxy read misc $DISCID | check_read $DISCID
+cddb_query -c off -D $CDDB_CACHE -P cddbp read misc $DISCID
+check_read $? $DISCID
+
+cddb_query -c off -D $CDDB_CACHE -P http  read misc $DISCID
+check_read $? $DISCID
+
+cddb_query -c off -D $CDDB_CACHE -P proxy read misc $DISCID
+check_read $? $DISCID
 
 #
-# Fell through all tests
+# Print results and exit accordingly
 #
-exit $SUCCESS
+finalize
