@@ -1,6 +1,6 @@
 # Copyright 1999-2003 Gentoo Technologies, Inc.
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /cvsroot/libcddb/libcddb/misc/Attic/libcddb-0.9.0.ebuild,v 1.1 2003/04/16 21:01:35 airborne Exp $
+# $Header: /cvsroot/libcddb/libcddb/misc/libcddb.ebuild,v 1.1 2003/04/17 17:54:31 airborne Exp $
 
 IUSE="doc"
 
