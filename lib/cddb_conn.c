@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_conn.c,v 1.22 2003/05/29 10:14:35 airborne Exp $
+    $Id: cddb_conn.c,v 1.23 2004/03/09 12:43:57 rockyb Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,15 +19,43 @@
     Boston, MA  02111-1307, USA.
 */
 
-#include <sys/types.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 #include "cddb/cddb_ni.h"
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#if defined( UNDER_CE )
+#   include <winsock.h>
+#elif defined( WIN32 )
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   define close closesocket
+#endif 
+
+#ifdef HAVE_NETDB_H
+#include <netdb.h>
+#endif
+
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
+
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+
+#ifdef HAVE_STLIB_H
+#include <stdlib.h>
+#endif 
+
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 
 /* --- prototypes --- */
