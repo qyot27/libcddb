@@ -1,4 +1,4 @@
-$Id: TODO,v 1.13 2003/04/22 18:07:14 airborne Exp $
+$Id: TODO,v 1.14 2003/04/30 18:02:41 airborne Exp $
 
 * improved error handling
 
@@ -27,3 +27,5 @@ $Id: TODO,v 1.13 2003/04/22 18:07:14 airborne Exp $
 * create some sort of local CDDB query index?
 
 * research possible use of pkg-config
+
+* full text search on CDDB server
