@@ -1,3 +1,13 @@
+2002-11-22 20:44  airborne
+
+	* cddb_cmd.c:
+	support for mutiple exact matches
+
+2002-11-18 23:19  airborne
+
+	* cddb_cmd_ni.h, cddb_ni.h, cddb_cmd.c, cddb_conn.c:
+	enable protocol version 5 in CDDBP mode
+
 2002-11-17 17:46  airborne
 
 	* cddb_disc.h, cddb_cmd.c, cddb_conn.c, cddb_disc.c:
