@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.16 2004/07/21 12:29:23 airborne Exp $
+    $Id: cddb_net.c,v 1.17 2004/07/21 16:17:50 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -109,13 +109,14 @@ static int sock_ready(int sock, int timeout, int to_write)
 /* Socket-based work-alikes */
 
 
-char *sock_fgets(char *s, int size, int sock, int timeout)
+char *sock_fgets(char *s, int size, cddb_conn_t *c)
 {
     int rv;
-    time_t now, end;
+    time_t now, end, timeout;
     char *p = s;
 
     cddb_log_debug("sock_fgets()");
+    timeout = c->timeout;
     end = time(NULL) + timeout;
     size--;                      /* save one for terminating null */
     while (size) {
@@ -126,12 +127,12 @@ char *sock_fgets(char *s, int size, int sock, int timeout)
             return NULL;        /* time out */
         }
         /* can we read from the socket? */
-        if (!sock_can_read(sock, timeout)) {
+        if (!sock_can_read(c->socket, timeout)) {
             /* error or time out */
             return NULL;
         }
         /* read one byte */
-        rv = recv(sock, p, 1, 0);
+        rv = recv(c->socket, p, 1, 0);
         if (rv == -1) {
             /* recv() error */
             return NULL;
@@ -155,16 +156,17 @@ char *sock_fgets(char *s, int size, int sock, int timeout)
     return s;
 }
 
-size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock, int timeout)
+size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, cddb_conn_t *c)
 {
     size_t total_size, to_send;
-    time_t now, end;
+    time_t now, end, timeout;
     int rv;
     const char *p = (const char *)ptr;
 
     cddb_log_debug("sock_fwrite()");
     total_size = size * nmemb;
     to_send = total_size;
+    timeout = c->timeout;
     end = time(NULL) + timeout;
     while (to_send) {
         now = time(NULL);
@@ -175,12 +177,12 @@ size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock, int tim
             break;
         }
         /* can we write to the socket? */
-        if (!sock_can_write(sock, timeout)) {
+        if (!sock_can_write(c->socket, timeout)) {
             /* error or time out */
             break;
         }
         /* try sending data */
-        rv = send(sock, p, to_send, 0);
+        rv = send(c->socket, p, to_send, 0);
         if (rv == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
             /* error */
             break;
@@ -192,35 +194,35 @@ size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock, int tim
     return (total_size - to_send) / size;
 }
 
-int sock_fprintf(int sock, int timeout, const char *format, ...)
+int sock_fprintf(cddb_conn_t *c, const char *format, ...)
 {
     int rv;
     va_list args;
 
     cddb_log_debug("sock_fprintf()");
     va_start(args, format);
-    rv = sock_vfprintf(sock, timeout, format, args);
+    rv = sock_vfprintf(c, format, args);
     va_end(args);
     return rv;
 }
 
-int sock_vfprintf(int sock, int timeout, const char *format, va_list ap)
+int sock_vfprintf(cddb_conn_t *c, const char *format, va_list ap)
 {
     char *buf;
     int rv;
    
     cddb_log_debug("sock_vfprintf()");
-    buf = (char*)malloc(LINE_SIZE);
-    rv = vsnprintf(buf, LINE_SIZE, format, ap);
+    buf = (char*)malloc(c->buf_size);
+    rv = vsnprintf(buf, c->buf_size, format, ap);
     cddb_log_debug("...buf = '%s'", buf);
-    if (rv < 0 || rv >= LINE_SIZE) {
+    if (rv < 0 || rv >= c->buf_size) {
         /* buffer too small */
-        cddb_log_crit("internal sock_vfprintf buffer too small");
+        cddb_errno_log_crit(c, CDDB_ERR_LINE_SIZE);
         free(buf);
         return -1;
     }
-    rv = sock_fwrite(buf, sizeof(char), rv, sock, timeout);
-        free(buf);
+    rv = sock_fwrite(buf, sizeof(char), rv, c);
+    free(buf);
     return rv;
 }
 
