@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cddb/cddb_ni.h"
 
@@ -50,6 +51,7 @@ void cddb_disc_destroy(cddb_disc_t *disc)
 
 void cddb_disc_add_track(cddb_disc_t *disc, cddb_track_t *track)
 {
+    dlog("cddb_disc_add_track()");
     if (!disc->tracks) {
         /* first track on disc */
         disc->tracks = track;
@@ -64,6 +66,7 @@ void cddb_disc_add_track(cddb_disc_t *disc, cddb_track_t *track)
         t->next = track;
     }
     disc->track_cnt++;
+    track->num = disc->track_cnt;
 }
 
 cddb_track_t *cddb_disc_get_track(cddb_disc_t *disc, int track_no)
@@ -77,6 +80,7 @@ cddb_track_t *cddb_disc_get_track(cddb_disc_t *disc, int track_no)
     for (track = disc->tracks; 
          track_no > 0; 
          track_no--, track = track->next) { /* no-op */ }
+    /* XXX: should we check track->num?? */
     return track;
 }
 
@@ -107,6 +111,22 @@ void cddb_disc_set_category(cddb_disc_t *disc, const char *cat)
             disc->category = i;
             return;
         }
+    }
+}
+
+void cddb_disc_set_title(cddb_disc_t *disc, const char *title)
+{
+    if (disc) {
+        FREE_NOT_NULL(disc->title);
+        disc->title = strdup(title);
+    }
+}
+
+void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist)
+{
+    if (disc) {
+        FREE_NOT_NULL(disc->artist);
+        disc->artist = strdup(artist);
     }
 }
 
