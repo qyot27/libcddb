@@ -1,4 +1,4 @@
-$Id: TODO,v 1.18 2003/05/13 20:46:40 airborne Exp $
+$Id: TODO,v 1.19 2003/05/25 18:33:20 airborne Exp $
 
 * improved error handling
 
@@ -8,7 +8,7 @@ $Id: TODO,v 1.18 2003/05/13 20:46:40 airborne Exp $
 
 * if no disc found in .cddbslave/<category>/ try .cddbslave/ ?
 
-* support for extended data and playing order fields
+* support for playing order field
 
 * support for writing multi-lined fields
 
