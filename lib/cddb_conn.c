@@ -270,10 +270,14 @@ void cddb_disconnect(cddb_conn_t *c)
 
     dlog("cddb_disconnect()");
     if (CONNECTION_OK(c)) {
+        /*
         if (!c->is_http_enabled) {
+            void *old_handler = signal(SIGPIPE, SIG_IGN);
             cddb_send_cmd(c, CMD_QUIT);        
             code = cddb_get_response_code(c, &msg);
+            signal(SIGPIPE, old_handler);
         }
+        */
         fclose(c->fp);
         close(c->sockfd);
         c->sockfd = -1;
