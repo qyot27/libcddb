@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.48 2004/07/21 16:14:16 airborne Exp $
+    $Id: cddb_cmd.c,v 1.49 2004/10/08 21:12:05 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -889,6 +889,10 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
             FREE_NOT_NULL(fn);
         }
         cddb_errno_log_error(c, CDDB_ERR_INVALID_RESPONSE);
+        return FALSE;
+    }
+
+    if (!cddb_disc_iconv(c, disc)) {
         return FALSE;
     }
 
