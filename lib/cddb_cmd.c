@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.39 2003/05/13 20:29:24 airborne Exp $
+    $Id: cddb_cmd.c,v 1.40 2003/05/20 20:53:07 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -141,6 +141,8 @@ char *cddb_cache_file_name(cddb_conn_t *c, cddb_disc_t *disc)
     if (fn) {
         snprintf(fn, len + 1, "%s/%s/%08x", c->cache_dir, 
                  CDDB_CATEGORY[disc->category], disc->discid);
+    } else {
+        cddb_errno_log_crit(c, CDDB_ERR_OUT_OF_MEMORY);
     }
     return fn;
 }
@@ -151,14 +153,14 @@ int cddb_cache_exists(cddb_conn_t *c, cddb_disc_t *disc)
     char *fn = NULL;
     struct stat buf;
 
-    dlog("cddb_cache_exists()");
+    cddb_log_debug("cddb_cache_exists()");
     /* try to stat cache file */
     fn = cddb_cache_file_name(c, disc);
     if (fn) {
         if ((stat(fn, &buf) == -1) || !S_ISREG(buf.st_mode)) {
-            dlog("\tnot in cache");
+            cddb_log_debug("...not in cache");
         } else {
-            dlog("\tin cache");
+            cddb_log_debug("...in cache");
             rv = TRUE;
         }
     }
@@ -171,7 +173,7 @@ int cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode)
     int rv = FALSE;
     char *fn = NULL;
 
-    dlog("cddb_cache_open()");
+    cddb_log_debug("cddb_cache_open()");
     /* close previous entry */
     cddb_cache_close(c);
     /* open new entry */
@@ -186,8 +188,8 @@ int cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode)
 
 void cddb_cache_close(cddb_conn_t *c)
 {
-    dlog("cddb_cache_close()");
     if (c->cache_fp != NULL) {
+        cddb_log_debug("cddb_cache_close()");
         fclose(c->cache_fp);
         c->cache_fp = NULL;
     }
@@ -197,28 +199,31 @@ int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc)
 {
     int rv;
 
-    dlog("cddb_cache_read()");
+    cddb_log_debug("cddb_cache_read()");
     if (c->use_cache == CACHE_OFF) {
         /* don't use cache */
+        cddb_log_debug("...cache disabled");
         return FALSE;
     }
 
     /* check whether cached version exists */
     if (!cddb_cache_exists(c, disc)) {
         /* no cached version available */
-        dlog("\tno cached version found");
+        cddb_log_debug("...no cached version found");
         return FALSE;
     }
 
     /* try to open cache file */
     if (!cddb_cache_open(c, disc, "r")) {
         /* cached version not readable */
-        dlog("\tcached version not readable");
+        char *fn = cddb_cache_file_name(c, disc);
+        cddb_log_warn("cache file not readable: %s", fn);
+        FREE_NOT_NULL(fn);
         return FALSE;
     }
 
     /* parse CDDB record */
-    dlog("\tcached version found");
+    cddb_log_debug("...cached version found");
     c->cache_read = TRUE;
     rv = cddb_parse_record(c, disc);
     c->cache_read = FALSE;
@@ -249,9 +254,10 @@ int cddb_cache_query(cddb_conn_t *c, cddb_disc_t *disc)
 {
     int hash;
 
-    dlog("cddb_cache_query()");
+    cddb_log_debug("cddb_cache_query()");
     if (c->use_cache == CACHE_OFF) {
         /* don't use cache */
+        cddb_log_debug("...cache disabled");
         return FALSE;
     }
 
@@ -263,9 +269,9 @@ int cddb_cache_query(cddb_conn_t *c, cddb_disc_t *disc)
 
     /* data already in memory? */
     if (query_cache[hash].discid == disc->discid) {
-        dlog("\tentry found in memory");
+        cddb_log_debug("...entry found in memory");
         disc->category = query_cache[hash].category;
-        c->errnum = CDDB_ERR_OK;
+        cddb_errno_set(c, CDDB_ERR_OK);
         return TRUE;
     }
 
@@ -277,7 +283,7 @@ int cddb_cache_query_disc(cddb_conn_t *c, cddb_disc_t *disc)
 {
     int cat, hash;
 
-    dlog("cddb_cache_query_disc()");
+    cddb_log_debug("cddb_cache_query_disc()");
     for (cat = CDDB_CAT_DATA; cat < CDDB_CAT_INVALID; cat++) {
         disc->category = cat;
         if (cddb_cache_exists(c, disc)) {
@@ -285,13 +291,13 @@ int cddb_cache_query_disc(cddb_conn_t *c, cddb_disc_t *disc)
             hash = cddb_cache_query_hash(disc);
             query_cache[hash].discid = disc->discid;
             query_cache[hash].category = disc->category;
-            dlog("\tentry found in local db");
-            c->errnum = CDDB_ERR_OK;
+            cddb_log_debug("...entry found in local db");
+            cddb_errno_set(c, CDDB_ERR_OK);
             return TRUE;
         }
     }
     disc->category = CDDB_CAT_INVALID;
-    dlog("\tentry not found in local db");
+    cddb_log_debug("...entry not found in local db");
     return FALSE;
 }
 
@@ -299,15 +305,17 @@ int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc)
 {
     char fn[LINE_SIZE];
 
-    dlog("cddb_cache_mkdir()");
+    cddb_log_debug("cddb_cache_mkdir()");
     /* create CDDB slave dir */
     if ((mkdir(c->cache_dir, 0755) == -1) && (errno != EEXIST)) {
+        cddb_log_error("could not create cache directory: %s", c->cache_dir);
         return FALSE;
     }
 
     /* create category dir */
     snprintf(fn, sizeof(fn), "%s/%s", c->cache_dir, CDDB_CATEGORY[disc->category]);
     if ((mkdir(fn, 0755) == -1) && (errno != EEXIST)) {
+        cddb_log_error("could not create category directory: %s", fn);
         return FALSE;
     }
 
@@ -322,7 +330,7 @@ void cddb_query_clear(cddb_conn_t *c)
 {
     int i;
 
-    dlog("cddb_query_clear()");
+    cddb_log_debug("cddb_query_clear()");
     if (c->query_data != NULL) {
         for (i = 0; i < c->query_cnt; i++) {
             cddb_disc_destroy(c->query_data[i]);
@@ -343,30 +351,30 @@ int cddb_get_response_code(cddb_conn_t *c, char **msg)
     char *line, *space;
     int code, rv;
 
-    dlog("cddb_get_response_code()");
+    cddb_log_debug("cddb_get_response_code()");
     line = cddb_read_line(c);
     if (!line) {
-        if (c->errnum != CDDB_ERR_OK) {
-            c->errnum = CDDB_ERR_UNEXPECTED_EOF;
+        if (cddb_errno(c) != CDDB_ERR_OK) {
+            cddb_errno_log_error(c, CDDB_ERR_UNEXPECTED_EOF);
         }
         return -1;
     }
 
     rv = sscanf(line, "%d", &code);
     if (rv != 1) {
-        c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        cddb_errno_log_error(c, CDDB_ERR_INVALID_RESPONSE);
         return -1;
     }
 
     space = strchr(line, CHR_SPACE);
     if (space == NULL) {
-        c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        cddb_errno_log_error(c, CDDB_ERR_INVALID_RESPONSE);
         return -1;
     }
     *msg = space + 1;           /* message starts after space */
 
-    c->errnum = CDDB_ERR_OK;
-    dlog("\tcode = %d (%s)", code, *msg);
+    cddb_errno_set(c, CDDB_ERR_OK);
+    cddb_log_debug("...code = %d (%s)", code, *msg);
     return code;
 }
 
@@ -374,7 +382,7 @@ char *cddb_read_line(cddb_conn_t *c)
 {
     char *s;
 
-    dlog("cddb_read_line()");
+    cddb_log_debug("cddb_read_line()");
     /* read line, possibly returning NULL */
     if (c->cache_read) {
         s = fgets(c->line, LINE_SIZE, cddb_cache_file(c));
@@ -394,8 +402,8 @@ char *cddb_read_line(cddb_conn_t *c)
         return NULL;
     }
 
-    c->errnum = CDDB_ERR_OK;
-    dlog("\t[%c] line = '%s'", (c->cache_read ? 'C' : 'N'), c->line);
+    cddb_errno_set(c, CDDB_ERR_OK);
+    cddb_log_debug("...[%c] line = '%s'", (c->cache_read ? 'C' : 'N'), c->line);
     return c->line;
 }
 
@@ -403,7 +411,7 @@ static void url_encode(char *s)
 {
     while (*s) {
         switch (*s) {
-        case ' ': *s = '+'; break;
+            case ' ': *s = '+'; break;
         }
         s++;
     }
@@ -416,28 +424,28 @@ int cddb_http_parse_response(cddb_conn_t *c)
 
     if ((line = cddb_read_line(c)) == NULL) {
         /* no HTTP response line */
-        c->errnum = CDDB_ERR_UNEXPECTED_EOF;
+        cddb_errno_log_error(c, CDDB_ERR_UNEXPECTED_EOF);
         return FALSE;
     }
 
     if (sscanf(line, "%*s %d %*s", &code) != 1) {
         /* invalid */
-        c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        cddb_errno_log_error(c, CDDB_ERR_INVALID_RESPONSE);
         return FALSE;
     }
 
-    dlog("\tHTTP response code = %d", code);
+    cddb_log_debug("...HTTP response code = %d", code);
     switch (code) {
-    case 200:
-        /* HTTP OK */
-        break;
-    default:
-        /* anythign else = error */
-        c->errnum = CDDB_ERR_SERVER_ERROR;
-        return FALSE;
+        case 200:
+            /* HTTP OK */
+            break;
+        default:
+            /* anythign else = error */
+            cddb_errno_log_error(c, CDDB_ERR_SERVER_ERROR);
+            return FALSE;
     }
 
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
 
@@ -445,7 +453,7 @@ void cddb_http_parse_headers(cddb_conn_t *c)
 {
     char *line;
 
-    dlog("cddb_http_parse_headers()");
+    cddb_log_debug("cddb_http_parse_headers()");
     while (((line = cddb_read_line(c)) != NULL) &&
            (*line != CHR_EOS)) {
         /* no-op */
@@ -454,80 +462,80 @@ void cddb_http_parse_headers(cddb_conn_t *c)
 
 int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
 {
-    dlog("cddb_http_send_cmd()");
+    cddb_log_debug("cddb_http_send_cmd()");
     switch (cmd) {
-    case CMD_WRITE:
-        /* entry submission (POST method) */
-        {
-            char *category;
-            int discid, size;
+        case CMD_WRITE:
+            /* entry submission (POST method) */
+            {
+                char *category;
+                int discid, size;
+                
+                category = va_arg(args, char *);
+                discid = va_arg(args, int);
+                size = va_arg(args, int);
 
-            category = va_arg(args, char *);
-            discid = va_arg(args, int);
-            size = va_arg(args, int);
+                if (c->is_http_proxy_enabled) {
+                    /* use an HTTP proxy */
+                    sock_fprintf(c->socket, c->timeout, "POST http://%s:%d%s HTTP/1.0\r\n", 
+                                 c->server_name, c->server_port, c->http_path_submit);
+                    sock_fprintf(c->socket, c->timeout, "Host: %s:%d\r\n",
+                                 c->server_name, c->server_port);
+                } else {
+                    /* direct connection */
+                    sock_fprintf(c->socket, c->timeout, "POST %s HTTP/1.0\r\n",
+                                 c->http_path_submit);
+                }
 
-            if (c->is_http_proxy_enabled) {
-                /* use an HTTP proxy */
-                sock_fprintf(c->socket, c->timeout, "POST http://%s:%d%s HTTP/1.0\r\n", 
-                             c->server_name, c->server_port, c->http_path_submit);
-                sock_fprintf(c->socket, c->timeout, "Host: %s:%d\r\n",
-                             c->server_name, c->server_port);
-            } else {
-                /* direct connection */
-                sock_fprintf(c->socket, c->timeout, "POST %s HTTP/1.0\r\n",
-                             c->http_path_submit);
+                sock_fprintf(c->socket, c->timeout, "Category: %s\r\n", category);
+                sock_fprintf(c->socket, c->timeout, "Discid: %08x\r\n", discid);
+                sock_fprintf(c->socket, c->timeout, "User-Email: %s@%s\r\n", 
+                             c->user, c->hostname);
+                sock_fprintf(c->socket, c->timeout, "Submit-Mode: submit\r\n");
+                sock_fprintf(c->socket, c->timeout, "Content-Length: %d\r\n", size);
+                sock_fprintf(c->socket, c->timeout, "\r\n");
             }
+            break;
+        default:
+            /* anything else */
+            {
+                char buf[LINE_SIZE];
 
-            sock_fprintf(c->socket, c->timeout, "Category: %s\r\n", category);
-            sock_fprintf(c->socket, c->timeout, "Discid: %08x\r\n", discid);
-            sock_fprintf(c->socket, c->timeout, "User-Email: %s@%s\r\n", 
-                         c->user, c->hostname);
-            sock_fprintf(c->socket, c->timeout, "Submit-Mode: submit\r\n");
-            sock_fprintf(c->socket, c->timeout, "Content-Length: %d\r\n", size);
-            sock_fprintf(c->socket, c->timeout, "\r\n");
-        }
-        break;
-    default:
-        /* anything else */
-        {
-            char buf[LINE_SIZE];
+                if (c->is_http_proxy_enabled) {
+                    /* use an HTTP proxy */
+                    sock_fprintf(c->socket, c->timeout, "GET http://%s:%d%s", 
+                                 c->server_name, c->server_port, c->http_path_query);
+                } else {
+                    /* direct connection */
+                    sock_fprintf(c->socket, c->timeout, "GET %s", c->http_path_query);
+                }
 
-            if (c->is_http_proxy_enabled) {
-                /* use an HTTP proxy */
-                sock_fprintf(c->socket, c->timeout, "GET http://%s:%d%s", 
-                             c->server_name, c->server_port, c->http_path_query);
-            } else {
-                /* direct connection */
-                sock_fprintf(c->socket, c->timeout, "GET %s", c->http_path_query);
+                vsnprintf(buf, sizeof(buf), CDDB_COMMANDS[cmd], args);
+                url_encode(buf);
+                sock_fprintf(c->socket, c->timeout, "?cmd=%s&", buf);
+
+                sock_fprintf(c->socket, c->timeout, "hello=%s+%s+%s+%s&", 
+                             c->user, c->hostname, c->cname, c->cversion);
+                sock_fprintf(c->socket, c->timeout, "proto=%d", DEFAULT_PROTOCOL_VERSION);
+                sock_fprintf(c->socket, c->timeout, " HTTP/1.0\r\n");
+
+                if (c->is_http_proxy_enabled) {
+                    /* insert host header */
+                    sock_fprintf(c->socket, c->timeout, "Host: %s:%d\r\n",
+                                 c->server_name, c->server_port);
+                }
+                sock_fprintf(c->socket, c->timeout, "\r\n");
+
+                /* parse HTTP response line */
+                if (!cddb_http_parse_response(c)) {
+                    return FALSE;
+                }
+
+                /* skip HTTP response headers */
+                cddb_http_parse_headers(c);
             }
-
-            vsnprintf(buf, sizeof(buf), CDDB_COMMANDS[cmd], args);
-            url_encode(buf);
-            sock_fprintf(c->socket, c->timeout, "?cmd=%s&", buf);
-
-            sock_fprintf(c->socket, c->timeout, "hello=%s+%s+%s+%s&", 
-                         c->user, c->hostname, c->cname, c->cversion);
-            sock_fprintf(c->socket, c->timeout, "proto=%d", DEFAULT_PROTOCOL_VERSION);
-            sock_fprintf(c->socket, c->timeout, " HTTP/1.0\r\n");
-
-            if (c->is_http_proxy_enabled) {
-                /* insert host header */
-                sock_fprintf(c->socket, c->timeout, "Host: %s:%d\r\n",
-                             c->server_name, c->server_port);
-            }
-            sock_fprintf(c->socket, c->timeout, "\r\n");
-
-            /* parse HTTP response line */
-            if (!cddb_http_parse_response(c)) {
-                return FALSE;
-            }
-
-            /* skip HTTP response headers */
-            cddb_http_parse_headers(c);
-        }
     }
 
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
 
@@ -535,9 +543,9 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
 {
     va_list args;
     
-    dlog("cddb_send_cmd()");
+    cddb_log_debug("cddb_send_cmd()");
     if (!CONNECTION_OK(c)) {
-        c->errnum = CDDB_ERR_NOT_CONNECTED;
+        cddb_errno_log_error(c, CDDB_ERR_NOT_CONNECTED);
         return FALSE;
     }
     
@@ -547,9 +555,9 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
         if (!cddb_http_send_cmd(c, cmd, args)) {
             int errnum;
 
-            errnum = c->errnum; /* save error number */
+            errnum = cddb_errno(c); /* save error number */
             cddb_disconnect(c);
-            c->errnum = errnum; /* restore error number */
+            cddb_errno_set(c, errnum); /* restore error number */
             return FALSE;
         }
     } else {
@@ -559,7 +567,7 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
     }
     va_end(args);
 
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
 
@@ -587,21 +595,22 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     int cache_content;
     int track_no = 0, old_no = -1;
 
-    dlog("cddb_parse_record()");
+    cddb_log_debug("cddb_parse_record()");
     /* 
      * Do we need to cache the processed content ?  We cache if:
      *   1. caching is allowed (CACHE_ON or CACHE_ONLY) 
      * and
      *   2. a cached version does not yet exist
      */
-    cache_content = (c->use_cache != CACHE_OFF) && !cddb_cache_exists(c, disc);
+    cache_content = !c->cache_read && (c->use_cache != CACHE_OFF) && 
+                    !cddb_cache_exists(c, disc);
     if (cache_content) {
         /* create cache directory structure */
         /* XXX: what to do if mkdir fails? */
         cache_content = cddb_cache_mkdir(c, disc);
         cache_content &= cddb_cache_open(c, disc, "w");
     }
-    dlog("\tcache_content: %s", (cache_content ? "yes" : "no"));
+    cddb_log_debug("...cache_content: %s", (cache_content ? "yes" : "no"));
 
     state = STATE_START;
     while (NEXT_LINE(c, line)) {
@@ -611,161 +620,161 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
         }
 
         switch (state) {
-        case STATE_START:
-            dlog("\tstate: START");
-            if (regexec(REGEX_TRACK_FRAME_OFFSETS, line, 0, NULL, 0) == 0) {
-                /* expect a list of track frame offsets now */
-                state = STATE_TRACK_OFFSETS;
-            }
-            break;
-        case STATE_TRACK_OFFSETS:
-            dlog("\tstate: TRACK OFFSETS");
-            if (regexec(REGEX_TRACK_FRAME_OFFSET, line, 2, matches, 0) == 0) {
-                track = cddb_disc_get_track(disc, track_no);
-                if (!track) {
-                    /* no such track present in disc structure yet */
-                    track = cddb_track_new();
-                    /* XXX: insert at track_no pos?? */
-                    cddb_disc_add_track(disc, track);
+            case STATE_START:
+                cddb_log_debug("...state: START");
+                if (regexec(REGEX_TRACK_FRAME_OFFSETS, line, 0, NULL, 0) == 0) {
+                    /* expect a list of track frame offsets now */
+                    state = STATE_TRACK_OFFSETS;
                 }
-                track->frame_offset = cddb_regex_get_int(line, matches, 1);
-                track_no++;
-            } else {
-                /* expect disc length now */
-                state = STATE_DISC_LENGTH;
-            }
-            break;
-        case STATE_DISC_LENGTH:
-            dlog("\tstate: DISC LENGTH");
-            if (regexec(REGEX_DISC_LENGTH, line, 2, matches, 0) == 0) {
-                disc->length = cddb_regex_get_int(line, matches, 1);
-                /* expect disc title now */
-                state = STATE_DISC_TITLE;
-            }            
-            break;
-        case STATE_DISC_TITLE:
-            dlog("\tstate: DISC TITLE");
-            if (regexec(REGEX_DISC_TITLE, line, 5, matches, 0) == 0) {
-                /* XXX: more error detection possible! */
-                if (multi_line == MULTI_NONE) {
-                    /* start parsing title or artist, delete current
-                       track and artist in case this disc structure is
-                       being reused from a previous read */
-                    cddb_disc_set_artist(disc, NULL);
-                    cddb_disc_set_title(disc, NULL);
-                }
-                if (matches[2].rm_so != -1) {
-                    /* both artist and title of disc are specified */
-                    buf = cddb_regex_get_string(line, matches, 2);
-                    cddb_disc_append_artist(disc, buf);
-                    free(buf);
-                    buf = cddb_regex_get_string(line, matches, 3);
-                    cddb_disc_append_title(disc, buf);
-                    free(buf);
-                    /* we should only get title continuations now */
-                    multi_line = MULTI_TITLE;
+                break;
+            case STATE_TRACK_OFFSETS:
+                cddb_log_debug("...state: TRACK OFFSETS");
+                if (regexec(REGEX_TRACK_FRAME_OFFSET, line, 2, matches, 0) == 0) {
+                    track = cddb_disc_get_track(disc, track_no);
+                    if (!track) {
+                        /* no such track present in disc structure yet */
+                        track = cddb_track_new();
+                        /* XXX: insert at track_no pos?? */
+                        cddb_disc_add_track(disc, track);
+                    }
+                    track->frame_offset = cddb_regex_get_int(line, matches, 1);
+                    track_no++;
                 } else {
-                    /* only title or artist of disc on this line */
-                    if (multi_line != MULTI_TITLE) {
-                        /* this line is part of the artist name */
-                        buf = cddb_regex_get_string(line, matches, 4);
+                    /* expect disc length now */
+                    state = STATE_DISC_LENGTH;
+                }
+                break;
+            case STATE_DISC_LENGTH:
+                cddb_log_debug("...state: DISC LENGTH");
+                if (regexec(REGEX_DISC_LENGTH, line, 2, matches, 0) == 0) {
+                    disc->length = cddb_regex_get_int(line, matches, 1);
+                    /* expect disc title now */
+                    state = STATE_DISC_TITLE;
+                }            
+                break;
+            case STATE_DISC_TITLE:
+                cddb_log_debug("...state: DISC TITLE");
+                if (regexec(REGEX_DISC_TITLE, line, 5, matches, 0) == 0) {
+                    /* XXX: more error detection possible! */
+                    if (multi_line == MULTI_NONE) {
+                        /* start parsing title or artist, delete current
+                           track and artist in case this disc structure is
+                           being reused from a previous read */
+                        cddb_disc_set_artist(disc, NULL);
+                        cddb_disc_set_title(disc, NULL);
+                    }
+                    if (matches[2].rm_so != -1) {
+                        /* both artist and title of disc are specified */
+                        buf = cddb_regex_get_string(line, matches, 2);
                         cddb_disc_append_artist(disc, buf);
                         free(buf);
-                        /* next line might be continuation of artist name */
-                        multi_line = MULTI_ARTIST;
-                    } else {
-                        /* this line is part of the title */
-                        buf = cddb_regex_get_string(line, matches, 4);
+                        buf = cddb_regex_get_string(line, matches, 3);
                         cddb_disc_append_title(disc, buf);
                         free(buf);
-                    }
-                }
-                break;
-            }
-            if (multi_line == MULTI_NONE) {
-                /* not yet parsing multi-line DTITLE */
-                /* might be comment line, just skip it */
-                break;
-            }
-            multi_line = MULTI_NONE;
-            /* fall through to end multi-line disc title */
-        case STATE_DISC_YEAR:
-            dlog("\tstate: DISC YEAR");
-            if (regexec(REGEX_DISC_YEAR, line, 2, matches, 0) == 0) {
-                disc->year = cddb_regex_get_int(line, matches, 1);
-                /* expect disc genre now */
-                state = STATE_DISC_GENRE;
-                break;
-            }
-            /* fall through because disc year is optional */
-        case STATE_DISC_GENRE:
-            dlog("\tstate: DISC GENRE");
-            if (regexec(REGEX_DISC_GENRE, line, 2, matches, 0) == 0) {
-                buf = cddb_regex_get_string(line, matches, 1);
-                cddb_disc_set_genre(disc, buf);
-                free(buf);
-                /* expect track title now */
-                state = STATE_TRACK_TITLE;
-                break;
-            }
-            /* fall through because disc genre is optional */
-        case STATE_TRACK_TITLE:
-            dlog("\tstate: TRACK TITLE");
-            if (regexec(REGEX_TRACK_TITLE, line, 6, matches, 0) == 0) {
-                state = STATE_TRACK_TITLE;
-                track_no = cddb_regex_get_int(line, matches, 1);
-                track = cddb_disc_get_track(disc, track_no);
-                if (track == NULL) {
-                    c->errnum = CDDB_ERR_TRACK_NOT_FOUND;
-                    return FALSE;
-                }
-                if (track_no != old_no) {
-                    old_no = track_no;
-                    /* reset multi-line flag, expect artist first */
-                    multi_line = MULTI_ARTIST;
-                    /* delete current title and artist in case this
-                       track structure is being reused from a previous
-                       read */
-                    cddb_track_set_artist(track, NULL);
-                    cddb_track_set_title(track, NULL);
-                }
-                if (matches[3].rm_so == -1) {
-                    /* only title or artist of track on this line */
-                    if (multi_line != MULTI_TITLE) {
-                        /* this line might be part of the artist,
-                           but if we don't encounter a ' / ' it's the title,
-                           so we use the title space for now and fix it later
-                           if needed (see below) */
-                        buf = cddb_regex_get_string(line, matches, 5);
-                        cddb_track_append_title(track, buf);
-                        free(buf);
+                        /* we should only get title continuations now */
+                        multi_line = MULTI_TITLE;
                     } else {
-                        /* this line is part of the title */
-                        buf = cddb_regex_get_string(line, matches, 5);
+                        /* only title or artist of disc on this line */
+                        if (multi_line != MULTI_TITLE) {
+                            /* this line is part of the artist name */
+                            buf = cddb_regex_get_string(line, matches, 4);
+                            cddb_disc_append_artist(disc, buf);
+                            free(buf);
+                            /* next line might be continuation of artist name */
+                            multi_line = MULTI_ARTIST;
+                        } else {
+                            /* this line is part of the title */
+                            buf = cddb_regex_get_string(line, matches, 4);
+                            cddb_disc_append_title(disc, buf);
+                            free(buf);
+                        }
+                    }
+                    break;
+                }
+                if (multi_line == MULTI_NONE) {
+                    /* not yet parsing multi-line DTITLE */
+                    /* might be comment line, just skip it */
+                    break;
+                }
+                multi_line = MULTI_NONE;
+                /* fall through to end multi-line disc title */
+            case STATE_DISC_YEAR:
+                cddb_log_debug("...state: DISC YEAR");
+                if (regexec(REGEX_DISC_YEAR, line, 2, matches, 0) == 0) {
+                    disc->year = cddb_regex_get_int(line, matches, 1);
+                    /* expect disc genre now */
+                    state = STATE_DISC_GENRE;
+                    break;
+                }
+                /* fall through because disc year is optional */
+            case STATE_DISC_GENRE:
+                cddb_log_debug("...state: DISC GENRE");
+                if (regexec(REGEX_DISC_GENRE, line, 2, matches, 0) == 0) {
+                    buf = cddb_regex_get_string(line, matches, 1);
+                    cddb_disc_set_genre(disc, buf);
+                    free(buf);
+                    /* expect track title now */
+                    state = STATE_TRACK_TITLE;
+                    break;
+                }
+                /* fall through because disc genre is optional */
+            case STATE_TRACK_TITLE:
+                cddb_log_debug("...state: TRACK TITLE");
+                if (regexec(REGEX_TRACK_TITLE, line, 6, matches, 0) == 0) {
+                    state = STATE_TRACK_TITLE;
+                    track_no = cddb_regex_get_int(line, matches, 1);
+                    track = cddb_disc_get_track(disc, track_no);
+                    if (track == NULL) {
+                        cddb_errno_log_error(c, CDDB_ERR_TRACK_NOT_FOUND);
+                        return FALSE;
+                    }
+                    if (track_no != old_no) {
+                        old_no = track_no;
+                        /* reset multi-line flag, expect artist first */
+                        multi_line = MULTI_ARTIST;
+                        /* delete current title and artist in case this
+                           track structure is being reused from a previous
+                           read */
+                        cddb_track_set_artist(track, NULL);
+                        cddb_track_set_title(track, NULL);
+                    }
+                    if (matches[3].rm_so == -1) {
+                        /* only title or artist of track on this line */
+                        if (multi_line != MULTI_TITLE) {
+                            /* this line might be part of the artist,
+                               but if we don't encounter a ' / ' it's the title,
+                               so we use the title space for now and fix it later
+                               if needed (see below) */
+                            buf = cddb_regex_get_string(line, matches, 5);
+                            cddb_track_append_title(track, buf);
+                            free(buf);
+                        } else {
+                            /* this line is part of the title */
+                            buf = cddb_regex_get_string(line, matches, 5);
+                            cddb_track_append_title(track, buf);
+                            free(buf);
+                        }
+                    } else {
+                        /* we might have put the artist in the title space,
+                           fix this now (see artist) */
+                        track->artist = track->title;
+                        track->title = NULL;
+                        /* both artist and title of track are specified */
+                        buf = cddb_regex_get_string(line, matches, 3);
+                        cddb_track_append_artist(track, buf);
+                        free(buf);
+                        buf = cddb_regex_get_string(line, matches, 4);
                         cddb_track_append_title(track, buf);
                         free(buf);
+                        /* we should only get title continuations now */
+                        multi_line = MULTI_TITLE;
                     }
                 } else {
-                    /* we might have put the artist in the title space,
-                       fix this now (see artist) */
-                    track->artist = track->title;
-                    track->title = NULL;
-                    /* both artist and title of track are specified */
-                    buf = cddb_regex_get_string(line, matches, 3);
-                    cddb_track_append_artist(track, buf);
-                    free(buf);
-                    buf = cddb_regex_get_string(line, matches, 4);
-                    cddb_track_append_title(track, buf);
-                    free(buf);
-                    /* we should only get title continuations now */
-                    multi_line = MULTI_TITLE;
+                    /* we're done parsing */
+                    cddb_log_debug("...state: STOP");
+                    state = STATE_STOP;
                 }
-            } else {
-                /* we're done parsing */
-                dlog("\tstate: STOP");
-                state = STATE_STOP;
-            }
-            break;
+                break;
         }
     }
 
@@ -785,16 +794,16 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
             /* we're reading from the cache, remove the invalid entry */
             char *fn = cddb_cache_file_name(c, disc);
             if (fn) {
-                dlog("\tremoving invalid cache entry '%s'", fn);
+                cddb_log_warn("removing invalid cache entry '%s'", fn);
                 unlink(fn);
             }
             FREE_NOT_NULL(fn);
         }
-        c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        cddb_errno_log_error(c, CDDB_ERR_INVALID_RESPONSE);
         return FALSE;
     }
 
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
 
@@ -807,10 +816,10 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
     char *msg;
     int code, rc;
 
-    dlog("cddb_read()");
+    cddb_log_debug("cddb_read()");
     /* check whether we have enough info to execute the command */
     if ((disc->category == CDDB_CAT_INVALID) || (disc->discid == 0)) {
-        c->errnum = CDDB_ERR_DATA_MISSING;
+        cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
         return FALSE;
     }
 
@@ -819,7 +828,7 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
         return TRUE;
     } else if (c->use_cache == CACHE_ONLY) {
         /* no network access allowed */
-        c->errnum = CDDB_ERR_DISC_NOT_FOUND;
+        cddb_errno_set(c, CDDB_ERR_DISC_NOT_FOUND);
         return FALSE;
     }
 
@@ -833,25 +842,25 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
         return FALSE;
     }
     switch (code = cddb_get_response_code(c, &msg)) {
-    case  -1:
-        return FALSE;
-    case 210:                   /* OK, CDDB database entry follows */
-        break;
-    case 401:                   /* specified CDDB entry not found */
-        c->errnum = CDDB_ERR_DISC_NOT_FOUND;
-        return FALSE;
-    case 402:                   /* server error */
-    case 403:                   /* database entry is corrupt */
-        c->errnum = CDDB_ERR_SERVER_ERROR;
-        return FALSE;
-    case 409:                   /* no handshake */
-    case 530:                   /* server error, server timeout */
-        cddb_disconnect(c);
-        c->errnum = CDDB_ERR_NOT_CONNECTED;
-        return FALSE;
-    default:
-        c->errnum = CDDB_ERR_UNKNOWN;
-        return FALSE;
+        case  -1:
+            return FALSE;
+        case 210:                   /* OK, CDDB database entry follows */
+            break;
+        case 401:                   /* specified CDDB entry not found */
+            cddb_errno_set(c, CDDB_ERR_DISC_NOT_FOUND);
+            return FALSE;
+        case 402:                   /* server error */
+        case 403:                   /* database entry is corrupt */
+            cddb_errno_log_error(c, CDDB_ERR_SERVER_ERROR);
+            return FALSE;
+        case 409:                   /* no handshake */
+        case 530:                   /* server error, server timeout */
+            cddb_disconnect(c);
+            cddb_errno_log_error(c, CDDB_ERR_NOT_CONNECTED);
+            return FALSE;
+        default:
+            cddb_errno_log_error(c, CDDB_ERR_UNKNOWN);
+            return FALSE;
     }
 
     /* parse CDDB record */
@@ -872,7 +881,7 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
 
     if (regexec(REGEX_QUERY_MATCH, line, 7, matches, 0) == REG_NOMATCH) {
         /* invalid repsponse */
-        c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        cddb_errno_log_error(c, CDDB_ERR_INVALID_RESPONSE);
         return FALSE;
     }
     /* extract category */
@@ -893,7 +902,7 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
         disc->title = cddb_regex_get_string(line, matches, 6);
     }        
 
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
 
@@ -904,7 +913,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     char buf[LINE_SIZE], offset[32];
     cddb_track_t *track;
 
-    dlog("cddb_query()");
+    cddb_log_debug("cddb_query()");
     /* clear previous query result set */
     cddb_query_clear(c);
     
@@ -912,11 +921,11 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     cddb_disc_calc_discid(disc);
 
     /* check whether we have enough info to execute the command */
-    dlog("\tdisc->discid    = %8x", disc->discid);
-    dlog("\tdisc->length    = %d", disc->length);
-    dlog("\tdisc->track_cnt = %d", disc->track_cnt);
+    cddb_log_debug("...disc->discid    = %8x", disc->discid);
+    cddb_log_debug("...disc->length    = %d", disc->length);
+    cddb_log_debug("...disc->track_cnt = %d", disc->track_cnt);
     if ((disc->discid == 0) || (disc->length == 0) || (disc->track_cnt == 0)) {
-        c->errnum = CDDB_ERR_DATA_MISSING;
+        cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
         return -1;
     }
 
@@ -925,7 +934,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         return TRUE;
     } else if (c->use_cache == CACHE_ONLY) {
         /* no network access allowed */
-        c->errnum = CDDB_ERR_DISC_NOT_FOUND;
+        cddb_errno_set(c, CDDB_ERR_DISC_NOT_FOUND);
         return FALSE;
     }
 
@@ -935,7 +944,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
          track != NULL; 
          track = cddb_disc_get_track_next(disc)) {
         if (track->frame_offset == -1) {
-            c->errnum = CDDB_ERR_DATA_MISSING;
+            cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
             return -1;
         }
         // XXX: buffer overflow checking
@@ -953,59 +962,59 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         return -1;
     }
     switch (code = cddb_get_response_code(c, &msg)) {
-    case  -1:
-        return -1;
-    case 200:                   /* found exact match */
-        dlog("\texact match");
-        if (!cddb_parse_query_data(c, disc, msg)) {
+        case  -1:
             return -1;
-        }
-        count = 1;
-        break;
-    case 210:                   /* found exact matches, list follows */
-    case 211:                   /* found inexact matches, list follows */
-        dlog("\t(in)exact matches");
-        {
-            int query_max = 0;
-            while (NEXT_LINE(c, line)) {
-                /* check whether there is enough space in query result set */
-                if (c->query_cnt >= query_max) {
-                    /* realloc */
-                    query_max += QUERY_RESULT_SET_INC;
-                    c->query_data = realloc(c->query_data, query_max*sizeof(cddb_disc_t*));
-                }
-                /* clone disc and fill in the blanks */
-                c->query_data[c->query_cnt] = cddb_disc_clone(disc);
-                if (!cddb_parse_query_data(c, c->query_data[c->query_cnt], line)) {
-                    return -1;
-                }
-                c->query_cnt++;
-            }
-            if (c->query_cnt == 0) {
-                /* empty result set */
-                c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        case 200:                   /* found exact match */
+            cddb_log_debug("...exact match");
+            if (!cddb_parse_query_data(c, disc, msg)) {
                 return -1;
             }
-            /* return first disc in result set */
-            cddb_disc_copy(disc, c->query_data[c->query_idx++]);
-        }
-        count = c->query_cnt;
-        break;
-    case 202:                   /* no match found */
-        dlog("\tno match");
-        count = 0;
-        break;
-    case 403:                   /* database entry is corrupt */
-        c->errnum = CDDB_ERR_SERVER_ERROR;
-        return -1;
-    case 409:                   /* no handshake */
-    case 530:                   /* server error, server timeout */
-        cddb_disconnect(c);
-        c->errnum = CDDB_ERR_NOT_CONNECTED;
-        return -1;
-    default:
-        c->errnum = CDDB_ERR_UNKNOWN;
-        return -1;
+            count = 1;
+            break;
+        case 210:                   /* found exact matches, list follows */
+        case 211:                   /* found inexact matches, list follows */
+            cddb_log_debug("...(in)exact matches");
+            {
+                int query_max = 0;
+                while (NEXT_LINE(c, line)) {
+                    /* check whether there is enough space in query result set */
+                    if (c->query_cnt >= query_max) {
+                        /* realloc */
+                        query_max += QUERY_RESULT_SET_INC;
+                        c->query_data = realloc(c->query_data, query_max*sizeof(cddb_disc_t*));
+                    }
+                    /* clone disc and fill in the blanks */
+                    c->query_data[c->query_cnt] = cddb_disc_clone(disc);
+                    if (!cddb_parse_query_data(c, c->query_data[c->query_cnt], line)) {
+                        return -1;
+                    }
+                    c->query_cnt++;
+                }
+                if (c->query_cnt == 0) {
+                    /* empty result set */
+                    cddb_errno_log_error(c, CDDB_ERR_INVALID_RESPONSE);
+                    return -1;
+                }
+                /* return first disc in result set */
+                cddb_disc_copy(disc, c->query_data[c->query_idx++]);
+            }
+            count = c->query_cnt;
+            break;
+        case 202:                   /* no match found */
+            cddb_log_debug("...no match");
+            count = 0;
+            break;
+        case 403:                   /* database entry is corrupt */
+            cddb_errno_log_error(c, CDDB_ERR_SERVER_ERROR);
+            return -1;
+        case 409:                   /* no handshake */
+        case 530:                   /* server error, server timeout */
+            cddb_disconnect(c);
+            cddb_errno_log_error(c, CDDB_ERR_NOT_CONNECTED);
+            return -1;
+        default:
+            cddb_errno_log_error(c, CDDB_ERR_UNKNOWN);
+            return -1;
     }
 
     /* close connection if using HTTP */
@@ -1013,23 +1022,23 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         cddb_disconnect(c);
     }
 
-    dlog("\tnumber of matches: %d", count);
-    c->errnum = CDDB_ERR_OK;
+    cddb_log_debug("...number of matches: %d", count);
+    cddb_errno_set(c, CDDB_ERR_OK);
     return count;
 }
 
 int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
 {
-    dlog("cddb_query_next()");
+    cddb_log_debug("cddb_query_next()");
     if ((c->query_cnt == 0) || (c->query_idx >= c->query_cnt)) {
         /* no more discs */
-        c->errnum = CDDB_ERR_DISC_NOT_FOUND;
+        cddb_errno_set(c, CDDB_ERR_DISC_NOT_FOUND);
         return FALSE;
     }
     /* return next disc in result set */
     cddb_disc_copy(disc, c->query_data[c->query_idx++]);
 
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
 
@@ -1101,19 +1110,19 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     cddb_track_t *track;
     char buf[WRITE_BUF_SIZE];
 
-    dlog("cddb_write()");
+    cddb_log_debug("cddb_write()");
     /* check whether the default e-mail address has been changed, the
        freedb spec requires this */
     if (strcmp(c->user, DEFAULT_USER) == 0 ||
         strcmp(c->hostname, DEFAULT_HOST) == 0) {
-        c->errnum = CDDB_ERR_EMAIL_INVALID;
+        cddb_errno_log_error(c, CDDB_ERR_EMAIL_INVALID);
         return FALSE;
     }
     /* check whether we have enough disc data to execute the command */
     if ((disc->discid == 0) || (disc->category == CDDB_CAT_INVALID) || 
         (disc->length == 0) || (disc->track_cnt == 0) ||
         (disc->artist == NULL) || (disc->title == NULL)) {
-        c->errnum = CDDB_ERR_DATA_MISSING;
+        cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
         return FALSE;
     }
 
@@ -1122,7 +1131,7 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
          track != NULL; 
          track = cddb_disc_get_track_next(disc)) {
         if ((track->frame_offset == -1) || (track->title == NULL)) {
-            c->errnum = CDDB_ERR_DATA_MISSING;
+            cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
             return FALSE;
         }
     }
@@ -1136,7 +1145,7 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
         /* XXX: what to do if mkdir fails? */
         if (cddb_cache_mkdir(c, disc)) {
             /* open file, possibly overwriting it */
-            dlog("\tcaching data");
+            cddb_log_debug("...caching data");
             cddb_cache_open(c, disc, "w");
             fwrite(buf, sizeof(char), size, cddb_cache_file(c));
             cddb_cache_close(c);
@@ -1154,29 +1163,28 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     }
     if (!c->is_http_enabled) {
         switch (code = cddb_get_response_code(c, &msg)) {
-        case  -1:
-            return FALSE;
-        case 320:                   /* OK, input CDDB data */
-            break;
-        case 401:                   /* permission denied */
-        case 402:                   /* server file system full/file access failed */
-        case 501:                   /* entry rejected */
-            dlog("\tpermission denied");
-            c->errnum = CDDB_ERR_PERMISSION_DENIED;
-            return FALSE;
-        case 409:                   /* no handshake */
-        case 530:                   /* server error, server timeout */
-            cddb_disconnect(c);
-            c->errnum = CDDB_ERR_NOT_CONNECTED;
-            return FALSE;
-        default:
-            c->errnum = CDDB_ERR_UNKNOWN;
-            return FALSE;
+            case  -1:
+                return FALSE;
+            case 320:                   /* OK, input CDDB data */
+                break;
+            case 401:                   /* permission denied */
+            case 402:                   /* server file system full/file access failed */
+            case 501:                   /* entry rejected */
+                cddb_errno_log_error(c, CDDB_ERR_PERMISSION_DENIED);
+                return FALSE;
+            case 409:                   /* no handshake */
+            case 530:                   /* server error, server timeout */
+                cddb_disconnect(c);
+                cddb_errno_log_error(c, CDDB_ERR_NOT_CONNECTED);
+                return FALSE;
+            default:
+                cddb_errno_log_error(c, CDDB_ERR_UNKNOWN);
+                return FALSE;
         }
     }
 
     /* ready to send data */
-    dlog("\tsending data");
+    cddb_log_debug("...sending data");
     sock_fwrite(buf, sizeof(char), size, c->socket, c->timeout);
     if (c->is_http_enabled) {
         /* skip HTTP response headers */
@@ -1188,24 +1196,24 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
 
     /* check response */
     switch (code = cddb_get_response_code(c, &msg)) {
-    case  -1:
-        return FALSE;
-    case 200:                   /* CDDB entry accepted */
-        dlog("\tentry accepted");
-        break;
-    case 401:                   /* CDDB entry rejected */
-    case 500:                   /* (HTTP) Missing required header information */
-    case 501:                   /* (HTTP) Invalid header information */
-        dlog("\tentry not accepted");
-        c->errnum = CDDB_ERR_REJECTED;
-        return FALSE;
-    case 530:                   /* server error, server timeout */
-        cddb_disconnect(c);
-        c->errnum = CDDB_ERR_NOT_CONNECTED;
-        return FALSE;
-    default:
-        c->errnum = CDDB_ERR_UNKNOWN;
-        return FALSE;
+        case  -1:
+            return FALSE;
+        case 200:                   /* CDDB entry accepted */
+            cddb_log_debug("...entry accepted");
+            break;
+        case 401:                   /* CDDB entry rejected */
+        case 500:                   /* (HTTP) Missing required header information */
+        case 501:                   /* (HTTP) Invalid header information */
+            cddb_log_debug("...entry not accepted");
+            cddb_errno_log_error(c, CDDB_ERR_REJECTED);
+            return FALSE;
+        case 530:                   /* server error, server timeout */
+            cddb_disconnect(c);
+            cddb_errno_log_error(c, CDDB_ERR_NOT_CONNECTED);
+            return FALSE;
+        default:
+            cddb_errno_log_error(c, CDDB_ERR_UNKNOWN);
+            return FALSE;
     }
 
     /* close connection if using HTTP */
@@ -1213,6 +1221,6 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
         cddb_disconnect(c);
     }
 
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
