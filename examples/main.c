@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.1 2003/04/14 20:41:01 airborne Exp $
+    $Id: main.c,v 1.2 2003/04/14 21:06:23 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -121,7 +121,9 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
                 /* Disable the usage of the local CDDB cache. */
                 cddb_cache_disable(conn);
             } else if (strcmp(optarg, "only") == 0) {
-                error_exit("-c, cache mode 'only' not yet implemented");
+                /* Only use the local CDDB cache.  Never try reading
+                   any data from the network. */
+                cddb_cache_only(conn);
             } else {
                 error_usage("-c, invalid cache mode '%s'", optarg);
             }
