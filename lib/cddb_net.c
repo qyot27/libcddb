@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.14 2004/07/07 11:52:32 rockyb Exp $
+    $Id: cddb_net.c,v 1.15 2004/07/18 07:13:20 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -210,6 +210,7 @@ int sock_vfprintf(int sock, int timeout, const char *format, va_list ap)
     int rv;
    
     cddb_log_debug("sock_vfprintf()");
+    // XXX: use LINE_SIZE for buffer size??
     rv = vsnprintf(buf, sizeof(buf), format, ap);
     cddb_log_debug("...buf = '%s'", buf);
     if (rv >= sizeof(buf)) {
