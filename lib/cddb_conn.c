@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.21 2003/05/20 20:45:26 airborne Exp $
+    $Id: cddb_conn.c,v 1.22 2003/05/29 10:14:35 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -223,8 +223,10 @@ int cddb_cache_set_dir(cddb_conn_t *c, const char *dir)
         if (dir[0] == '~') {
             /* expand ~ to $HOME */
             home = getenv("HOME");
-            c->cache_dir = (char*)malloc(strlen(home) + strlen(dir));
-            sprintf(c->cache_dir, "%s%s", home, dir + 1);
+            if (home) {
+                c->cache_dir = (char*)malloc(strlen(home) + strlen(dir));
+                sprintf(c->cache_dir, "%s%s", home, dir + 1);
+            }
         } else {
             c->cache_dir = strdup(dir);
         }
