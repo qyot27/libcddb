@@ -40,7 +40,9 @@ AC_CHECK_LIB([socket], [connect])
 
 dnl Checks for header files.
 AC_HEADER_STDC
+AC_HEADER_TIME
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -51,7 +53,8 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr memset])
+AC_FUNC_SELECT_ARGTYPES
+AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr memset alarm select])
 AC_CHECK_FUNC([gethostbyname], , AC_CHECK_LIB([nsl], [gethostbyname]))
 
 dnl Check and add some GCC specific warning flags
