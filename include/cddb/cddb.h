@@ -1,7 +1,7 @@
 /*
-    $Id: cddb.h,v 1.9 2004/07/18 07:23:09 airborne Exp $
+    $Id: cddb.h,v 1.10 2005/03/11 21:13:45 airborne Exp $
 
-    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -40,6 +40,21 @@
  * \mainpage libCDDB, a C API for CDDB server access
  */
 
+
+/**
+ * Initializes the library.  This is used to setup any globally used
+ * variables.  The first time you create a new CDDB connection structure
+ * the library will automatically initialize itself.  So, there is no
+ * need to explicitly call this function.
+ */
+void libcddb_init(void);
+
+/**
+ * Frees up any global (cross connection) resources.  You should call
+ * this function before terminating your program.  Using any library
+ * calls after shutting down are bound to give problems.
+ */
+void libcddb_shutdown(void);
 
 #ifdef __cplusplus
     }
