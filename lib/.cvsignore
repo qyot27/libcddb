@@ -6,6 +6,7 @@ cddb_cmd.lo
 cddb_conn.lo
 cddb_disc.lo
 cddb_error.lo
+cddb_log.lo
 cddb_net.lo
 cddb_regex.lo
 cddb_track.lo
