@@ -43,6 +43,10 @@ int cddb_write_data(char *buf, int size, cddb_disc_t *disc);
 
 /**
  */
+int cddb_http_parse_response(cddb_conn_t *c);
+
+/**
+ */
 void cddb_http_parse_headers(cddb_conn_t *c);
 
 /**
@@ -251,6 +255,38 @@ void url_encode(char *s)
     }
 }
 
+int cddb_http_parse_response(cddb_conn_t *c)
+{
+    char *line;
+    int code;
+
+    if ((line = cddb_read_line(c)) == NULL) {
+        /* no HTTP response line */
+        c->errnum = CDDB_ERR_UNEXPECTED_EOF;
+        return FALSE;
+    }
+
+    if (sscanf(line, "%*s %d %*s", &code) != 1) {
+        /* invalid */
+        c->errnum = CDDB_ERR_INVALID_RESPONSE;
+        return FALSE;
+    }
+
+    dlog("\tHTTP response code = %d", code);
+    switch (code) {
+    case 200:
+        /* HTTP OK */
+        break;
+    default:
+        /* anythign else = error */
+        c->errnum = CDDB_ERR_SERVER_ERROR;
+        return FALSE;
+    }
+
+    c->errnum = CDDB_ERR_OK;
+    return TRUE;
+}
+
 void cddb_http_parse_headers(cddb_conn_t *c)
 {
     char *line;
@@ -321,6 +357,11 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
                 fprintf(c->fp, "Host: %s:%d\r\n", c->server_name, c->server_port);
             }
             fprintf(c->fp, "\r\n");
+
+            /* parse HTTP response line */
+            if (!cddb_http_parse_response(c)) {
+                return FALSE;
+            }
 
             /* skip HTTP response headers */
             cddb_http_parse_headers(c);
