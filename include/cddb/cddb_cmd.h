@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.h,v 1.8 2003/04/20 14:44:05 airborne Exp $
+    $Id: cddb_cmd.h,v 1.9 2004/07/18 07:06:46 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -25,6 +25,13 @@
 #ifdef __cplusplus
     extern "C" {
 #endif
+
+
+/* --- global constants --- */
+
+
+/** Internal buffer size for command processing. */
+#define LINE_SIZE      257
 
 
 /* --- accessing data on the CDDB server --- */
