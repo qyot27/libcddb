@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.h,v 1.8 2004/03/10 03:08:48 rockyb Exp $
+    $Id: cddb_regex.h,v 1.9 2004/04/04 02:11:42 rockyb Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,10 +27,13 @@
     extern "C" {
 #endif
 
-
+#include <cddb/cddb_config.h>
 #include <stdlib.h>
-#include <regex.h>
 
+#ifdef CDDB_NEED_UNISTD_H
+#include <unistd.h>
+#endif
+#include <regex.h>
 
 /**
  */

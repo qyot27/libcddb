@@ -6,6 +6,7 @@ AC_CONFIG_FILES([Makefile              \
                  libcddb.pc            \
                  include/Makefile      \
                  include/cddb/Makefile \
+                 include/cddb/cddb_config.h \
                  lib/Makefile          \
                  examples/Makefile     \
                  tests/Makefile        \
@@ -52,6 +53,12 @@ AC_CANONICAL_HOST
 case $host in
     *beos*)
         AC_DEFINE([BEOS],1,[Define if compiling on BeOS system.])
+        ;;
+    *darwin*)
+        AC_DEFINE([CDDB_NEED_UNISTD_H],1,
+	[Define if you have <unistd.h> and need it included. 
+	 On MacOS, <regex.h> needs this but that header doesn't
+	 include it.])
         ;;
 esac
 
