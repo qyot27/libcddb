@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.26 2004/10/08 21:08:02 airborne Exp $
+    $Id: cddb_conn.c,v 1.27 2004/10/09 06:14:28 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -130,6 +130,14 @@ void cddb_destroy(cddb_conn_t *c)
         FREE_NOT_NULL(c->user);
         FREE_NOT_NULL(c->hostname);
         cddb_query_clear(c);
+#ifdef HAVE_ICONV_H
+        if (c->cd_to_freedb) {
+            iconv_close(c->cd_to_freedb);
+        }
+        if (c->cd_from_freedb) {
+            iconv_close(c->cd_from_freedb);
+        }
+#endif /* HAVE_ICONV_H */
         free(c);
     }
 }
@@ -138,9 +146,15 @@ void cddb_destroy(cddb_conn_t *c)
 /* --- getters & setters --- */
 
 
-#ifdef HAVE_ICONV_H
 int cddb_set_charset(cddb_conn_t *c, const char *charset)
 {
+#ifdef HAVE_ICONV_H
+    if (c->cd_to_freedb) {
+        iconv_close(c->cd_to_freedb);
+    }
+    if (c->cd_from_freedb) {
+        iconv_close(c->cd_from_freedb);
+    }
     c->cd_to_freedb = iconv_open(SERVER_CHARSET, charset);
     c->cd_from_freedb = iconv_open(charset, SERVER_CHARSET);
     if ((c->cd_to_freedb == (iconv_t)-1) || (c->cd_from_freedb == (iconv_t)-1)) {
@@ -151,8 +165,10 @@ int cddb_set_charset(cddb_conn_t *c, const char *charset)
     }
     cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
-}
+#else
+    return FALSE;
 #endif /* HAVE_ICONV_H */
+}
 
 void cddb_set_buf_size(cddb_conn_t *c, unsigned int size)
 {
