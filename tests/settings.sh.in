@@ -1,0 +1,25 @@
+#!/bin/sh
+# @configure_input@
+#
+# $Id: settings.sh.in,v 1.1 2003/04/20 22:22:27 airborne Exp $
+
+# location of the example program used in the tests
+CDDB_QUERY='@abs_top_builddir@/examples/cddb_query -q'
+
+# test result return codes
+SUCCESS=0
+FAILURE=1
+SKIPPED=77
+
+check_discid()
+{
+    DISCID_STR='CD disc ID is '
+    EXP_ID=$1
+    RET_ID=`sed "/^${DISCID_STR}[0-9a-f]*\$/!d;s/${DISCID_STR}\([0-9a-f]*\)/\1/"`
+    printf 'Checking disc ID %s... ' ${EXP_ID}
+    if [ ${RET_ID}x != ${EXP_ID}x ]; then
+        printf 'failed.\n'
+        exit $FAILURE
+    fi
+    printf 'ok.\n'
+}
