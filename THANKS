@@ -10,7 +10,9 @@
         - some other minor patches
 
     David Collett
-        - C++ patch (similar as above :))
+        - C++ patch (similar as above)
 
     Rocky Bernstein
         - patch to prevent some compiler warnings
+        - forc^H^H^H^Hencouraged me to write unit tests
+        - some patches and hints for autoconf/automake
