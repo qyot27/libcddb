@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.23 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_conn.h,v 1.24 2005/03/11 21:32:40 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -138,7 +138,7 @@ void cddb_destroy(cddb_conn_t *c);
  * converted.
  *
  * @param c The connection structure.
- * @param charset The character set that will be used.
+ * @param cs The character set that will be used.
  * @return FALSE if the specified character set is unknown, or no conversion
  *         from/to UTF-8 is available.  TRUE otherwise.
  */
