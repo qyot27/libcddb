@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_util.c,v 1.1 2004/10/08 21:13:36 airborne Exp $
+    $Id: cddb_util.c,v 1.2 2004/10/15 19:07:20 airborne Exp $
 
     Copyright (C) 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -31,6 +31,7 @@
 
 int cddb_str_iconv(iconv_t cd, char *in, char **out)
 {
+#ifdef HAVE_ICONV_H
     int inlen, outlen, buflen, rc;
     int len;                    /* number of chars in buffer */
     char *buf;
@@ -63,5 +64,6 @@ int cddb_str_iconv(iconv_t cd, char *in, char **out)
     memcpy(*out, buf, len);
     *(*out + len) = '\0';
     free(buf);
+#endif
     return TRUE;
 }
