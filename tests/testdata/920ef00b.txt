@@ -1,5 +1,6 @@
 Artist:   Massive Attack
 Title:    Mezzanine
+Ext.data: \n YEAR: 1998 ID3G:  27
 Genre:    Trip-Hop
 Year:     1998
 Length:   63:46 (3826 seconds)
