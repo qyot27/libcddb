@@ -1,5 +1,5 @@
 /*
-    $Id: do_query.c,v 1.4 2003/04/21 10:19:44 airborne Exp $
+    $Id: do_query.c,v 1.5 2003/05/09 18:17:16 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -22,7 +22,7 @@
 #include "main.h"
 
 
-void do_query(cddb_conn_t *conn, cddb_disc_t *disc)
+void do_query(cddb_conn_t *conn, cddb_disc_t *disc, int quiet)
 {
     int matches, i;
 
@@ -46,7 +46,9 @@ void do_query(cddb_conn_t *conn, cddb_disc_t *disc)
         /* Print an explanatory message on stderr.  Other routines are
            available for retrieving the message without printing it or
            printing it on a stream other than stderr. */
-        cddb_error_print(cddb_errno(conn));
+        if (!quiet) {
+            cddb_error_print(cddb_errno(conn));
+        }
         /* Return to calling fucntion. */
         return;
     }

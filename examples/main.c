@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.12 2003/04/25 17:55:05 airborne Exp $
+    $Id: main.c,v 1.13 2003/05/09 18:17:16 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -394,7 +394,7 @@ int main(int argc, char **argv)
         break;
     case CMD_QUERY:
         /* Query the CDDB server for possibly matches. */
-        do_query(conn, disc);
+        do_query(conn, disc, quiet);
         break;
     case CMD_READ:
         /* If we read the disc data from a CD, then we first have to
