@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.14 2003/05/31 13:26:49 airborne Exp $
+    $Id: cddb_ni.h,v 1.15 2004/07/18 07:07:01 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -47,8 +47,6 @@
 #define CHR_EOS        '\0'
 #define CHR_SPACE      ' '
 #define CHR_DOT        '.'
-
-#define LINE_SIZE      257
 
 #define CLIENT_NAME    PACKAGE
 #define CLIENT_VERSION VERSION
