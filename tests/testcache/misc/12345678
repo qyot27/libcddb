@@ -14,8 +14,11 @@
 #	7500
 #	8250
 #	9000
+#   9750
+#  10500
+#  11250
 #
-# Disc length: 130 seconds
+# Disc length: 160 seconds
 #
 # Revision: 1
 #
@@ -42,3 +45,16 @@ TTITLE9=Track /Artist10 / TrackTitle10
 TTITLE10=TrackArtist11 / Track/Title11
 TTITLE11=TrackArtist12 / Track/ Title12
 TTITLE12=TrackArtist10 / Track /Title13
+TTITLE13=Track
+TTITLE13=Title14
+TTITLE14=TrackTitle15 
+TTITLE14=cntd.
+TTITLE15=TrackTitle16
+TTITLE15= cntd.
+EXTT0=TrackExt1
+EXTT1=Track
+EXTT1=Ext2
+EXTT2=TrackExt3 
+EXTT2=cntd.
+EXTT3=TrackExt4
+EXTT3= cntd.
