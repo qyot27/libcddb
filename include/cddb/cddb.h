@@ -1,5 +1,5 @@
 /*
-    $Id: cddb.h,v 1.7 2003/05/20 20:40:48 airborne Exp $
+    $Id: cddb.h,v 1.8 2004/04/23 02:17:02 rockyb Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,6 +27,7 @@
 #endif
 
 
+#include <cddb/cddb_config.h>
 #include <cddb/cddb_error.h>
 #include <cddb/cddb_track.h>
 #include <cddb/cddb_disc.h>
