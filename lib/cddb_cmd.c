@@ -164,6 +164,7 @@ void cddb_query_clear(cddb_conn_t *c)
 {
     int i;
 
+    dlog("cddb_query_clear()");
     if (c->query_data != NULL) {
         for (i = 0; i < c->query_cnt; i++) {
             cddb_disc_destroy(c->query_data[i]);
@@ -510,7 +511,7 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
 
 int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
 {
-    char *cat;
+    char *aux;
     regmatch_t matches[7];
 
     if (regexec(REGEX_QUERY_MATCH, line, 7, matches, 0) == REG_NOMATCH) {
@@ -519,9 +520,11 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
         return FALSE;
     }
     /* extract category */
-    cat = cddb_regex_get_string(line, matches, 1);
-    cddb_disc_set_category(disc, cat);
-    free(cat);
+    aux = cddb_regex_get_string(line, matches, 1);
+    cddb_disc_set_category(disc, aux);
+    /* extract disc ID */
+    aux = cddb_regex_get_string(line, matches, 2);
+    disc->discid = strtol(aux, NULL, 16);
     /* extract artist and title */
     if (matches[4].rm_so != -1) {
         /* both artist and title of disc are specified */
@@ -532,6 +535,7 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
         disc->title = cddb_regex_get_string(line, matches, 6);
     }        
 
+    free(aux);
     c->errnum = CDDB_ERR_OK;
     return TRUE;
 }
@@ -596,7 +600,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
             int query_max = 0;
             while (NEXT_LINE(c, line)) {
                 /* check whether there is enough space in query result set */
-                if (c->query_idx >= query_max) {
+                if (c->query_cnt >= query_max) {
                     /* realloc */
                     query_max += QUERY_RESULT_SET_INC;
                     c->query_data = realloc(c->query_data, query_max*sizeof(cddb_disc_t*));
@@ -641,6 +645,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 
 int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
 {
+    dlog("cddb_query_next()");
     if ((c->query_cnt == 0) || (c->query_idx >= c->query_cnt)) {
         /* no more discs */
         c->errnum = CDDB_ERR_DISC_NOT_FOUND;
