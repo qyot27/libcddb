@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.h,v 1.9 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_track.h,v 1.10 2003/04/17 17:28:51 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -114,7 +114,8 @@ int cddb_track_get_length(cddb_track_t *track);
 /**
  * Set the track title.  If the track already had a title, then the
  * memory for that string will be freed.  The new title will be copied
- * into a new chunk of memory.
+ * into a new chunk of memory.  If the given title is NULL, then the
+ * title of the track will be deleted.
  *
  * @param track The CDDB track structure.
  * @param title The new track title.
@@ -143,7 +144,8 @@ const char *cddb_track_get_artist(cddb_track_t *track);
 /**
  * Set the track artist name.  If the track already had an artist
  * name, then the memory for that string will be freed.  The new
- * artist name will be copied into a new chunk of memory.
+ * artist name will be copied into a new chunk of memory.  If the given artist
+ * name is NULL, then the artist name of the track will be deleted.
  *
  * @param track  The CDDB track structure.
  * @param artist The new track artist name.

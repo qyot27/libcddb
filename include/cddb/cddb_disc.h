@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.11 2003/04/14 22:25:49 airborne Exp $
+    $Id: cddb_disc.h,v 1.12 2003/04/17 17:28:51 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -250,7 +250,8 @@ void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre);
 /**
  * Set the disc title.  If the disc already had a title, then the
  * memory for that string will be freed.  The new title will be copied
- * into a new chunk of memory.
+ * into a new chunk of memory.  If the given title is NULL, then the
+ * title of the disc will be deleted.
  *
  * @param disc The CDDB disc structure.
  * @param title The new disc title.
@@ -279,7 +280,8 @@ void cddb_disc_append_title(cddb_disc_t *disc, const char *title);
 /**
  * Set the disc artist name.  If the disc already had an artist name,
  * then the memory for that string will be freed.  The new artist name
- * will be copied into a new chunk of memory.
+ * will be copied into a new chunk of memory.  If the given artist
+ * name is NULL, then the artist name of the disc will be deleted.
  *
  * @param disc   The CDDB disc structure.
  * @param artist The new disc artist name.

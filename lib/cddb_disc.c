@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.11 2003/04/14 22:25:50 airborne Exp $
+    $Id: cddb_disc.c,v 1.12 2003/04/17 17:28:34 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -184,7 +184,9 @@ void cddb_disc_set_title(cddb_disc_t *disc, const char *title)
 {
     if (disc) {
         FREE_NOT_NULL(disc->title);
-        disc->title = strdup(title);
+        if (title) {
+            disc->title = strdup(title);
+        }
     }
 }
 
@@ -208,7 +210,9 @@ void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist)
 {
     if (disc) {
         FREE_NOT_NULL(disc->artist);
-        disc->artist = strdup(artist);
+        if (artist) {
+            disc->artist = strdup(artist);
+        }
     }
 }
 

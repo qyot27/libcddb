@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.9 2003/04/14 22:25:50 airborne Exp $
+    $Id: cddb_track.c,v 1.10 2003/04/17 17:28:41 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -76,7 +76,9 @@ void cddb_track_set_title(cddb_track_t *track, const char *title)
 {
     if (track) {
         FREE_NOT_NULL(track->title);
-        track->title = strdup(title);
+        if (title) {
+            track->title = strdup(title);
+        }
     }
 }
 
@@ -147,7 +149,9 @@ void cddb_track_set_artist(cddb_track_t *track, const char *artist)
 {
     if (track) {
         FREE_NOT_NULL(track->artist);
-        track->artist = strdup(artist);
+        if (artist) {
+            track->artist = strdup(artist);
+        }
     }
 }
 
@@ -201,7 +205,7 @@ void cddb_track_print(cddb_track_t *track)
 {
     printf("    number: %d\n", track->num);
     printf("    frame offset: %d\n", track->frame_offset);
-    printf("    length: %d seconds\n", track->length);
+    printf("    length: %d seconds\n", cddb_track_get_length(track));
     printf("    artist: '%s'\n", STR_OR_NULL(cddb_track_get_artist(track)));
     printf("    title: '%s'\n", STR_OR_NULL(track->title));
 }
