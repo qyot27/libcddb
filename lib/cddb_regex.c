@@ -58,7 +58,7 @@ void cddb_regex_init()
     }
 }
 
-int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx)
+int cddb_regex_get_int(char *s, regmatch_t matches[], int idx)
 {
     char c;
     int start, end, i;
@@ -72,7 +72,7 @@ int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx)
     return i;
 }
 
-int cddb_regex_get_hex(const char *s, regmatch_t matches[], int idx)
+int cddb_regex_get_hex(char *s, regmatch_t matches[], int idx)
 {
     char c;
     int start, end, i;

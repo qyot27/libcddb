@@ -28,7 +28,7 @@ void cddb_regex_init();
 
 /**
  */
-int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx);
+int cddb_regex_get_int(char *s, regmatch_t matches[], int idx);
 
 /**
  */
