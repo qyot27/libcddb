@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.13 2003/04/14 22:25:50 airborne Exp $
+    $Id: cddb_conn.c,v 1.14 2003/04/20 19:25:42 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -291,7 +291,7 @@ int cddb_connect(cddb_conn_t *c)
         /* initialize socket address */
         c->sa.sin_family = AF_INET;
         c->sa.sin_addr = *((struct in_addr*)he->h_addr);
-        bzero(&(c->sa.sin_zero), 8); /* zero the rest of the struct */
+        memset(&(c->sa.sin_zero), 0, sizeof(c->sa.sin_zero));
 
         if ((c->socket  = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
             c->errnum = CDDB_ERR_CONNECT;
