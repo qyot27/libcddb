@@ -12,3 +12,5 @@
 * unit testing
 
 * improve documentation
+
+* tilde expansion in cddb_cache_set_dir
