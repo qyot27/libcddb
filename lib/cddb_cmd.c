@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.28 2003/04/16 06:20:33 airborne Exp $
+    $Id: cddb_cmd.c,v 1.29 2003/04/17 17:33:49 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -644,6 +644,13 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
             dlog("\tstate: DISC TITLE");
             if (regexec(REGEX_DISC_TITLE, line, 5, matches, 0) == 0) {
                 /* XXX: more error detection possible! */
+                if (multi_line == MULTI_NONE) {
+                    /* start parsing title or artist, delete current
+                       track and artist in case this disc structure is
+                       being reused from a previous read */
+                    cddb_disc_set_artist(disc, NULL);
+                    cddb_disc_set_title(disc, NULL);
+                }
                 if (matches[2].rm_so != -1) {
                     /* both artist and title of disc are specified */
                     buf = cddb_regex_get_string(line, matches, 2);
@@ -710,6 +717,11 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                 if (track_no != old_no) {
                     /* reset multi-line flag, expect artist first */
                     multi_line = MULTI_ARTIST;
+                    /* delete current title and artist in case this
+                       track structure is being reused from a previous
+                       read */
+                    cddb_track_set_artist(track, NULL);
+                    cddb_track_set_title(track, NULL);
                 }
                 if (matches[3].rm_so == -1) {
                     /* only title or artist of track on this line */
