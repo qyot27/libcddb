@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.12 2003/05/12 18:48:31 airborne Exp $
+    $Id: cddb_ni.h,v 1.13 2003/05/20 20:41:17 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -31,7 +31,6 @@
 #  include <config.h>
 #endif
 
-#include "cddb/debug.h"
 #include "cddb/cddb_regex.h"
 #include "cddb/cddb_net.h"
 #include "cddb/cddb.h"
