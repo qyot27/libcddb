@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.4 2003/04/17 22:19:11 airborne Exp $
+    $Id: main.c,v 1.5 2003/04/20 14:41:29 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -34,8 +34,11 @@
 #define CMD_QUERY  2
 #define CMD_READ   3
 static int command = 0;         /* request command */
-static char *category;          /* category command-line argument */
-static unsigned int discid;     /* disc ID command-line argument or calculated */
+static char *category = NULL;   /* category command-line argument */
+static unsigned int discid = 0; /* disc ID command-line argument or calculated */
+static int dlength = 0;         /* disc length command-line argument */
+static int tcount = 0;          /* track count command-line parameter */
+static int *foffset = NULL;     /* frame offset list command-line parameter */
 static int use_cd = 0;          /* use CD-ROM to retrieve disc data */
 
 /* print usage message */
@@ -52,10 +55,18 @@ static void usage(void)
     fprintf(stderr, "  -s <server>      name of CDDB server (default = freedb.org)\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Available commands:\n");
-    fprintf(stderr, "  calc             calculate disc ID\n");
-    fprintf(stderr, "  query            query CDDB server and list all matching entries\n");
-    fprintf(stderr, "  read <cat> <id>  retrieve disc details from CDDB server, <cat> see\n");
-    fprintf(stderr, "                   below, <id> is disc ID in hexadecimal\n");
+    fprintf(stderr, "  calc <len> <n> <fo_1> ... <fo_n>\n");
+    fprintf(stderr, "                   calculate disc ID\n");
+    fprintf(stderr, "  query <len> <n> <fo_1> ... <fo_n>\n");
+    fprintf(stderr, "                   query CDDB server and list all matching entries\n");
+    fprintf(stderr, "  read <cat> <id>  retrieve disc details from CDDB server\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "Command arguments\n");
+    fprintf(stderr, "  <cat>            disc category (see below)\n");
+    fprintf(stderr, "  <fo_i>           frame offset of track i\n");
+    fprintf(stderr, "  <id>             disc ID in hexadecimal\n");
+    fprintf(stderr, "  <len>            disc length in seconds\n");
+    fprintf(stderr, "  <n>              track count\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "If you do not specify any arguments for a command, the program\n");
     fprintf(stderr, "will try to retrieve the needed disc data from a CD in your CD-ROM\n");
@@ -99,6 +110,30 @@ static void error_usage(const char *fmt, ...)
     va_end(ap);
     usage();
     exit(-1);
+}
+
+#define CMD_STR(c) ((c) == CMD_DISCID ? "calc" : "query")
+static void parse_disc_data(int cmd, int argc, char **argv, int idx)
+{
+    if (argc >= idx + 3) {
+        /* at least two extra arguments are needed */
+        sscanf(argv[idx+1], "%d", &dlength);
+        sscanf(argv[idx+2], "%d", &tcount);
+        if (argc == idx + tcount + 3) {
+            /* parse frame offsets */
+            if (tcount > 0) {
+                int i;
+                foffset = calloc(tcount, sizeof(int));
+                for (i = 0; i < tcount; i++) {
+                    sscanf(argv[idx+3+i], "%d", &foffset[i]);
+                }
+            }
+        } else {
+            error_usage("track count is %d, but %d frame offset(s) specified", tcount, (argc - idx - 3));
+        }
+    } else {
+        error_usage("the %s command requires at least two arguments", CMD_STR(cmd));
+    }
 }
 
 static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
@@ -198,34 +233,38 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
         /* no command given */
 		error_usage("command missing");
     }
+
+    /* use CD-ROM ? */
+    if (argc == optind + 1) {
+        use_cd = 1;
+    }
+
     /* process command */
     if (strcmp(argv[optind], "calc") == 0) {
         /* calculate disc ID */
         command = CMD_DISCID;
-        use_cd = 1;
-        /* no more arguments are needed */
-        if (argc != optind + 1) {
-            error_usage("the calc command requires no arguments");
+        if (!use_cd) {
+            /* check disc arguments */
+            parse_disc_data(CMD_DISCID, argc, argv, optind);
         }
     } else if (strcmp(argv[optind], "query") == 0) {
         /* CDDB query */
         command = CMD_QUERY;
-        /* no more arguments are needed */
-        if (argc != optind + 1) {
-            error_usage("the query command requires no arguments");
+        if (!use_cd) {
+            /* check disc arguments */
+            parse_disc_data(CMD_QUERY, argc, argv, optind);
         }
     } else if (strcmp(argv[optind], "read") == 0) {
         /* CDDB read */
         command = CMD_READ;
-        /* use CD-ROM ? */
-        if (argc == optind + 1) {
-            use_cd = 1;
-        } else if (argc == optind + 3) {
-            /* two more arguments are needed */
-            category = strdup(argv[optind+1]);
-            sscanf(argv[optind+2], "%x", &discid);
-        } else {
-            error_usage("the read command requires two arguments");
+        if (!use_cd) {
+            if (argc == optind + 3) {
+                /* two more arguments are needed */
+                category = strdup(argv[optind+1]);
+                sscanf(argv[optind+2], "%x", &discid);
+            } else {
+                error_usage("the read command requires two arguments");
+            }
         }
     } else {
         /* unknown command */
@@ -260,15 +299,33 @@ int main(int argc, char **argv)
         if (!disc) {
             error_exit("could not read CD in CD-ROM drive");
         }
+    } else if (command == CMD_DISCID || command == CMD_QUERY) {
+        /* The disc ID calculation and query command both need a disc
+           structure.  We will initialize a new disc with the data
+           provided on the command-line. */
+        disc = cd_create(dlength, tcount, foffset);
+        if (!disc) {
+            error_exit("could not create disc structure");
+        }
     }
 
     /* Execute requested command. */
     switch (command) {
     case CMD_DISCID:
         /* Calculate the disc ID.  This function will initialize the
-           disc ID field in the disc structure. */
+           disc ID field in the disc structure.  Afterwards you can
+           retrieve the disc ID as shown below. */
         cddb_disc_calc_discid(disc);
         printf("CD disc ID is %08x\n", cddb_disc_get_discid(disc));
+        break;
+    case CMD_QUERY:
+        /* Query the CDDB server for possibly matches.  Next to the
+           parameters specified on the command-line or retrieved from
+           the CD, this command also requires the disc ID to be
+           initalized correctly.  So we first calculate this disc ID
+           before executing the query command. */
+        cddb_disc_calc_discid(disc);
+        do_query(conn, disc);
         break;
     case CMD_READ:
         disc = do_read(conn, category, discid);
@@ -288,6 +345,9 @@ int main(int argc, char **argv)
        provided pointer is not NULL before freeing it. */
     cddb_disc_destroy(disc);
     cddb_destroy(conn);
+    if (foffset) {
+        /* free foffset */
+    }
 
     return 0;
 }
