@@ -172,7 +172,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email)
 
 int cddb_handshake(cddb_conn_t *c)
 {
-    const char *msg;
+    char *msg;
     int code;
 
     dlog("cddb_handshake()");

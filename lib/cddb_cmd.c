@@ -280,9 +280,9 @@ void cddb_query_clear(cddb_conn_t *c)
 /* --- server request / response handling --- */
 
 
-int cddb_get_response_code(cddb_conn_t *c, const char **msg)
+int cddb_get_response_code(cddb_conn_t *c, char **msg)
 {
-    const char *line, *space;
+    char *line, *space;
     int code, rv;
 
     dlog("cddb_get_response_code()");
@@ -704,7 +704,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
 
 int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
 {
-    const char *msg;
+    char *msg;
     int code, rc;
 
     dlog("cddb_read()");
@@ -794,8 +794,7 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
 
 int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 {
-    const char *msg;
-    char *line;
+    char *msg, *line;
     int code, count;
     char buf[LINE_SIZE], offset[32];
     cddb_track_t *track;
@@ -985,7 +984,7 @@ int cddb_write_data(char *buf, int size, cddb_disc_t *disc)
 
 int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
 {
-    const char *msg;
+    char *msg;
     int code, size;
     cddb_track_t *track;
     FILE *cache;

@@ -29,7 +29,7 @@ enum { CMD_HELLO = 0,
  * @param msg the CDDB response msg
  * @return the CDDB response code or -1 on error
  */
-int cddb_get_response_code(cddb_conn_t *c, const char **msg);
+int cddb_get_response_code(cddb_conn_t *c, char **msg);
 
 /**
  */
