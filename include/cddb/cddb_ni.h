@@ -30,6 +30,8 @@
 #define DEFAULT_CACHE       ".cddbslave"
 #define DEFAULT_PROXY_PORT  8080
 
+#define DEFAULT_PROTOCOL_VERSION 5
+
 #define FREE_NOT_NULL(p) if (p) free(p)
 #define CONNECTION_OK(c) (c->fp != NULL)
 #define STR_OR_NULL(s) ((s) ? s : "NULL")

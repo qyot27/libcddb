@@ -16,12 +16,13 @@
 #define CHR_SPACE      ' '
 #define CHR_DOT        '.'
 
-static const char *CDDB_COMMANDS[5] = {
+static const char *CDDB_COMMANDS[CMD_LAST] = {
     "cddb hello %s %s %s %s",
     "quit",
     "cddb read %s %08x",
     "cddb query %08x %d %s %d",
     "cddb write %s %08x",
+    "proto %d",
 };
 
 #define WRITE_BUF_SIZE 4096
@@ -350,7 +351,8 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
 
             fprintf(c->fp, "hello=%s+%s+%s+%s&", 
                     c->user, c->hostname, CLIENT_NAME, CLIENT_VERSION);
-            fprintf(c->fp, "proto=5 HTTP/1.0\r\n");
+            fprintf(c->fp, "proto=%d", DEFAULT_PROTOCOL_VERSION);
+            fprintf(c->fp, " HTTP/1.0\r\n");
 
             if (c->is_http_proxy_enabled) {
                 /* insert host header */

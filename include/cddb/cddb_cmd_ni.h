@@ -6,7 +6,11 @@ enum { CMD_HELLO = 0,
        CMD_QUIT,
        CMD_READ,
        CMD_QUERY,
-       CMD_WRITE };
+       CMD_WRITE,
+       CMD_PROTO,
+       /* dummy for array size */
+       CMD_LAST
+};
 
 
 /* --- utility functions --- */

@@ -205,6 +205,22 @@ int cddb_handshake(cddb_conn_t *c)
         return FALSE;
     }
 
+    /* set protocol level */
+    if (!cddb_send_cmd(c, CMD_PROTO, DEFAULT_PROTOCOL_VERSION)) {
+        return FALSE;
+    }
+    switch (code = cddb_get_response_code(c, &msg)) {
+    case  -1:
+        return FALSE;
+    case 200:                   /* ok */
+    case 201:                   /* ok */
+    case 502:                   /* protocol already set */
+        break;
+    case 501:                   /* illegal protocol level */
+        /* ignore */
+        break;
+    }
+    
     c->errnum = CDDB_ERR_OK;
     return TRUE;
 }
