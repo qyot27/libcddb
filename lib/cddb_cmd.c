@@ -28,6 +28,15 @@ static const char *CDDB_COMMANDS[CMD_LAST] = {
 #define WRITE_BUF_SIZE 4096
 #define QUERY_RESULT_SET_INC 10
 
+/*
+ * Small memory cache for querying local database.
+ */
+#define QUERY_CACHE_SIZE 256
+static struct query_cache_entry {
+    unsigned int discid;
+    cddb_cat_t category;
+} query_cache[QUERY_CACHE_SIZE];
+
 
 /* --- prototypes --- */
 
@@ -73,6 +82,19 @@ FILE *cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode);
 /**
  */
 int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ */
+int cddb_cache_query(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ */
+int cddb_cache_query_disc(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ * Initialize the local query cache.
+ */
+void cddb_cache_query_init(void);
 
 /**
  */
@@ -144,6 +166,75 @@ int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc)
     c->fp = old_fp;
 
     return rv;
+}
+
+inline void cddb_cache_query_init(void)
+{
+    static int query_cache_init = FALSE;
+    int i;
+
+    if (!query_cache_init) {
+        for (i = 0; i < sizeof(QUERY_CACHE_SIZE); i++) {
+            query_cache[i].category = CDDB_CAT_INVALID;
+        }
+        query_cache_init = TRUE;
+    }
+}
+
+inline int cddb_cache_query_hash(cddb_disc_t *disc)
+{
+    /* use upper 8 bits of disc ID as hash */
+    return disc->discid >> 24;
+}
+
+int cddb_cache_query(cddb_conn_t *c, cddb_disc_t *disc)
+{
+    int hash;
+
+    dlog("cddb_cache_query()");
+    if (!c->use_cache) {
+        /* don't use cache */
+        return FALSE;
+    }
+
+    /* initialize memory cache */
+    cddb_cache_query_init();
+
+    /* calculate disc hash */
+    hash = cddb_cache_query_hash(disc);
+
+    /* data already in memory? */
+    if (query_cache[hash].discid == disc->discid) {
+        dlog("\tentry found in memory");
+        disc->category = query_cache[hash].category;
+        c->errnum = CDDB_ERR_OK;
+        return TRUE;
+    }
+
+    /* search local database on disc */
+    return cddb_cache_query_disc(c, disc);
+}
+
+int cddb_cache_query_disc(cddb_conn_t *c, cddb_disc_t *disc)
+{
+    int cat, hash;
+
+    dlog("cddb_cache_query_disc()");
+    for (cat = CDDB_CAT_DATA; cat < CDDB_CAT_INVALID; cat++) {
+        disc->category = cat;
+        if (cddb_cache_exists(c, disc)) {
+            /* update memory cache */
+            hash = cddb_cache_query_hash(disc);
+            query_cache[hash].discid = disc->discid;
+            query_cache[hash].category = disc->category;
+            dlog("\tentry found in local db");
+            c->errnum = CDDB_ERR_OK;
+            return TRUE;
+        }
+    }
+    disc->category = CDDB_CAT_INVALID;
+    dlog("\tentry not found in local db");
+    return FALSE;
 }
 
 int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc)
@@ -658,6 +749,11 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     if ((disc->discid == 0) || (disc->length == 0) || (disc->track_cnt == 0)) {
         c->errnum = CDDB_ERR_DATA_MISSING;
         return -1;
+    }
+
+    if (cddb_cache_query(c, disc)) {
+        /* cached version found */
+        return TRUE;
     }
 
     /* check track offsets and generate offset list */
