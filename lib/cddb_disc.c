@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.16 2003/05/23 21:10:30 airborne Exp $
+    $Id: cddb_disc.c,v 1.17 2004/07/18 07:12:20 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -112,6 +112,7 @@ void cddb_disc_add_track(cddb_disc_t *disc, cddb_track_t *track)
             t = t->next;
         }
         t->next = track;
+        track->prev = t;
     }
     disc->track_cnt++;
     track->num = disc->track_cnt;
