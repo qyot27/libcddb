@@ -22,7 +22,6 @@ static const char *CDDB_COMMANDS[CMD_LAST] = {
 #define WRITE_BUF_SIZE 4096
 #define QUERY_RESULT_SET_INC 10
 
-#define USE_CACHED_ENTRY(c) (c->cache_fp != NULL)
 
 /*
  * Small memory cache for querying local database.
@@ -171,7 +170,9 @@ int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc)
 
     /* parse CDDB record */
     dlog("\tcached version found");
+    c->cache_read = TRUE;
     rv = cddb_parse_record(c, disc);
+    c->cache_read = FALSE;
 
     /* close cache entry */
     cddb_cache_close(c);
@@ -329,7 +330,7 @@ char *cddb_read_line(cddb_conn_t *c)
 
     dlog("cddb_read_line()");
     /* read line, possibly returning NULL */
-    if (USE_CACHED_ENTRY(c)) {
+    if (c->cache_read) {
         s = fgets(c->line, LINE_SIZE, cddb_cache_file(c));
     } else {
         s = sock_fgets(c->line, LINE_SIZE, c->socket);
@@ -348,7 +349,7 @@ char *cddb_read_line(cddb_conn_t *c)
     }
 
     c->errnum = CDDB_ERR_OK;
-    dlog("\tline = '%s'", c->line);
+    dlog("\t[%c] line = '%s'", (c->cache_read ? 'C' : 'N'), c->line);
     return c->line;
 }
 
