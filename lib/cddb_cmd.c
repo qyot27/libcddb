@@ -693,8 +693,9 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         }
         count = 1;
         break;
-    case 211:                   /* found inexact match, list follows */
-        dlog("\tinexact match");
+    case 210:                   /* found exact matches, list follows */
+    case 211:                   /* found inexact matches, list follows */
+        dlog("\t(in)exact matches");
         {
             int query_max = 0;
             while (NEXT_LINE(c, line)) {
