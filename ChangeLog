@@ -1,3 +1,188 @@
+2004-10-16 16:51  airborne
+
+	* NEWS: added changes between 0.9.5 and 0.9.6
+
+2004-10-16 15:53  airborne
+
+	* lib/cddb_util.c: conversion fails if out of memory
+
+2004-10-16 10:09  airborne
+
+	* lib/Makefile.am: incremented library revision number
+
+2004-10-16 10:02  airborne
+
+	* configure.ac: added extra substitution, used in unit tests
+	(settings.sh.in)
+
+2004-10-16 10:00  airborne
+
+	* tests/settings.sh.in: added iconv support
+
+2004-10-16 10:00  airborne
+
+	* tests/Makefile.am: added charset test script
+
+2004-10-16 09:58  airborne
+
+	* include/cddb/cddb_error.h, lib/cddb_error.c: moved line size
+	error back to its original location in enum (to stay backwards
+	compatible)
+
+2004-10-16 09:56  airborne
+
+	* tests/: testdata/12340000.ISO8859-1.txt,
+	testdata/12340000.UTF8.txt, check_charset.sh,
+	testcache/misc/12340000: initial revision
+
+2004-10-16 08:32  airborne
+
+	* lib/cddb_cmd.c: added character set conversion support for query
+	command
+
+2004-10-15 21:43  airborne
+
+	* lib/cddb_conn.c: [bugfix] make sure to alloc enough memory (thank
+	you Valgrind) [bugfix] fix memory leak (thank you Valgrind)
+
+2004-10-15 21:42  airborne
+
+	* include/cddb/cddb_conn_ni.h: [cosmetic] removed white space
+
+2004-10-15 21:23  airborne
+
+	* configure.ac: tab removal don't check for iconv_open (header file
+	should be enough)
+
+2004-10-15 21:21  airborne
+
+	* lib/cddb_conn.c: use new character set conversion structure
+
+2004-10-15 21:07  airborne
+
+	* lib/cddb_util.c: added conditional compile for character set
+	conversion
+
+2004-10-15 21:05  airborne
+
+	* lib/cddb_cmd.c: added character set conversion when writing CDDB
+	record [bugfix] make sure category is saved when genre is empty
+	string [bugfix] when writing prevent network access when CACHE_ONLY
+	is set
+
+2004-10-15 21:01  airborne
+
+	* lib/cddb_disc.c: conversion descriptor is parameter now
+	conditional compile (HAVE_ICONV_H) is no longer necessary here
+
+2004-10-15 20:59  airborne
+
+	* lib/cddb_track.c: conversion descriptor is parameter now
+	conditional compile (HAVE_ICONV_H) no longer necessary here
+
+2004-10-15 20:55  airborne
+
+	* include/cddb/cddb_ni.h: define dummy iconv_t type if no iconv.h
+	header is included
+
+2004-10-15 20:54  airborne
+
+	* include/cddb/cddb_conn_ni.h: iconv_t now always exists (see
+	cddb_ni.h)
+
+2004-10-15 20:47  airborne
+
+	* lib/cddb_regex.c: even more robust disc length parsing regex
+
+2004-10-15 20:46  airborne
+
+	* include/cddb/cddb_ni.h: include iconv header conversion funtions
+	now get iconv structure instead of cddb connection structure
+
+2004-10-15 20:41  airborne
+
+	* include/cddb/cddb_conn_ni.h: add structure for character set
+	conversion
+
+2004-10-15 20:40  airborne
+
+	* include/cddb/cddb_conn.h: avoid inclusion of optinal iconv.h in
+	installed header file use custom opaque structure instead
+
+2004-10-09 08:14  airborne
+
+	* lib/cddb_conn.c: free iconv structures
+
+2004-10-08 23:18  airborne
+
+	* misc/libcddb.ebuild: sync with portage tree version
+
+2004-10-08 23:15  airborne
+
+	* configure.ac: removed deprecated --enable-debug option, added
+	checks for iconv support, added check for realloc function, updated
+	maintainer CFLAGS (strdup caused problems with previous set)
+
+2004-10-08 23:13  airborne
+
+	* lib/cddb_util.c: initial version
+
+2004-10-08 23:12  airborne
+
+	* lib/Makefile.am: added cddb_util.c file
+
+2004-10-08 23:12  airborne
+
+	* lib/cddb_cmd.c: convert strings to user character set after
+	parsing disc record
+
+2004-10-08 23:09  airborne
+
+	* lib/: cddb_disc.c, cddb_track.c: added character set conversion
+	function
+
+2004-10-08 23:08  airborne
+
+	* lib/cddb_conn.c: added character set conversion fields and
+	function
+
+2004-10-08 23:05  airborne
+
+	* examples/main.c: added option for defining character set on
+	command line
+
+2004-10-08 23:03  airborne
+
+	* include/cddb/cddb_ni.h: added prototypes for private character
+	set conversion functions, incremented protocol version to 6
+
+2004-10-08 23:01  airborne
+
+	* include/cddb/cddb_conn.h: added character set conversion fields
+	and fucntion
+
+2004-10-08 22:59  airborne
+
+	* include/cddb/cddb_error.h, lib/cddb_error.c: added character set
+	conversion errors
+
+2004-10-08 21:55  airborne
+
+	* lib/cddb_regex.c: [bugfix] FreeDB changed their spec, the string
+	" seconds" on disc length line is no longer mandatory
+
+2004-07-24 07:41  airborne
+
+	* configure.ac: version bumped to 0.9.6
+
+2004-07-24 07:41  airborne
+
+	* misc/libcddb.ebuild: updated libcdio requirement
+
+2004-07-21 18:21  airborne
+
+	* ChangeLog: added 0.9.5 changes
+
 2004-07-21 18:19  airborne
 
 	* NEWS: added changes between 0.9.4 and 0.9.5
