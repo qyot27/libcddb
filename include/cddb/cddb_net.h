@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.h,v 1.8 2004/07/07 10:29:24 rockyb Exp $
+    $Id: cddb_net.h,v 1.9 2004/07/18 07:08:07 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -127,7 +127,7 @@ struct hostent *timeout_gethostbyname(const char *hostname, int timeout);
  * @return Zero on success, -1 on failure (errno will be set).
  */
 int timeout_connect(int sockfd, const struct sockaddr *addr, size_t len, 
-		    int timeout);
+                    int timeout);
 
 
 #ifdef __cplusplus
