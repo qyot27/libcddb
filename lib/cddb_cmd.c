@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.29 2003/04/17 17:33:49 airborne Exp $
+    $Id: cddb_cmd.c,v 1.30 2003/04/21 08:46:08 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -715,6 +715,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                     return FALSE;
                 }
                 if (track_no != old_no) {
+                    old_no = track_no;
                     /* reset multi-line flag, expect artist first */
                     multi_line = MULTI_ARTIST;
                     /* delete current title and artist in case this
@@ -736,7 +737,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                     } else {
                         /* this line is part of the title */
                         buf = cddb_regex_get_string(line, matches, 5);
-                        cddb_disc_append_title(disc, buf);
+                        cddb_track_append_title(track, buf);
                         free(buf);
                     }
                 } else {
