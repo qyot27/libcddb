@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.20 2003/05/12 18:46:16 airborne Exp $
+    $Id: cddb_conn.c,v 1.21 2003/05/20 20:45:26 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -87,6 +87,8 @@ cddb_conn_t *cddb_new(void)
         c->query_data = NULL;
         c->query_idx = 0;
         c->query_cnt = 0;
+    } else {
+        cddb_log_crit(cddb_error_str(CDDB_ERR_OUT_OF_MEMORY));
     }
 
     return c;
@@ -138,13 +140,13 @@ void cddb_set_http_path_submit(cddb_conn_t *c, const char *path)
 void cddb_http_enable(cddb_conn_t *c)
 {
     c->is_http_enabled = TRUE;
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
 }
 
 void cddb_http_disable(cddb_conn_t *c)
 {
     c->is_http_enabled = FALSE;
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
 }
 
 void cddb_http_proxy_enable(cddb_conn_t *c)
@@ -152,13 +154,13 @@ void cddb_http_proxy_enable(cddb_conn_t *c)
     /* enabling HTTP proxy implies HTTP, but not vice versa */
     cddb_http_enable(c);
     c->is_http_proxy_enabled = TRUE;
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
 }
 
 void cddb_http_proxy_disable(cddb_conn_t *c)
 {
     c->is_http_proxy_enabled = FALSE;
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
 }
 
 void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server)
@@ -187,11 +189,12 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email)
     char *at;
     int len;
 
-    dlog("cddb_set_email_address()");
+    cddb_log_debug("cddb_set_email_address()");
     if ((email == NULL) ||
         ((at = strchr(email, '@')) == NULL) ||
         (at == email) || 
         (*(at+1) == '\0')) {
+        cddb_errno_log_error(c, CDDB_ERR_EMAIL_INVALID);
         return FALSE;
     }
     /* extract user name */
@@ -204,8 +207,8 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email)
     at++;
     FREE_NOT_NULL(c->hostname);
     c->hostname = strdup(at);
-    dlog("\tuser name = '%s'", c->user);
-    dlog("\thost name = '%s'", c->hostname);
+    cddb_log_debug("...user name = '%s'", c->user);
+    cddb_log_debug("...host name = '%s'", c->hostname);
 
     return TRUE;
 }
@@ -214,7 +217,7 @@ int cddb_cache_set_dir(cddb_conn_t *c, const char *dir)
 {
     char *home;
 
-    dlog("cddb_cache_set_dir()");
+    cddb_log_debug("cddb_cache_set_dir()");
     if (dir) {
         FREE_NOT_NULL(c->cache_dir);
         if (dir[0] == '~') {
@@ -238,19 +241,19 @@ int cddb_handshake(cddb_conn_t *c)
     char *msg;
     int code;
 
-    dlog("cddb_handshake()");
+    cddb_log_debug("cddb_handshake()");
     /* check sign-on banner */
     switch (code = cddb_get_response_code(c, &msg)) {
-    case  -1:
-        return FALSE;
-    case 200:                   /* read/write */
-    case 201:                   /* read only */
-        break;
-    case 432:
-    case 433:
-    case 434:
-        c->errnum = CDDB_ERR_PERMISSION_DENIED;
-        return FALSE;
+        case  -1:
+            return FALSE;
+        case 200:                   /* read/write */
+        case 201:                   /* read only */
+            break;
+        case 432:
+        case 433:
+        case 434:
+            cddb_errno_log_error(c, CDDB_ERR_PERMISSION_DENIED);
+            return FALSE;
     }
 
     /* send hello and check response */
@@ -258,14 +261,14 @@ int cddb_handshake(cddb_conn_t *c)
         return FALSE;
     }
     switch (code = cddb_get_response_code(c, &msg)) {
-    case  -1:
-        return FALSE;
-    case 200:                   /* ok */
-    case 402:                   /* already shook hands */
-        break;
-    case 431:
-        c->errnum = CDDB_ERR_PERMISSION_DENIED;
-        return FALSE;
+        case  -1:
+            return FALSE;
+        case 200:                   /* ok */
+        case 402:                   /* already shook hands */
+            break;
+        case 431:
+            cddb_errno_log_error(c, CDDB_ERR_PERMISSION_DENIED);
+            return FALSE;
     }
 
     /* set protocol level */
@@ -273,18 +276,18 @@ int cddb_handshake(cddb_conn_t *c)
         return FALSE;
     }
     switch (code = cddb_get_response_code(c, &msg)) {
-    case  -1:
-        return FALSE;
-    case 200:                   /* ok */
-    case 201:                   /* ok */
-    case 502:                   /* protocol already set */
-        break;
-    case 501:                   /* illegal protocol level */
-        /* ignore */
-        break;
+        case  -1:
+            return FALSE;
+        case 200:                   /* ok */
+        case 201:                   /* ok */
+        case 502:                   /* protocol already set */
+            break;
+        case 501:                   /* illegal protocol level */
+            /* ignore */
+            break;
     }
     
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
 
@@ -292,7 +295,7 @@ int cddb_connect(cddb_conn_t *c)
 {
     int rv = TRUE;
 
-    dlog("cddb_connect()");
+    cddb_log_debug("cddb_connect()");
     if (!CONNECTION_OK(c)) {
         struct hostent *he;
 
@@ -307,7 +310,7 @@ int cddb_connect(cddb_conn_t *c)
             c->sa.sin_port = htons(c->server_port);
         }
         if (he == NULL) {
-            c->errnum = CDDB_ERR_UNKNOWN_HOST_NAME;
+            cddb_errno_log_error(c, CDDB_ERR_UNKNOWN_HOST_NAME);
             return FALSE;
         }
         /* initialize socket address */
@@ -316,14 +319,14 @@ int cddb_connect(cddb_conn_t *c)
         memset(&(c->sa.sin_zero), 0, sizeof(c->sa.sin_zero));
 
         if ((c->socket  = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-            c->errnum = CDDB_ERR_CONNECT;
+            cddb_errno_log_error(c, CDDB_ERR_CONNECT);
             return FALSE;
         }
 
         rv =  timeout_connect(c->socket, (struct sockaddr*)&(c->sa), 
                               sizeof(struct sockaddr), c->timeout);
         if (rv == -1) {
-            c->errnum = CDDB_ERR_CONNECT;
+            cddb_errno_log_error(c, CDDB_ERR_CONNECT);
             return FALSE;
         } 
 
@@ -333,16 +336,16 @@ int cddb_connect(cddb_conn_t *c)
         }
     }
 
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
 }
 
 void cddb_disconnect(cddb_conn_t *c)
 {
-    dlog("cddb_disconnect()");
+    cddb_log_debug("cddb_disconnect()");
     if (CONNECTION_OK(c)) {
         close(c->socket);
         c->socket = -1;
     }
-    c->errnum = CDDB_ERR_OK;
+    cddb_errno_set(c, CDDB_ERR_OK);
 }
