@@ -1,7 +1,7 @@
 /*
-    $Id: do_display.c,v 1.4 2003/05/25 14:24:24 airborne Exp $
+    $Id: do_display.c,v 1.5 2004/03/03 12:30:25 rockyb Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +20,10 @@
 */
 
 #include "main.h"
+
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
 
 #define STR_OR_NULL(s) ((s) ? s : "(null)")
 
