@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.9 2003/05/20 20:47:29 airborne Exp $
+    $Id: cddb_net.c,v 1.10 2003/05/25 14:25:46 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -51,7 +51,7 @@ static int sock_ready(int sock, int timeout, int to_write)
     struct timeval tv;
     int rv;
 
-    cddb_log_debug("sock_ready()");
+    //cddb_log_debug("sock_ready()");
     /* set up select time out */
     tv.tv_sec = timeout;
     tv.tv_usec = 0;
