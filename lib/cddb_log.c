@@ -1,5 +1,5 @@
 /*
-  $Id: cddb_log.c,v 1.2 2003/05/20 21:42:07 airborne Exp $
+  $Id: cddb_log.c,v 1.3 2003/05/31 13:29:51 airborne Exp $
 
   Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -50,6 +50,10 @@ void cddb_log_set_level(cddb_log_level_t level)
 cddb_log_handler_t cddb_log_set_handler(cddb_log_handler_t new_handler)
 {
     cddb_log_handler_t old_handler = _handler;
+
+    if (!new_handler) {
+        new_handler = default_cddb_log_handler;
+    }
     _handler = new_handler;
     return old_handler;
 }
