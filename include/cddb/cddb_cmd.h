@@ -10,8 +10,46 @@
  * requires that the category and disc ID of the provided disc
  * structure are valid.
  *
+ * If nothing goes wrong, the function will return 1 and the error
+ * code will be reset to:
+ * - #CDDB_ERR_OK:
+ *     If everything went as planned.
+ *
+ * If there is a problem with reading data from the CDDB server one of
+ * the following error codes will be set:
+ * - #CDDB_ERR_DATA_MISSING:
+ *     If some required data is missing from the given disc
+ *     structure to execute this command.
+ * - #CDDB_ERR_DISC_NOT_FOUND:
+ *     If the requested disc is not known by the CDDB server.
+ * - #CDDB_ERR_SERVER_ERROR:
+ *     If the server encountered an error while trying to process your
+ *     request.
+ * - #CDDB_ERR_UNKNOWN:
+ *     If the server specified an unknown response code.  Please
+ *     report this as a libcddb bug.
+ *
+ * When there are problems with the connection to the CDDB server one
+ * of the following error codes will be set:
+ * - #CDDB_ERR_UNKNOWN_HOST_NAME:
+ *     If there was an error when resolving the host name of the CDDB
+ *     server.
+ * - #CDDB_ERR_CONNECT:
+ *     If a connection to the CDDB server could not be established.
+ *     This can be due to incorrect data about the location of the
+ *     server (host name, port).
+ * - #CDDB_ERR_NOT_CONNECTED:
+ *     If something when wrong in the process and you got
+ *     disconnected.  Retrying might succeed (but no guarantees).
+ * - #CDDB_ERR_PERMISSION_DENIED:
+ *     If the server is up and running but denied the connection.
+ *     This can occur when the server is too highly loaded or the
+ *     handshake information (user name, ...) is considered to be
+ *     invalid.
+ *
  * @param c    The CDDB connection structure.
  * @param disc A non-null CDDB disc structure.
+ * @return 1 on succes, 0 on failure
  */
 int cddb_read(cddb_conn_t *c, cddb_disc_t *disc);
 
