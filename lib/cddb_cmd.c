@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.33 2003/04/22 18:14:43 airborne Exp $
+    $Id: cddb_cmd.c,v 1.34 2003/05/01 09:50:20 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -64,7 +64,7 @@ char *cddb_read_line(cddb_conn_t *c);
 /**
  * @returns The amount of data written into the buffer.
  */
-int cddb_write_data(char *buf, int size, cddb_disc_t *disc);
+int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc);
 
 /**
  */
@@ -503,7 +503,7 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
             sock_fprintf(c->socket, "?cmd=%s&", buf);
 
             sock_fprintf(c->socket, "hello=%s+%s+%s+%s&", 
-                         c->user, c->hostname, CLIENT_NAME, CLIENT_VERSION);
+                         c->user, c->hostname, c->cname, c->cversion);
             sock_fprintf(c->socket, "proto=%d", DEFAULT_PROTOCOL_VERSION);
             sock_fprintf(c->socket, " HTTP/1.0\r\n");
 
@@ -1026,7 +1026,7 @@ int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
     return TRUE;
 }
 
-int cddb_write_data(char *buf, int size, cddb_disc_t *disc)
+int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc)
 {
     int i, remaining;
     cddb_track_t *track;
@@ -1050,8 +1050,8 @@ int cddb_write_data(char *buf, int size, cddb_disc_t *disc)
     CDDB_WRITE_APPEND(26+6, "#\n# Disc length: %6d seconds\n", disc->length);
     /* submission info */
     CDDB_WRITE_APPEND(16, "#\n# Revision: 0\n");
-    CDDB_WRITE_APPEND(21+strlen(CLIENT_NAME)+strlen(CLIENT_VERSION),
-                      "# Submitted via: %s %s\n#\n", CLIENT_NAME, CLIENT_VERSION);
+    CDDB_WRITE_APPEND(21+strlen(c->cname)+strlen(c->cversion),
+                      "# Submitted via: %s %s\n#\n", c->cname, c->cversion);
     /* disc data */
     CDDB_WRITE_APPEND(8+8, "DISCID=%08x\n", disc->discid);
     CDDB_WRITE_APPEND(11+strlen(disc->artist)+strlen(disc->title),
@@ -1114,7 +1114,7 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     }
 
     /* create CDDB entry */
-    size = cddb_write_data(buf, sizeof(buf), disc);
+    size = cddb_write_data(c, buf, sizeof(buf), disc);
     
     /* cache data if needed */
     if (c->use_cache != CACHE_OFF) {

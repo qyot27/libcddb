@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.15 2003/04/30 18:55:47 airborne Exp $
+    $Id: cddb_conn.c,v 1.16 2003/05/01 09:50:20 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -52,6 +52,9 @@ cddb_conn_t *cddb_new(void)
     c = (cddb_conn_t*)malloc(sizeof(cddb_conn_t));
     if (c) {
         c->line = (char*)malloc(LINE_SIZE);
+
+        c->cname = strdup(CLIENT_NAME);
+        c->cversion = strdup(CLIENT_VERSION);
 
         c->is_connected = FALSE;
         c->socket = -1;
@@ -170,6 +173,16 @@ void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port)
     c->http_proxy_server_port = port;
 }
 
+void cddb_set_client(cddb_conn_t *c, const char *cname, const char *cversion)
+{
+    if (cname && cversion) {
+        FREE_NOT_NULL(c->cname);
+        FREE_NOT_NULL(c->cversion);
+        c->cname = strdup(cname);
+        c->cversion = strdup(cversion);
+    }
+}
+
 int cddb_set_email_address(cddb_conn_t *c, const char *email)
 {
     char *at;
@@ -233,7 +246,7 @@ int cddb_handshake(cddb_conn_t *c)
     }
 
     /* send hello and check response */
-    if (!cddb_send_cmd(c, CMD_HELLO, c->user, c->hostname, CLIENT_NAME, CLIENT_VERSION)) {
+    if (!cddb_send_cmd(c, CMD_HELLO, c->user, c->hostname, c->cname, c->cversion)) {
         return FALSE;
     }
     switch (code = cddb_get_response_code(c, &msg)) {
