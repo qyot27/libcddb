@@ -352,6 +352,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                     cddb_disc_add_track(disc, track);
                 }
                 track->frame_offset = cddb_regex_get_int(line, matches, 1);
+                track_no++;
             } else {
                 /* expect disc length now */
                 state = STATE_DISC_LENGTH;
