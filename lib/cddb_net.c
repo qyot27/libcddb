@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.5 2003/05/12 18:47:15 airborne Exp $
+    $Id: cddb_net.c,v 1.6 2003/05/12 19:17:53 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -145,10 +145,26 @@ struct hostent *timeout_gethostbyname(const char *hostname, int timeout)
 int timeout_connect(int sockfd, const struct sockaddr *addr, 
                     socklen_t len, int timeout)
 {
-    int old, got_error = 0;
+    int got_error = 0;
 
-    old = fcntl(sockfd, F_GETFL, 0); /* get current flags */
-    fcntl(sockfd, F_SETFL, old | O_NONBLOCK); /* add non-blocking flag */
+    /* set socket to non-blocking */
+#ifdef BEOS
+    int on = 1;
+
+    if (setsockopt(sockfd, SOL_SOCKET, SO_NONBLOCK, &on, sizeof(on)) == -1) {
+        /* error while trying to set socket to non-blocking */
+        return -1;
+    }
+#else
+    int flags;
+
+    flags = fcntl(sockfd, F_GETFL, 0);
+    flags |= O_NONBLOCK;        /* add non-blocking flag */
+    if (fcntl(sockfd, F_SETFL, flags) == -1) {
+        return -1;
+    }
+#endif /* BEOS */
+
     /* try connecting */
     if (connect(sockfd, addr, len) == -1) {
         /* check whether we can continue */
@@ -188,6 +204,5 @@ int timeout_connect(int sockfd, const struct sockaddr *addr,
         /* connect failed */
         got_error = -1;
     }
-    fcntl(sockfd, F_SETFL, old); /* restore old flags */
     return got_error;
 }
