@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.30 2005/02/04 21:10:39 rockyb Exp $
+    $Id: cddb_conn.c,v 1.31 2005/03/11 21:17:00 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -63,10 +63,7 @@ cddb_conn_t *cddb_new(void)
     cddb_conn_t *c;
     const char *s;
 
-#ifdef HAVE_REGEX_H
-    cddb_regex_init();
-#endif
-
+    libcddb_init();             /* initialize globals if not yet done */
     c = (cddb_conn_t*)malloc(sizeof(cddb_conn_t));
     if (c) {
         c->buf_size = DEFAULT_BUF_SIZE;
@@ -147,7 +144,6 @@ void cddb_destroy(cddb_conn_t *c)
         cddb_query_clear(c);
         cddb_close_iconv(c);
         FREE_NOT_NULL(c->charset);
-	cddb_regex_destroy();
         free(c);
     }
 }
