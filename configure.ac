@@ -1,4 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.57)
 AC_INIT(configure.ac)
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([Makefile include/Makefile include/cddb/Makefile \
@@ -25,6 +26,7 @@ esac
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
+AC_PROG_CPP
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -37,16 +39,18 @@ AC_CHECK_LIB([cdio], [cdio_open])
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h unistd.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
-AC_FUNC_ALLOCA
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(mkdir regcomp socket strdup strtol)
+AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr gethostbyname memset])
 
 dnl Check and add some GCC specific warning flags
 dnl - we do this as the last thing so that a possible -Werror flag
