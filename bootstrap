@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export WANT_AUTOCONF_2_5=1
+export WANT_AUTOMAKE=1.7
+
 set -x
 
 aclocal
@@ -7,3 +10,4 @@ libtoolize --force --copy
 autoheader
 automake --add-missing --copy
 autoconf
+#configure --enable-maintainer-mode
