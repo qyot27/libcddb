@@ -1,0 +1,12 @@
+
+  I would like to thank the following people for their contribution to
+  the libcddb project.
+
+
+    David Mitchell
+        - initial version of multi-line support for tracks
+        - BeOS support
+        - some other minor patches
+
+    David Collett
+        - C++ patch
