@@ -1,7 +1,7 @@
 /*
-    $Id: cddb_net.c,v 1.10 2003/05/25 14:25:46 airborne Exp $
+    $Id: cddb_net.c,v 1.11 2004/03/02 00:32:48 rockyb Exp $
 
-    Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
+    Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,17 +19,42 @@
     Boston, MA  02111-1307, USA.
 */
 
+#include "cddb/cddb_ni.h"
+
 #include <errno.h>
+
+#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
+
+#ifdef HAVE_NETDB_H
 #include <netdb.h>
+#endif
+
 #include <setjmp.h>
 #include <signal.h>
+
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+
 #include <time.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
+#endif
+
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
+
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
-#include "cddb/cddb_ni.h"
+#endif
 
 
 /* Utility functions */
