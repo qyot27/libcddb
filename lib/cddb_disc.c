@@ -22,7 +22,9 @@ cddb_disc_t *cddb_disc_new(void)
     cddb_disc_t *disc;
 
     disc = (cddb_disc_t*)calloc(1, sizeof(cddb_disc_t));
-    disc->category = CDDB_CAT_INVALID;
+    if (disc) {
+        disc->category = CDDB_CAT_INVALID;
+    }
 
     return disc;
 }
@@ -127,6 +129,15 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc)
 /* --- setters / getters --- */
 
 
+const char *cddb_disc_get_category_str(cddb_disc_t *disc)
+{
+    if (disc) {
+        return CDDB_CATEGORY[disc->category];
+    } else {
+        return NULL;
+    }
+}
+
 void cddb_disc_set_category(cddb_disc_t *disc, const char *cat)
 {
     int i;
@@ -139,6 +150,14 @@ void cddb_disc_set_category(cddb_disc_t *disc, const char *cat)
             disc->category = i;
             return;
         }
+    }
+}
+
+void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre)
+{
+    if (disc) {
+        FREE_NOT_NULL(disc->genre);
+        disc->genre = strdup(genre);
     }
 }
 
@@ -251,20 +270,25 @@ int cddb_disc_calc_discid(cddb_disc_t *disc)
     for (first = track = cddb_disc_get_track_first(disc); 
          track != NULL; 
          track = cddb_disc_get_track_next(disc)) {
-        tmp = track->frame_offset / 75;
+        tmp = track->frame_offset / FRAMES_PER_SECOND;
         do {
             result += tmp % 10;
             tmp /= 10;
         } while (tmp != 0);
     }
 
-    /* first byte is offsets of tracks
-     * 2 next bytes total length in seconds
-     * last byte is nr of tracks
-     */
-    disc->discid = (result % 0xff) << 24 | 
-                   (disc->length - first->frame_offset/75) << 8 | 
-                   disc->track_cnt;
+    if (first == NULL) {
+        /* set disc id to zero if there are no tracks */
+        disc->discid = 0;
+    } else {
+        /* first byte is offsets of tracks
+         * 2 next bytes total length in seconds
+         * last byte is nr of tracks
+         */
+        disc->discid = (result % 0xff) << 24 | 
+                       (disc->length - first->frame_offset / FRAMES_PER_SECOND) << 8 | 
+                       disc->track_cnt;
+    }
     dlog("\tDisc ID: %08x", disc->discid);
 
     return TRUE;
