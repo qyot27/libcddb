@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.43 2003/05/23 21:33:06 airborne Exp $
+    $Id: cddb_cmd.c,v 1.44 2003/05/25 18:31:44 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -571,8 +571,6 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
     return TRUE;
 }
 
-#define NEXT_LINE(c,l) (((l = cddb_read_line(c)) != NULL) && (*l != CHR_DOT))
-
 #define STATE_START         0
 #define STATE_TRACK_OFFSETS 1
 #define STATE_DISC_LENGTH   2
@@ -582,8 +580,9 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
 #define STATE_DISC_EXT      6
 #define STATE_TRACK_TITLE   7
 #define STATE_TRACK_EXT     8
-#define STATE_TRACK_ORDER   9
-#define STATE_STOP          10
+#define STATE_PLAY_ORDER    9
+#define STATE_END_DOT       10
+#define STATE_STOP          11
 
 #define MULTI_NONE          0
 #define MULTI_ARTIST        1
@@ -617,7 +616,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
     cddb_log_debug("...cache_content: %s", (cache_content ? "yes" : "no"));
 
     state = STATE_START;
-    while (NEXT_LINE(c, line)) {
+    while ((line = cddb_read_line(c)) != NULL) {
 
         if (cache_content) {
             fprintf(cddb_cache_file(c), "%s\n", line);
@@ -824,12 +823,30 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                     cddb_track_append_ext_data(track, buf);
                     free(buf);
                     break;
-                } else {
-                    /* we're done parsing */
-                    cddb_log_debug("...state: STOP");
-                    state = STATE_STOP;
                 }
-                break;
+                /* fall through, reached end of extended track data? */
+            case STATE_PLAY_ORDER:
+                cddb_log_debug("...state: PLAY ORDER");
+                if (regexec(REGEX_PLAY_ORDER, line, 2, matches, 0) == 0) {
+                    /* expect nothing more */
+                    state = STATE_END_DOT;
+                    break;
+                }
+                /* fall through, reached end? */
+            case STATE_END_DOT:
+                cddb_log_debug("...state: STOP");
+                if (*line == CHR_DOT) {
+                    /* server response ends with a dot, so end of parsing */
+                    state = STATE_STOP;
+                    break;
+                }
+            default:
+                /* unexpected line */
+                cddb_log_error("unexpected line = '%s'", line);
+        }
+        /* break if we have to stop parsing */
+        if (state == STATE_STOP) {
+            break;
         }
     }
 
@@ -1031,7 +1048,11 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
             cddb_log_debug("...(in)exact matches");
             {
                 int query_max = 0;
-                while (NEXT_LINE(c, line)) {
+                while ((line = cddb_read_line(c)) != NULL) {
+                    /* end of list? */
+                    if (*line == CHR_DOT) {
+                        break;
+                    }
                     /* check whether there is enough space in query result set */
                     if (c->query_cnt >= query_max) {
                         /* realloc */
