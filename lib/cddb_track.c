@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.16 2004/10/08 21:11:00 airborne Exp $
+    $Id: cddb_track.c,v 1.17 2004/10/15 18:59:55 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -19,6 +19,9 @@
     Boston, MA  02111-1307, USA.
 */
 
+
+#include "cddb/cddb_ni.h"
+
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
@@ -26,47 +29,40 @@
 #include <string.h>
 #endif
 
-#include "cddb/cddb_ni.h"
-
 
 /* --- private functions */
 
-int cddb_track_iconv(cddb_conn_t *c, cddb_track_t *track)
+int cddb_track_iconv(iconv_t cd, cddb_track_t *track)
 { 
-#ifdef HAVE_ICONV_H
     char *result;
 
-    if (!c->cd_from_freedb) {
+    if (!cd) {
         return TRUE;            /* no user character set defined */
     }
     if (track->title) {
-        if (cddb_str_iconv(c->cd_from_freedb, track->title, &result)) {
+        if (cddb_str_iconv(cd, track->title, &result)) {
             free(track->title);
             track->title = result;
         } else {
-            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
             return FALSE;
         }
     }
     if (track->artist) {
-        if (cddb_str_iconv(c->cd_from_freedb, track->artist, &result)) {
+        if (cddb_str_iconv(cd, track->artist, &result)) {
             free(track->artist);
             track->artist = result;
         } else {
-            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
             return FALSE;
         }
     }
     if (track->ext_data) {
-        if (cddb_str_iconv(c->cd_from_freedb, track->ext_data, &result)) {
+        if (cddb_str_iconv(cd, track->ext_data, &result)) {
             free(track->ext_data);
             track->ext_data = result;
         } else {
-            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
             return FALSE;
         }
     }
-#endif
     return TRUE;
 }
 
