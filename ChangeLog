@@ -1,3 +1,24 @@
+2002-11-17 17:46  airborne
+
+	* cddb_disc.h, cddb_cmd.c, cddb_conn.c, cddb_disc.c:
+	improved music genre support
+
+2002-11-17 17:45  airborne
+
+	* cddb_track.c, cddb_track.h:
+	support for disc reference, added track artist getter function
+
+2002-11-17 17:33  airborne
+
+	* cddb_conn.h:
+	added missing public prototype
+
+2002-11-13 23:38  airborne
+
+	* cddb_conn.c:
+	fix SIGPIPE problem when connection timed out (an alternative solution
+	is commented out)
+
 2002-11-10 17:32  airborne
 
 	* cddb_cmd.c: 
