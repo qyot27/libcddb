@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.h,v 1.10 2004/07/18 07:23:09 airborne Exp $
+    $Id: cddb_cmd.h,v 1.11 2004/07/21 12:30:50 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -31,7 +31,7 @@
 
 
 /** Internal buffer size for command processing. */
-#define LINE_SIZE      257
+#define LINE_SIZE      1024
 
 
 /* --- accessing data on the CDDB server --- */
