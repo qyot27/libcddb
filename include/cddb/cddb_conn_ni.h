@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn_ni.h,v 1.8 2004/10/15 18:41:40 airborne Exp $
+    $Id: cddb_conn_ni.h,v 1.9 2004/10/15 18:54:10 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -28,16 +28,12 @@
 
 #include "cddb_ni.h"
 
+
 struct cddb_iconv_s {
-#ifdef HAVE_ICONV_H
     iconv_t cd_to_freedb;       /**< character set conversion descriptor for
                                      converting from user to FreeDB format */
     iconv_t cd_from_freedb;     /**< character set conversion descriptor for
                                      converting from FreeDB to user format */
-#else
-    void *cd_to_freedb;         /**< dummy pointer (for code uniformity) */
-    void *cd_from_freedb;       /**< dummy pointer (for code uniformity) */
-#endif
  };
 
 
