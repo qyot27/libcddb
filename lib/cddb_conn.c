@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.16 2003/05/01 09:50:20 airborne Exp $
+    $Id: cddb_conn.c,v 1.17 2003/05/01 15:24:24 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -77,11 +77,9 @@ cddb_conn_t *cddb_new(void)
         sprintf(c->cache_dir, "%s/%s", s, DEFAULT_CACHE);
         c->cache_read = FALSE;
 
-        /* retrieve user and host name from environment */
-        s = getenv("USER");
-        c->user = s ? strdup(s) : strdup(DEFAULT_USER);
-        s = getenv("HOSTNAME");
-        c->hostname = s ? strdup(s) : strdup(DEFAULT_HOST);
+        /* use anonymous@localhost */
+        c->user = strdup(DEFAULT_USER);
+        c->hostname = strdup(DEFAULT_HOST);
 
         c->errnum = CDDB_ERR_OK;
 
