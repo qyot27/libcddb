@@ -461,7 +461,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
 int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
 {
     const char *msg;
-    int code;
+    int code, rc;
 
     dlog("cddb_read()");
     /* check whether we have enough info to execute the command */
@@ -507,7 +507,14 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
     }
 
     /* parse CDDB record */
-    return cddb_parse_record(c, disc);
+    rc = cddb_parse_record(c, disc);
+
+    /* close connection if using HTTP */
+    if (c->is_http_enabled) {
+        cddb_disconnect(c);
+    }
+
+    return rc;
 }
 
 int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
@@ -638,6 +645,11 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     default:
         c->errnum = CDDB_ERR_UNKNOWN;
         return -1;
+    }
+
+    /* close connection if using HTTP */
+    if (c->is_http_enabled) {
+        cddb_disconnect(c);
     }
 
     dlog("\tnumber of matches: %d", count);
@@ -818,6 +830,11 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
     default:
         c->errnum = CDDB_ERR_UNKNOWN;
         return FALSE;
+    }
+
+    /* close connection if using HTTP */
+    if (c->is_http_enabled) {
+        cddb_disconnect(c);
     }
 
     c->errnum = CDDB_ERR_OK;
