@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.40 2003/05/20 20:53:07 airborne Exp $
+    $Id: cddb_cmd.c,v 1.41 2003/05/23 21:15:48 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -579,12 +579,16 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
 #define STATE_DISC_TITLE    3
 #define STATE_DISC_YEAR     4
 #define STATE_DISC_GENRE    5
-#define STATE_TRACK_TITLE   6
-#define STATE_STOP          7
+#define STATE_DISC_EXT      6
+#define STATE_TRACK_TITLE   7
+#define STATE_TRACK_EXT     8
+#define STATE_TRACK_ORDER   9
+#define STATE_STOP          10
 
 #define MULTI_NONE          0
 #define MULTI_ARTIST        1
 #define MULTI_TITLE         2
+#define MULTI_EXT           3
 
 int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
 {
@@ -769,6 +773,52 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                         /* we should only get title continuations now */
                         multi_line = MULTI_TITLE;
                     }
+                    /* valid track title, process next line */
+                    break;
+                }
+                multi_line = MULTI_NONE;
+                old_no = -1;
+                /* fall through, we might have reached end of track titles */
+            case STATE_DISC_EXT:
+                cddb_log_debug("...state: DISC EXT");
+                if (regexec(REGEX_DISC_EXT, line, 2, matches, 0) == 0) {
+                    state = STATE_DISC_EXT;
+                    if (multi_line == MULTI_NONE) {
+                        /* start parsing extended disc data, delete
+                           current data in case this disc structure is
+                           being reused from a previous read */
+                        cddb_disc_set_ext_data(disc, NULL);
+                        multi_line = MULTI_EXT;
+                    }
+                    buf = cddb_regex_get_string(line, matches, 1);
+                    cddb_disc_append_ext_data(disc, buf);
+                    free(buf);
+                    break;
+                }
+                multi_line = MULTI_NONE;
+                /* fall through, reached end of multi-line extended disc data */
+            case STATE_TRACK_EXT:
+                cddb_log_debug("...state: TRACK EXT");
+                if (regexec(REGEX_TRACK_EXT, line, 3, matches, 0) == 0) {
+                    state = STATE_TRACK_EXT;
+                    track_no = cddb_regex_get_int(line, matches, 1);
+                    track = cddb_disc_get_track(disc, track_no);
+                    if (track == NULL) {
+                        cddb_errno_log_error(c, CDDB_ERR_TRACK_NOT_FOUND);
+                        return FALSE;
+                    }
+                    if (track_no != old_no) {
+                        old_no = track_no;
+                        /* start parsing extended track data for a new
+                           track, delete current data in case this
+                           track structure is being reused from a
+                           previous read */
+                        cddb_track_set_ext_data(track, NULL);
+                    }
+                    buf = cddb_regex_get_string(line, matches, 2);
+                    cddb_track_append_ext_data(track, buf);
+                    free(buf);
+                    break;
                 } else {
                     /* we're done parsing */
                     cddb_log_debug("...state: STOP");
