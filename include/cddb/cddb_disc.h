@@ -29,6 +29,7 @@ typedef struct cddb_disc_s
 {
     unsigned int discid;        /**< four byte disc ID */
     cddb_cat_t category;        /**< CDDB category */
+    char *genre;                /**< disc genre */
     char *title;                /**< disc title */
     char *artist;               /**< disc artist */
     int length;                 /**< disc length in seconds */

@@ -265,8 +265,10 @@ int cddb_connect(cddb_conn_t *c)
 
 void cddb_disconnect(cddb_conn_t *c)
 {
+    /*
     const char *msg;
     int code;
+    */
 
     dlog("cddb_disconnect()");
     if (CONNECTION_OK(c)) {

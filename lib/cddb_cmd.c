@@ -498,6 +498,7 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
         case STATE_DISC_GENRE:
             dlog("\tstate: DISC GENRE");
             if (regexec(REGEX_DISC_GENRE, line, 2, matches, 0) == 0) {
+                disc->genre = cddb_regex_get_string(line, matches, 1);
                 /* expect track title now */
                 state = STATE_TRACK_TITLE;
                 break;
@@ -520,7 +521,6 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                 } else {
                     /* only title of track is specified */
                     track->title = cddb_regex_get_string(line, matches, 5);
-                    track->artist = strdup(disc->artist);
                 }
             } else {
                 /* we're done parsing */
@@ -790,7 +790,8 @@ int cddb_write_data(char *buf, int size, cddb_disc_t *disc)
                       "DTITLE=%s / %s\n", disc->artist, disc->title);
     //fprintf(fp, "DYEAR=%s\n",);
     CDDB_WRITE_APPEND(8+strlen(CDDB_CATEGORY[disc->category]),
-                      "DGENRE=%s\n", CDDB_CATEGORY[disc->category]);
+                      "DGENRE=%s\n", 
+                      (disc->genre ? disc->genre : CDDB_CATEGORY[disc->category]));
     /* track data */
     for (track = cddb_disc_get_track_first(disc), i=0; 
          track != NULL; 
