@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.h,v 1.4 2003/05/12 18:47:57 airborne Exp $
+    $Id: cddb_net.h,v 1.5 2003/05/13 20:27:06 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -33,13 +33,61 @@
 
 /* --- socket-based work-alikes --- */
 
-char *sock_fgets(char *s, int size, int sock);
 
-size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock);
+/**
+ * This function performs the same task as the standard fgets except
+ * for the fact that it might time-out if the socket read takes too
+ * long.  In case of a time out, errno will be set to ETIMEDOUT.
+ *
+ * @param s       The string buffer.
+ * @param size    Size of the buffer.
+ * @param sock    The socket to read from.
+ * @param timeout Number of seconds after which to time out.
+ * @return The string that was read or NULL on error or EOF when no
+ *         characters were read.
+ */
+char *sock_fgets(char *s, int size, int sock, int timeout);
 
-int sock_fprintf(int sock, const char *format, ...);
+/**
+ * This function performs the same task as the standard fwrite except
+ * for the fact that it might time-out if the socket write takes too
+ * long.  In case of a time out, errno will be set to ETIMEDOUT.
+ *
+ * @param ptr     Pointer to data record.
+ * @param size    Size of data record.
+ * @param nmemb   The number of data records to write.
+ * @param sock    The socket to write to.
+ * @param timeout Number of seconds after which to time out.
+ * @return The number of records written.
+ */
+size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock, 
+                   int timeout);
 
-int sock_vfprintf(int sock, const char *format, va_list ap);
+/**
+ * This function performs the same task as the standard fprintf except
+ * for the fact that it might time-out if the socket write takes too
+ * long.  In case of a time out, errno will be set to ETIMEDOUT.
+ *
+ * @param sock    The socket to write to.
+ * @param timeout Number of seconds after which to time out.
+ * @param format  Pointer to data record.
+ * @return The number of characters written.
+ */
+int sock_fprintf(int sock, int timeout, const char *format, ...);
+
+/**
+ * This function performs the same task as the standard vfprintf
+ * except for the fact that it might time-out if the socket write
+ * takes too long.  In case of a time out, errno will be set to
+ * ETIMEDOUT.
+ *
+ * @param sock    The socket to write to.
+ * @param timeout Number of seconds after which to time out.
+ * @param format  Pointer to data record.
+ * @param ap      Variable argument list.
+ * @return The number of characters written.
+ */
+int sock_vfprintf(int sock, int timeout, const char *format, va_list ap);
 
 /* --- time-out enabled work-alikes --- */
 

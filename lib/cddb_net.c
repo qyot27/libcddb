@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.6 2003/05/12 19:17:53 airborne Exp $
+    $Id: cddb_net.c,v 1.7 2003/05/13 20:28:00 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -24,6 +24,7 @@
 #include <netdb.h>
 #include <setjmp.h>
 #include <signal.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -31,22 +32,83 @@
 #include "cddb/cddb_ni.h"
 
 
+/* Utility functions */
+
+
+/**
+ * Checks whether bytes can be read/written from/to the socket within
+ * the specified time out period.
+ *
+ * @param sock     The socket to read from.
+ * @param timeout  Number of seconds after which to time out.
+ * @param to_write TRUE if we have to check for writing, FALSE for
+ *                 reading.
+ * @return TRUE if reading/writing is possible, FALSE otherwise.
+ */
+static int sock_ready(int sock, int timeout, int to_write)
+{
+    fd_set fds;
+    struct timeval tv;
+    int rv;
+
+    dlog("sock_ready()");
+    /* set up select time out */
+    tv.tv_sec = timeout;
+    tv.tv_usec = 0;
+    /* set up file descriptor set */
+    FD_ZERO(&fds);
+    FD_SET(sock, &fds);
+    /* wait for data to become available */
+    if (to_write) {
+        rv = select(sock + 1, NULL, &fds, NULL, &tv) ;
+    } else {
+        rv = select(sock + 1, &fds, NULL, NULL, &tv) ;
+    }
+    if (rv <= 0) {
+        if (rv == 0) {
+            errno = ETIMEDOUT;
+        }
+        return FALSE;
+    }
+    return TRUE;
+}
+#define sock_can_read(s,t) sock_ready(s, t, FALSE)
+#define sock_can_write(s,t) sock_ready(s, t, TRUE)
+
+
 /* Socket-based work-alikes */
 
-char *sock_fgets(char *s, int size, int sock)
+
+char *sock_fgets(char *s, int size, int sock, int timeout)
 {
+    int rv;
+    time_t now, end;
     char *p = s;
 
     dlog("sock_fgets()");
+    end = time(NULL) + timeout;
     size--;                      /* save one for terminating null */
     while (size) {
-        /* read one byte */
-        if (recv(sock, p, 1, 0) != 1) {
-            /* EOF or error */
-            break;
+        now = time(NULL);
+        timeout = end - now;
+        if (timeout <= 0) {
+            errno = ETIMEDOUT;
+            return NULL;        /* time out */
         }
-        /* XXX: how should we handle CRLF or CR? */
-        if (*p == CHR_LF) {
+        /* can we read from the socket? */
+        if (!sock_can_read(sock, timeout)) {
+            /* error or time out */
+            return NULL;
+        }
+        /* read one byte */
+        rv = recv(sock, p, 1, 0);
+        if (rv == -1) {
+            /* recv() error */
+            return NULL;
+        } else if (rv == 0) {
+            /* EOS reached */
+            break;
+        } else if (*p == CHR_LF) {
             /* EOL reached, stop reading */
             p++;
             break;
@@ -63,30 +125,56 @@ char *sock_fgets(char *s, int size, int sock)
     return s;
 }
 
-size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock)
+size_t sock_fwrite(const void *ptr, size_t size, size_t nmemb, int sock, int timeout)
 {
-    size_t total_size;
+    size_t total_size, to_send;
+    time_t now, end;
     int rv;
+    const char *p = (const char *)ptr;
 
     dlog("sock_fwrite()");
     total_size = size * nmemb;
-    rv = send(sock, (const char *)ptr, total_size, 0);
-    return rv/size;
+    to_send = total_size;
+    end = time(NULL) + timeout;
+    while (to_send) {
+        now = time(NULL);
+        timeout = end - now;
+        if (timeout <= 0) {
+            /* time out */
+            errno = ETIMEDOUT;
+            break;
+        }
+        /* can we write to the socket? */
+        if (!sock_can_write(sock, timeout)) {
+            /* error or time out */
+            break;
+        }
+        /* try sending data */
+        rv = send(sock, p, to_send, 0);
+        if (rv == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
+            /* error */
+            break;
+        } else {
+            to_send -= rv;
+            p += rv;
+        }
+    }
+    return (total_size - to_send) / size;
 }
 
-int sock_fprintf(int sock, const char *format, ...)
+int sock_fprintf(int sock, int timeout, const char *format, ...)
 {
     int rv;
     va_list args;
 
     dlog("sock_fprintf()");
     va_start(args, format);
-    rv = sock_vfprintf(sock, format, args);
+    rv = sock_vfprintf(sock, timeout, format, args);
     va_end(args);
     return rv;
 }
 
-int sock_vfprintf(int sock, const char *format, va_list ap)
+int sock_vfprintf(int sock, int timeout, const char *format, va_list ap)
 {
     char buf[1024];
     int rv;
@@ -100,7 +188,7 @@ int sock_vfprintf(int sock, const char *format, va_list ap)
         return -1;
     }
 
-    rv = send(sock, buf, rv, 0);
+    rv = sock_fwrite(buf, sizeof(char), rv, sock, timeout);
     return rv;
 }
 
