@@ -1,3 +1,13 @@
+2002-12-02 22:45  airborne
+
+	* cddb_cmd.c:
+	added slave support to the query command
+
+2002-12-02 22:44  airborne
+
+	* cddb_cmd.h, cddb_disc.h, cddb.h: 
+	updated docs
+
 2002-11-22 20:44  airborne
 
 	* cddb_cmd.c:
