@@ -11,6 +11,14 @@ if test x$enable_debug = xyes; then
   AC_DEFINE(DEBUG)
 fi
 
+dnl Check for target
+AC_CANONICAL_HOST
+case $host in
+    *beos*)
+        AC_DEFINE(BEOS)
+        ;;
+esac
+
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
