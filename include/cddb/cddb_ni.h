@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.19 2004/10/15 18:46:11 airborne Exp $
+    $Id: cddb_ni.h,v 1.20 2004/10/15 18:55:26 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -33,6 +33,8 @@
 
 #ifdef HAVE_ICONV_H
 #  include <iconv.h>
+#else
+   typedef void *iconv_t;       /* for code uniformity */
 #endif
 
 #include "cddb/cddb_regex.h"
