@@ -4,8 +4,8 @@ AC_INIT(configure.ac)
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([Makefile include/Makefile include/cddb/Makefile \
                  lib/Makefile examples/Makefile tests/Makefile \
-                 tests/settings.sh])
-AM_INIT_AUTOMAKE(libcddb, 0.9.2)
+                 tests/settings.sh misc/Makefile])
+AM_INIT_AUTOMAKE(libcddb, 0.9.3)
 AM_MAINTAINER_MODE
 
 dnl Process custom command-line options
