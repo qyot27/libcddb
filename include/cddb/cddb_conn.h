@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.19 2004/07/18 07:23:09 airborne Exp $
+    $Id: cddb_conn.h,v 1.20 2004/07/21 16:12:31 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,6 +27,7 @@
 #endif
 
 
+#include <stdio.h>
 #include <netinet/in.h>
 
 #define CACHE_OFF  0            /**< do not use local CDDB cache, network
@@ -41,6 +42,8 @@
  */
 typedef struct cddb_conn_s 
 {
+    unsigned int buf_size;      /**< maximum line/buffer size, defaults to 1024
+                                     (see DEFAULT_BUF_SIZE) */
     char *line;                 /**< last line read */
 
     int is_connected;           /**< are we already connected to the server? */
@@ -48,29 +51,33 @@ typedef struct cddb_conn_s
                                      connecting to the CDDB server */
     int socket;                 /**< the socket file descriptor */
     char *server_name;          /**< host name of the CDDB server, defaults
-                                     to 'freedb.org' */
-    int server_port;            /**< port of the CDDB server, defaults to 888 */
+                                     to 'freedb.org' (see DEFAULT_SERVER) */
+    int server_port;            /**< port of the CDDB server, defaults to 888 
+                                     (see DEFAULT_PORT) */
     int timeout;                /**< time out interval (in seconds) used during
-                                     network operations, defaults to 10 seconds */
+                                     network operations, defaults to 10 seconds
+                                     (see DEFAULT_TIMEOUT) */
 
     char *http_path_query;      /**< URL for querying the server through HTTP,
-                                     defaults to /~cddb/cddb.cgi' */
+                                     defaults to /~cddb/cddb.cgi'
+                                     (see DEFAULT_PATH_QUERY) */
     char *http_path_submit;     /**< URL for submitting to the server through HTTP,
-                                     defaults to /~cddb/submit.cgi' */
+                                     defaults to /~cddb/submit.cgi'
+                                     (see DEFAULT_PATH_SUBMIT) */
     int is_http_enabled;        /**< use HTTP, disabled by default */
 
     int is_http_proxy_enabled;  /**< use HTTP through a proxy server,
                                      disabled by default */
     char *http_proxy_server;    /**< host name of the HTTP proxy server */
     int http_proxy_server_port; /**< port of the HTTP proxy server,
-                                     defaults to 8080 */
+                                     defaults to 8080 (see DEFAULT_PROXY_PORT) */
 
     FILE *cache_fp;             /**< a file pointer to a cached CDDB entry or
                                      NULL if no cached version is available */
     int use_cache;              /**< field to specify local CDDB cache behaviour, 
                                      enabled by default (CACHE_ON) */
     char *cache_dir;            /**< CDDB slave cache, defaults to 
-                                     '~/.cddbslave' */
+                                     '~/.cddbslave' (see DEFAULT_CACHE) */
     int cache_read;             /**< read data from cached file instead of
                                      from the network */
 
@@ -115,6 +122,14 @@ void cddb_destroy(cddb_conn_t *c);
 
 /* --- getters & setters --- */
 
+
+/**
+ * Change the size of the internal buffer.
+ *
+ * @param c The connection structure.
+ * @param size The new buffer size.
+ */
+void cddb_set_buf_size(cddb_conn_t *c, unsigned int size);
 
 /**
  * Get the host name of the CDDB server that is currently being used.
