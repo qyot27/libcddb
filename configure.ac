@@ -31,7 +31,7 @@ elif test x$default_loglevel != x; then
 fi
 
 AC_ARG_ENABLE([debug],
-              AC_HELP_STRING([--enable-debug], [enable debug mode (default=no)]),
+              AC_HELP_STRING([--enable-debug], [deprecated, use --enable-loglevel=debug instead]),
               enable_debug=yes, enable_debug=no)
 if test x$enable_debug = xyes; then
     AC_MSG_WARN([--enable-debug is deprecated, use --enable-loglevel instead])
