@@ -33,8 +33,8 @@ cddb_conn_t *cddb_new(void)
         c->line = (char*)malloc(LINE_SIZE);
 
         c->is_connected = FALSE;
-        c->sockfd = -1;
-        c->fp = NULL;
+        c->socket = -1;
+        c->cache_fp = NULL;
         c->server_name = strdup(DEFAULT_SERVER);
         c->server_port = DEFAULT_PORT;
 
@@ -252,22 +252,16 @@ int cddb_connect(cddb_conn_t *c)
         c->sa.sin_addr = *((struct in_addr*)he->h_addr);
         bzero(&(c->sa.sin_zero), 8); /* zero the rest of the struct */
 
-        if ((c->sockfd  = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        if ((c->socket  = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
             c->errnum = CDDB_ERR_CONNECT;
             return FALSE;
         }
 
-        rv =  connect(c->sockfd, (struct sockaddr*)&(c->sa), sizeof(struct sockaddr));
+        rv =  connect(c->socket, (struct sockaddr*)&(c->sa), sizeof(struct sockaddr));
         if (rv == -1) {
             c->errnum = CDDB_ERR_CONNECT;
             return FALSE;
         } 
-
-        c->fp = fdopen(c->sockfd, "w+");
-        if (c->fp == NULL) {
-            c->errnum = CDDB_ERR_CONNECT;
-            return FALSE;
-        }
 
         if (!c->is_http_enabled) {
             /* send handshake message to CDDB server (CDDBP only) */
@@ -281,25 +275,10 @@ int cddb_connect(cddb_conn_t *c)
 
 void cddb_disconnect(cddb_conn_t *c)
 {
-    /*
-    const char *msg;
-    int code;
-    */
-
     dlog("cddb_disconnect()");
     if (CONNECTION_OK(c)) {
-        /*
-        if (!c->is_http_enabled) {
-            void *old_handler = signal(SIGPIPE, SIG_IGN);
-            cddb_send_cmd(c, CMD_QUIT);        
-            code = cddb_get_response_code(c, &msg);
-            signal(SIGPIPE, old_handler);
-        }
-        */
-        fclose(c->fp);
-        close(c->sockfd);
-        c->sockfd = -1;
-        c->fp = NULL;
+        close(c->socket);
+        c->socket = -1;
     }
     c->errnum = CDDB_ERR_OK;
 }

@@ -12,6 +12,7 @@
 
 #include "cddb/debug.h"
 #include "cddb/cddb_regex.h"
+#include "cddb/cddb_net.h"
 #include "cddb/cddb.h"
 #include "cddb/cddb_conn_ni.h"
 #include "cddb/cddb_cmd_ni.h"
@@ -19,6 +20,12 @@
 
 #define FALSE          0
 #define TRUE           1
+
+#define CHR_CR         '\r'
+#define CHR_LF         '\n'
+#define CHR_EOS        '\0'
+#define CHR_SPACE      ' '
+#define CHR_DOT        '.'
 
 #define LINE_SIZE      256
 
@@ -37,7 +44,7 @@
 #define DEFAULT_PROTOCOL_VERSION 5
 
 #define FREE_NOT_NULL(p) if (p) free(p)
-#define CONNECTION_OK(c) (c->fp != NULL)
+#define CONNECTION_OK(c) (c->socket != -1)
 #define STR_OR_NULL(s) ((s) ? s : "NULL")
 
 

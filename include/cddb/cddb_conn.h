@@ -20,9 +20,9 @@ typedef struct cddb_conn_s
     int is_connected;           /**< are we already connected to the server? */
     struct sockaddr_in sa;      /**< the socket address structure for
                                      connecting to the CDDB server */
-    int sockfd;                 /**< the socket file descriptor */
-    FILE *fp;                   /**< a FILE pointer for easier reading
-                                     and writing on the socket */
+    int socket;                 /**< the socket file descriptor */
+    FILE *cache_fp;             /**< a file pointer to a cached CDDB entry or
+                                     NULL if no cached version is available */
     char *server_name;          /**< host name of the CDDB server, defaults
                                      to 'freedb.org' */
     int server_port;            /**< port of the CDDB server, defaults to 888 */
