@@ -10,6 +10,6 @@ dist-hook:
 	mkdir $(distdir)/testcache/misc
 	cp $(srcdir)/testcache/misc/1234* $(distdir)/testcache/misc/
 	mkdir $(distdir)/testdata
-	cp $(srcdir)/testdata/1234* $(distdir)/testdata/
+	cp $(srcdir)/testdata/*.txt $(distdir)/testdata/
 
 TESTS = $(check_SCRIPTS)
