@@ -1,4 +1,4 @@
-$Id: TODO,v 1.17 2003/05/08 20:29:21 airborne Exp $
+$Id: TODO,v 1.18 2003/05/13 20:46:40 airborne Exp $
 
 * improved error handling
 
@@ -11,8 +11,6 @@ $Id: TODO,v 1.17 2003/05/08 20:29:21 airborne Exp $
 * support for extended data and playing order fields
 
 * support for writing multi-lined fields
-
-* handle network time-outs
 
 * create some sort of local CDDB query index?
 
