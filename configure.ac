@@ -36,6 +36,7 @@ AC_PROG_MAKE_SET
 
 dnl Checks for libraries.
 AC_CHECK_LIB([cdio], [cdio_open])
+AC_CHECK_LIB([socket], [connect])
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -50,7 +51,8 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr gethostbyname memset])
+AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr memset])
+AC_CHECK_FUNC([gethostbyname], , AC_CHECK_LIB([nsl], [gethostbyname]))
 
 dnl Check and add some GCC specific warning flags
 dnl - we do this as the last thing so that a possible -Werror flag
