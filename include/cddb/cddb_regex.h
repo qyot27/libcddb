@@ -24,11 +24,11 @@ extern regex_t *REGEX_QUERY_MATCH;
 
 /**
  */
-void cddb_regex_init();
+void cddb_regex_init(void);
 
 /**
  */
-int cddb_regex_get_int(char *s, regmatch_t matches[], int idx);
+int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx);
 
 /**
  */

@@ -179,7 +179,7 @@ int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc)
     return rv;
 }
 
-inline void cddb_cache_query_init(void)
+void cddb_cache_query_init(void)
 {
     static int query_cache_init = FALSE;
     int i;
@@ -192,7 +192,7 @@ inline void cddb_cache_query_init(void)
     }
 }
 
-inline int cddb_cache_query_hash(cddb_disc_t *disc)
+inline static int cddb_cache_query_hash(cddb_disc_t *disc)
 {
     /* use upper 8 bits of disc ID as hash */
     return disc->discid >> 24;
@@ -352,7 +352,7 @@ char *cddb_read_line(cddb_conn_t *c)
     return c->line;
 }
 
-void url_encode(char *s)
+static void url_encode(char *s)
 {
     while (*s) {
         switch (*s) {
