@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.h,v 1.5 2003/05/01 15:41:24 airborne Exp $
+    $Id: cddb_error.h,v 1.6 2004/07/18 07:07:25 airborne Exp $
 
     Copyright (C) 2003 Kris Verbeeck <airborne@advalvas.be>
 
@@ -40,6 +40,7 @@ typedef enum {
     /* --- general errors --- */
 
     CDDB_ERR_OUT_OF_MEMORY,     /**< out of memory */
+    CDDB_ERR_LINE_SIZE,         /**< internal buffer too small (increase LINE_SIZE in cddb_cmd.h) */
     CDDB_ERR_NOT_IMPLEMENTED,   /**< feature not (yet) implemented */
     CDDB_ERR_UNKNOWN,           /**< problem unknown */
 
