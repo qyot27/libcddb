@@ -1,0 +1,77 @@
+#ifndef CDDB_ERROR_H
+#define CDDB_ERROR_H 1
+
+
+#include <stdio.h>
+
+
+/**
+ * A list of error codes returned by various libcddb functions.
+ */
+typedef enum {
+
+    CDDB_ERR_OK = 0,            /**< no error occurred */
+
+    /* --- general errors --- */
+
+    CDDB_ERR_OUT_OF_MEMORY,     /**< out of memory */
+    CDDB_ERR_NOT_IMPLEMENTED,   /**< feature not (yet) implemented */
+    CDDB_ERR_UNKNOWN,           /**< problem unknown */
+
+    /* --- connection errors --- */
+
+    CDDB_ERR_SERVER_ERROR,      /**< CDDB server error */
+    CDDB_ERR_UNKNOWN_HOST_NAME, /**< unknown host name */ 
+    CDDB_ERR_CONNECT,           /**< connection error */
+    CDDB_ERR_PERMISSION_DENIED, /**< permission denied */
+    CDDB_ERR_NOT_CONNECTED,     /**< not yet connected or connection
+                                     has been closed */
+
+    /* --- response parsing errors --- */
+
+    CDDB_ERR_UNEXPECTED_EOF,    /**< unexpected end-of-file encountered */
+    CDDB_ERR_INVALID_RESPONSE,  /**< invalid response data */
+    CDDB_ERR_DISC_NOT_FOUND,    /**< no results found */
+
+    /* --- library errors --- */
+
+    CDDB_ERR_DATA_MISSING,      /**< some data is missing for executing
+                                     a certain command */
+    CDDB_ERR_TRACK_NOT_FOUND,   /**< specified track is not present */
+    CDDB_ERR_REJECTED,          /**< posted data rejected */
+
+    /* --- terminator --- */
+
+    CDDB_ERR_LAST
+} cddb_error_t;
+
+
+/* --- error handling --- */
+
+
+/**
+ * Returns a string representation of the CDDB error code.
+ *
+ * @return The error string
+ */
+const char *cddb_error_str(cddb_error_t errnum);
+
+/**
+ * Prints the error message associated with the current error number
+ * on the given stream.
+ *
+ * @param stream The stream
+ * @param errnum The error number
+ */
+void cddb_error_stream_print(FILE *stream, cddb_error_t errnum);
+
+/**
+ * Prints the error message associated with the current error number
+ * to stderr.
+ *
+ * @param errnum The error number
+ */
+void cddb_error_print(cddb_error_t errnum);
+
+
+#endif /* CDDB_ERROR_H */

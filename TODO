@@ -1,0 +1,8 @@
+
+* HTTP proxy support
+
+* revision number handling for CDDB entries (if necessary)
+
+* client name and version customization
+
+* parse HTTP response status code (200, 403, 404, 500, ...)
