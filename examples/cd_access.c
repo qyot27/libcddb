@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.8 2004/03/09 01:26:26 rockyb Exp $
+    $Id: cd_access.c,v 1.9 2004/07/18 06:59:36 airborne Exp $
 
     Copyright (C) 2003, 2004 Kris Verbeeck <airborne@advalvas.be>
 
@@ -75,8 +75,7 @@ cddb_disc_t *cd_read(char *device)
 
         /* We only want to process audio CDs. */
         if (cdio_get_track_format(cdio, t) != TRACK_FORMAT_AUDIO) {
-            libcdio_error_exit("track %d is not an audio track", 
-			       t);
+            libcdio_error_exit("track %d is not an audio track", t);
         }
 
         /* Get frame offset of next track. */
@@ -98,7 +97,7 @@ cddb_disc_t *cd_read(char *device)
     }
 
     /* Now we have to create the libcddb disc structure. */
-    disc = cd_create(FRAMES_TO_SECONDS(lsn), cnt, foffset);
+    disc = cd_create(FRAMES_TO_SECONDS(lsn), cnt, foffset, 0);
 
     /* Free all resources held by libcdio CD access structure. */
     cdio_destroy(cdio);
@@ -112,7 +111,7 @@ cddb_disc_t *cd_read(char *device)
     return disc;
 }
 
-cddb_disc_t *cd_create(int dlength, int tcount, int *foffset)
+cddb_disc_t *cd_create(int dlength, int tcount, int *foffset, int use_time)
 {
     int i;
     cddb_disc_t *disc;
@@ -141,11 +140,19 @@ cddb_disc_t *cd_create(int dlength, int tcount, int *foffset)
                 return NULL;
             }
 
-            /* Set frame offset in track structure. */
-            cddb_track_set_frame_offset(track, foffset[i]);
-
-            /* And add the track to the disc. */
+            /* First add the track to the disc. */
             cddb_disc_add_track(disc, track);
+
+            if (use_time) {
+                /* Set length in track structure.  Since this track is
+                   already part of a disc, the frame offset for the
+                   track will be calculated automatically when we set
+                   its length. */
+                cddb_track_set_length(track, foffset[i]);
+            } else {
+                /* Set frame offset in track structure. */
+                cddb_track_set_frame_offset(track, foffset[i]);
+            }
         }
     }
     return disc;
