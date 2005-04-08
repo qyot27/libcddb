@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.10 2005/03/11 21:29:27 airborne Exp $
+    $Id: cd_access.c,v 1.11 2005/04/08 01:55:48 rockyb Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -26,6 +26,12 @@
 #include <cdio/cdio.h>
 #endif
 
+#if LIBCDIO_VERSION_NUM >= 72
+#include <cdio/cdda.h>
+#else
+#define CdIo_t CdIo
+#endif    
+
 #define libcdio_error_exit(...) error_exit(GENERIC_ERROR, "libcdio: " __VA_ARGS__)
 
 
@@ -40,7 +46,7 @@ cddb_disc_t *cd_read(char *device)
 
 #else
 
-    CdIo *cdio;                 /* libcdio CD access structure */
+    CdIo_t *cdio;               /* libcdio CD access structure */
     track_t cnt, t;             /* track counters */
     lsn_t lsn;                  /* Logical Sector Number */
     int *foffset = NULL;        /* list of frame offsets */
