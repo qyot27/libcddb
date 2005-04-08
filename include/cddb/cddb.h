@@ -1,5 +1,5 @@
 /*
-    $Id: cddb.h,v 1.10 2005/03/11 21:13:45 airborne Exp $
+    $Id: cddb.h,v 1.11 2005/04/08 01:45:48 rockyb Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -21,6 +21,8 @@
 
 #ifndef CDDB_H
 #define CDDB_H 1
+
+#include <cddb/version.h>
 
 #ifdef __cplusplus
     extern "C" {

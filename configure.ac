@@ -7,12 +7,16 @@ AC_CONFIG_FILES([Makefile              \
                  include/Makefile      \
                  include/cddb/Makefile \
                  include/cddb/cddb_config.h \
+                 include/cddb/version.h \
                  lib/Makefile          \
                  examples/Makefile     \
                  tests/Makefile        \
                  tests/settings.sh])
 AM_INIT_AUTOMAKE(libcddb, 1.0.0-cvs)
 AM_MAINTAINER_MODE
+
+LIBCDDB_VERSION_NUM=1
+AC_SUBST(LIBCDDB_VERSION_NUM)
 
 dnl Process custom command-line options
 AC_ARG_ENABLE([loglevel],
