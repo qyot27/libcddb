@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: libcddb
 Description: CDDB server access library
 Version: @VERSION@
-Libs: -L${libdir} -lcddb
+Libs: -L${libdir} -lcddb @LIBICONV@
 Cflags: -I${includedir}
