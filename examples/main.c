@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.20 2005/03/11 21:29:27 airborne Exp $
+    $Id: main.c,v 1.21 2005/04/16 19:54:27 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -181,7 +181,7 @@ static void parse_disc_data(int cmd, int argc, char **argv, int idx)
 static void init_protocol(cddb_conn_t *conn, const char *proto)
 {
     int len, port;
-    char *aux, *host, *portstr;
+    char *aux, *host, *portstr, *password;
 
     if (!*optarg) {
         error_usage("-P, server protocol missing");
@@ -214,6 +214,18 @@ static void init_protocol(cddb_conn_t *conn, const char *proto)
             error_exit(GENERIC_ERROR, "environment variable 'http_proxy' invalid");
         }
         host = aux + HTTP_PREFIX_LEN;
+        /* Check if a proxu username:password pair is provided */
+        aux = strchr(host, '@');
+        if (aux != NULL) {
+            *aux = '\0';
+            password = strchr(host, ':');
+            if (password != NULL) {
+                cddb_set_http_proxy_password(conn, password + 1);
+                *password = '\0';
+            }
+            cddb_set_http_proxy_username(conn, host);
+            host = aux + 1;
+        }
         /* Check if a proxy port is specified. */
         portstr = strchr(host, ':');
         if (portstr == NULL) {
