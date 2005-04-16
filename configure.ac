@@ -112,6 +112,7 @@ AC_SUBST(LIBCDIO_CFLAGS)
 dnl Check for iconv
 if test x$with_iconv != xno; then
     AC_CHECK_HEADERS([iconv.h], [with_iconv=1], [with_iconv=0])
+    AM_ICONV
 else
     with_iconv=0
 fi
