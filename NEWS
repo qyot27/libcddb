@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.9 2004/10/16 14:51:56 airborne Exp $
+$Id: NEWS,v 1.10 2005/04/16 20:12:52 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -6,6 +6,15 @@ between different libcddb releases.  These changes might impact the
 programs that use this library.  It does not describe every single
 change made to the code tree.  An overview of the CVS changes can be
 found in the Changelog file.
+
+
+CHANGES 0.9.6 -> 1.0.0
+
+* [NEW] Added support for proxy authentication.
+
+* [BUGFIX] Memory leaks fixed in regular expression handling.
+
+* Iconv compilation fixes for Solaris.
 
 
 CHANGES 0.9.5 -> 0.9.6
