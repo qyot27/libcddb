@@ -2,6 +2,7 @@
 .libs
 Makefile
 Makefile.in
+cddb.lo
 cddb_cmd.lo
 cddb_conn.lo
 cddb_disc.lo
@@ -10,4 +11,5 @@ cddb_log.lo
 cddb_net.lo
 cddb_regex.lo
 cddb_track.lo
+cddb_util.lo
 libcddb.la
