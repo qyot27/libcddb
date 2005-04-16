@@ -1,4 +1,5 @@
 Makefile
 Makefile.in
 cddb_config.h
+version.h
 
