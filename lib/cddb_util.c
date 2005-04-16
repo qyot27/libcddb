@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_util.c,v 1.4 2005/03/11 21:29:30 airborne Exp $
+    $Id: cddb_util.c,v 1.5 2005/04/16 20:02:11 airborne Exp $
 
     Copyright (C) 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -67,4 +67,45 @@ int cddb_str_iconv(iconv_t cd, char *in, char **out)
     free(buf);
 #endif
     return TRUE;
+}
+
+/* Base64 decoder ring */
+static char b64_vec[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+/* This routine will not check for buffer overflows.  Make sure the
+ * output buffer is big enough.
+ */
+void cddb_b64_encode(char *dst, const char *src)
+{
+    unsigned int triplet = 0;
+    int i = 0;
+
+    while (*src) {
+        triplet = (triplet << 8) | *src++;
+        i++;
+        if (i < 3) {
+            continue;
+        }
+        *dst++ = b64_vec[(triplet >> 18)];
+        *dst++ = b64_vec[(triplet >> 12) & 0x3f];
+        *dst++ = b64_vec[(triplet >>  6) & 0x3f];
+        *dst++ = b64_vec[(triplet >>  0) & 0x3f];
+        i = 0;
+        triplet = 0;
+    }
+    switch (i) {
+    case 1:
+        *dst++ = b64_vec[(triplet >> 2)];
+        *dst++ = b64_vec[(triplet << 4) & 0x3f];
+        *(unsigned short *)dst = 0x3d3d; /* add == */
+        dst += 2;
+        break;
+    case 2:
+        *dst++ = b64_vec[(triplet >> 10)];
+        *dst++ = b64_vec[(triplet >>  4) & 0x3f];
+        *dst++ = b64_vec[(triplet <<  2) & 0x3f];
+        *dst++ = '=';
+        break;
+    }
+    *dst = '\0';
 }
