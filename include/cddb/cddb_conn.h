@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.24 2005/03/11 21:32:40 airborne Exp $
+    $Id: cddb_conn.h,v 1.25 2005/04/16 19:55:58 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -77,6 +77,9 @@ typedef struct cddb_conn_s
     char *http_proxy_server;    /**< host name of the HTTP proxy server */
     int http_proxy_server_port; /**< port of the HTTP proxy server,
                                      defaults to 8080 (see DEFAULT_PROXY_PORT) */
+    char *http_proxy_username;  /**< HTTP proxy user name */
+    char *http_proxy_password;  /**< HTTP proxy password */
+    char *http_proxy_auth;      /**< Base64 encoded username:password */
 
     FILE *cache_fp;             /**< a file pointer to a cached CDDB entry or
                                      NULL if no cached version is available */
@@ -368,6 +371,44 @@ void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server);
  * @param port The server port.
  */
 void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
+
+/**
+ * Set the HTTP proxy user name which is used when Basic Authentication
+ * is required.
+ *
+ * @param c        The connection structure.
+ * @param username The user name.
+ */
+ 
+void cddb_set_http_proxy_username(cddb_conn_t* c, const char* username);
+
+/**
+ * Get the HTTP proxy user name.
+ *
+ * @param c The connection structure.
+ * @return The user name.
+ */
+ 
+#define cddb_get_http_proxy_username(c) (c)->http_proxy_username
+
+/**
+ * Set the HTTP proxy password which is used when Basic Authentication
+ * is required.
+ *
+ * @param c      The connection structure.
+ * @param passwd The password.
+ */
+ 
+void cddb_set_http_proxy_password(cddb_conn_t* c, const char* passwd);
+
+/**
+ * Get the HTTP proxy password. 
+ *
+ * @param c The connection structure.
+ * @return The password.
+ */
+ 
+#define cddb_get_http_proxy_password(c) (c)->http_proxy_password
 
 /**
  * Get the error number returned by the last libcddb command.
