@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.21 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_ni.h,v 1.22 2005/04/16 19:59:24 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -92,6 +92,13 @@ int cddb_disc_iconv(iconv_t cd, cddb_disc_t *disc);
  * Converts all track strings to user character encoding.
  */
 int cddb_track_iconv(iconv_t cd, cddb_track_t *track);
+
+/**
+ * Base64 encode the source string and write it to the destination
+ * buffer.  The destination buffer should be large enough (= 4/3 of
+ * src string length).
+ */
+void cddb_b64_encode(char *dst, const char *src);
 
 
 #ifdef __cplusplus
