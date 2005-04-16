@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.52 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_cmd.c,v 1.53 2005/04/16 20:04:44 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -469,6 +469,15 @@ void cddb_http_parse_headers(cddb_conn_t *c)
     }
 }
 
+static int cddb_add_proxy_auth(cddb_conn_t *c)
+{
+    /* send proxy authorization if user name is set */
+    if (c->http_proxy_username) {
+        sock_fprintf(c, "Proxy-Authorization: Basic %s\r\n", c->http_proxy_auth);
+    }
+    return TRUE;
+}
+
 int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
 {
     cddb_log_debug("cddb_http_send_cmd()");
@@ -489,6 +498,7 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
                                  c->server_name, c->server_port, c->http_path_submit);
                     sock_fprintf(c, "Host: %s:%d\r\n",
                                  c->server_name, c->server_port);
+                    cddb_add_proxy_auth(c);
                 } else {
                     /* direct connection */
                     sock_fprintf(c, "POST %s HTTP/1.0\r\n", c->http_path_submit);
@@ -537,6 +547,7 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
                     /* insert host header */
                     sock_fprintf(c, "Host: %s:%d\r\n",
                                  c->server_name, c->server_port);
+                    cddb_add_proxy_auth(c);
                 }
                 sock_fprintf(c, "\r\n");
 
