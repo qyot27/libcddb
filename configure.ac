@@ -12,7 +12,7 @@ AC_CONFIG_FILES([Makefile              \
                  examples/Makefile     \
                  tests/Makefile        \
                  tests/settings.sh])
-AM_INIT_AUTOMAKE(libcddb, 1.0.0-cvs)
+AM_INIT_AUTOMAKE(libcddb, 1.0.0)
 AM_MAINTAINER_MODE
 
 LIBCDDB_VERSION_NUM=1
