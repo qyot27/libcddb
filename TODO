@@ -1,4 +1,6 @@
-$Id: TODO,v 1.21 2004/07/21 12:33:52 airborne Exp $
+$Id: TODO,v 1.22 2005/04/16 20:05:42 airborne Exp $
+
+* check out-of-memory on malloc
 
 * support to enable/disable category dirs in .cddbslave ?
 
