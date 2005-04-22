@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.h,v 1.10 2005/02/04 21:10:35 rockyb Exp $
+    $Id: cddb_regex.h,v 1.11 2005/04/22 21:44:32 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -33,6 +33,7 @@
 #ifdef CDDB_NEED_UNISTD_H
 #include <unistd.h>
 #endif
+#include <sys/types.h>          /* need for MacOS X */
 #include <regex.h>
 
 /**
