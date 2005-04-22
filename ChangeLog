@@ -1,3 +1,46 @@
+2005-04-22 23:44  airborne
+
+	* include/cddb/cddb_regex.h: extra include for MacOS X compilation
+
+2005-04-22 23:43  airborne
+
+	* include/cddb/cddb_ni.h, lib/cddb_util.c: iconv compiler warning
+	  fix
+
+2005-04-22 23:42  airborne
+
+	* examples/cd_access.c: updated cdio message to reflect possible
+	  use of --without-cdio option
+
+2005-04-22 23:41  airborne
+
+	* configure.ac: version bumped to 1.0.1, added --without-cdio
+	  option
+
+2005-04-22 23:40  airborne
+
+	* THANKS: more and updated thanks
+
+2005-04-22 23:40  airborne
+
+	* .cvsignore: added build directory
+
+2005-04-17 00:04  rockyb
+
+	* lib/Makefile.am: cygwin library building needs LIBICONV
+
+2005-04-16 23:49  rockyb
+
+	* lib/.cvsignore: A couple more .lo files.
+
+2005-04-16 22:12  airborne
+
+	* NEWS: added changes between 0.9.5 and 1.0.0
+
+2005-04-16 22:08  airborne
+
+	* ChangeLog: added 1.0.0 changes
+
 2005-04-16 22:05  airborne
 
 	* TODO: [no log message]
