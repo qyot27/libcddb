@@ -12,7 +12,7 @@ AC_CONFIG_FILES([Makefile              \
                  examples/Makefile     \
                  tests/Makefile        \
                  tests/settings.sh])
-AM_INIT_AUTOMAKE(libcddb, 1.0.0)
+AM_INIT_AUTOMAKE(libcddb, 1.0.1)
 AM_MAINTAINER_MODE
 
 LIBCDDB_VERSION_NUM=1
@@ -44,6 +44,10 @@ if test x$default_loglevel != x; then
     AC_DEFINE_UNQUOTED([LOGLEVEL],$default_loglevel,[Set to default log level])
 fi
 
+AC_ARG_WITH([cdio],
+            AC_HELP_STRING([--without-cdio],
+                           [do not use libcdio functionality when building the ]
+                           [example program (default = use if found)]))
 AC_ARG_WITH([iconv],
             AC_HELP_STRING([--without-iconv],
                            [do not include character set conversion support using ]
@@ -99,15 +103,19 @@ AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_FUNCS([mkdir regcomp socket strdup strtol strchr memset alarm select realloc])
 AC_CHECK_FUNC([gethostbyname], , AC_CHECK_LIB([nsl], [gethostbyname]))
 
-PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.67, [
-    HAVE_LIBCDIO=yes 
-    AC_DEFINE(HAVE_LIBCDIO, [], [Define this if you have libcdio installed])
-    ],
-    [AC_MSG_WARN(new enough libcdio not found. CD reading in CDDB test program disabled. Get libcdio from http://www.gnu.org/software/libcdio/) 
-    HAVE_LIBCDIO=no])
-
-AC_SUBST(LIBCDIO_LIBS)
-AC_SUBST(LIBCDIO_CFLAGS)
+dnl Check for libcdio
+if test x$with_cdio != xno; then
+    PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.67, [
+        HAVE_LIBCDIO=yes 
+        AC_DEFINE(HAVE_LIBCDIO, [], [Define this if you have libcdio installed])
+        ],
+        [AC_MSG_WARN(new enough libcdio not found. CD reading in CDDB test program disabled. Get libcdio from http://www.gnu.org/software/libcdio/) 
+        HAVE_LIBCDIO=no])
+    AC_SUBST(LIBCDIO_LIBS)
+    AC_SUBST(LIBCDIO_CFLAGS)
+else
+    HAVE_LIBCDIO=no
+fi
 
 dnl Check for iconv
 if test x$with_iconv != xno; then
