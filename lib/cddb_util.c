@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_util.c,v 1.5 2005/04/16 20:02:11 airborne Exp $
+    $Id: cddb_util.c,v 1.6 2005/04/22 21:43:23 airborne Exp $
 
     Copyright (C) 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,7 +29,7 @@
 #endif
 
 
-int cddb_str_iconv(iconv_t cd, char *in, char **out)
+int cddb_str_iconv(iconv_t cd, ICONV_CONST char *in, char **out)
 {
 #ifdef HAVE_ICONV_H
     int inlen, outlen, buflen, rc;

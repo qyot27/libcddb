@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.22 2005/04/16 19:59:24 airborne Exp $
+    $Id: cddb_ni.h,v 1.23 2005/04/22 21:43:23 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -81,7 +81,7 @@
  * Convert a string to a new character encoding according to the given
  * conversion descriptor.
  */
-int cddb_str_iconv(iconv_t cd, char *in, char **out);
+int cddb_str_iconv(iconv_t cd, ICONV_CONST char *in, char **out);
 
 /**
  * Converts all disc and track strings to user character encoding.
