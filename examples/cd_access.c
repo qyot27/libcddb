@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.11 2005/04/08 01:55:48 rockyb Exp $
+    $Id: cd_access.c,v 1.12 2005/04/22 21:42:18 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -41,7 +41,7 @@ cddb_disc_t *cd_read(char *device)
     
 #ifndef HAVE_LIBCDIO
 
-    fprintf(stderr, "*** libcdio not installed, CD access not supported   ***\n");
+    fprintf(stderr, "*** libcdio support missing, CD access failed ***\n");
     fprintf(stderr, "*** see http://www.gnu.org/software/libcdio/ ***\n");
 
 #else
