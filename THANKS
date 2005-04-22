@@ -10,13 +10,11 @@
         - some other minor patches
 
     David Collett
-        - C++ patch (similar as above)
+        - C++ patch
 
     Rocky Bernstein
-        - patch to prevent some compiler warnings
         - forc^H^H^H^Hencouraged me to write unit tests
-        - some patches and hints for autoconf/automake
-        - fixes for Win32 support
+        - lots of cross platform fixes
         - initial regex memory leak patch
 
     Manfred Tremmel
@@ -28,4 +26,8 @@
           (see http://www.mandrakelinux.com/en/cookerdevel.php3)
 
     Derk-Jan Hartman
+    Rasmus Lerdorf
         - fixes for Mac OS X support
+
+    Bruno Fleisch
+        - initial proxy authentication patch
