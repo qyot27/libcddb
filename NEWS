@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.11 2005/04/22 21:48:55 airborne Exp $
+$Id: NEWS,v 1.12 2005/05/07 09:41:42 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -6,6 +6,16 @@ between different libcddb releases.  These changes might impact the
 programs that use this library.  It does not describe every single
 change made to the code tree.  An overview of the CVS changes can be
 found in the Changelog file.
+
+
+CHANGES 1.0.2 -> 1.0.1
+
+* [NEW] Added cddb_set_http_proxy_credentials function that allows you
+  to specify proxy user name and password in one go.  It also does not
+  store the user's credentials as cleartext in memory.
+
+* [FIX] An extra error code/message has been added to signal proxy
+  authentication failure.
 
 
 CHANGES 1.0.0 -> 1.0.1
