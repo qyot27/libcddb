@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.32 2005/04/16 20:03:28 airborne Exp $
+    $Id: cddb_conn.c,v 1.33 2005/05/07 09:18:27 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -57,7 +57,8 @@ static int cddb_handshake(cddb_conn_t *c);
 /**
  * Reset proxy authentication credentials.
  */
-static void cddb_set_http_proxy_auth(cddb_conn_t *c);
+static void cddb_set_http_proxy_auth(cddb_conn_t *c,
+                                     const char *username, const char *password);
 
 
 /* --- construction / destruction --- */
@@ -256,24 +257,25 @@ void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port)
     c->http_proxy_server_port = port;
 }
 
-static void cddb_set_http_proxy_auth(cddb_conn_t *c)
+static void cddb_set_http_proxy_auth(cddb_conn_t *c,
+                                     const char *username, const char *password)
 {
     int len;
     char *auth, *auth_b64;
 
     FREE_NOT_NULL(c->http_proxy_auth);
     len = 0;
-    if (c->http_proxy_username != NULL) {
-        len += strlen(c->http_proxy_username);
+    if (username != NULL) {
+        len += strlen(username);
     }
-    if (c->http_proxy_password != NULL) {
-        len += strlen(c->http_proxy_password);
+    if (password != NULL) {
+        len += strlen(password);
     }
     len +=  2;                               /* colon and 0-byte */;
     auth = (char*)malloc(len);
     snprintf(auth, len, "%s:%s",
-             (c->http_proxy_username ? c->http_proxy_username : ""),
-             (c->http_proxy_password ? c->http_proxy_password : ""));
+                        (username ? username : ""),
+                        (password ? password : ""));
     auth_b64 = (char*)malloc(len * 2); /* certainly big enough */
     cddb_b64_encode(auth_b64, auth);
     c->http_proxy_auth = strdup(auth_b64);
@@ -284,17 +286,31 @@ static void cddb_set_http_proxy_auth(cddb_conn_t *c)
 void cddb_set_http_proxy_username(cddb_conn_t *c, const char *username)
 {
     FREE_NOT_NULL(c->http_proxy_username);
-    c->http_proxy_username = strdup(username);
+    if (username) {
+        c->http_proxy_username = strdup(username);
+    }
     /* remake authentication credentials */
-    cddb_set_http_proxy_auth(c);
+    cddb_set_http_proxy_auth(c, c->http_proxy_username, c->http_proxy_password);
 }
 
 void cddb_set_http_proxy_password(cddb_conn_t *c, const char *password)
 {
     FREE_NOT_NULL(c->http_proxy_password);
-    c->http_proxy_password = strdup(password);
+    if (password) {
+        c->http_proxy_password = strdup(password);
+    }
     /* remake authentication credentials */
-    cddb_set_http_proxy_auth(c);
+    cddb_set_http_proxy_auth(c, c->http_proxy_username, c->http_proxy_password);
+}
+
+void cddb_set_http_proxy_credentials(cddb_conn_t* c,
+                                     const char *username, const char* password)
+{
+    /* remove cleartext credentials */
+    FREE_NOT_NULL(c->http_proxy_username);
+    FREE_NOT_NULL(c->http_proxy_password);
+    /* remake authentication credentials */
+    cddb_set_http_proxy_auth(c, username, password);
 }
 
 void cddb_set_client(cddb_conn_t *c, const char *cname, const char *cversion)
