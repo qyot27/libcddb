@@ -1,12 +1,8 @@
-$Id: TODO,v 1.22 2005/04/16 20:05:42 airborne Exp $
+$Id: TODO,v 1.23 2005/05/07 09:36:17 airborne Exp $
 
 * check out-of-memory on malloc
 
-* support to enable/disable category dirs in .cddbslave ?
-
 * revision number handling for CDDB entries (if necessary)
-
-* if no disc found in .cddbslave/<category>/ try .cddbslave/ ?
 
 * support for playing order field
 
@@ -17,3 +13,5 @@ $Id: TODO,v 1.22 2005/04/16 20:05:42 airborne Exp $
 * full text search on CDDB server
 
 * add lscat command
+
+* add sites command
