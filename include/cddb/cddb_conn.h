@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.25 2005/04/16 19:55:58 airborne Exp $
+    $Id: cddb_conn.h,v 1.26 2005/05/07 09:16:21 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -409,6 +409,20 @@ void cddb_set_http_proxy_password(cddb_conn_t* c, const char* passwd);
  */
  
 #define cddb_get_http_proxy_password(c) (c)->http_proxy_password
+
+/**
+ * Set the HTTP proxy user name and password in one go.  These
+ * credentials are used when Basic Authentication is required.  The
+ * advantage of using this function over setting the user name and
+ * password seperately is that the cleartext user name and password
+ * are not kept in memory longer than needed.
+ *
+ * @param c        The connection structure.
+ * @param username The user name.
+ * @param passwd   The password.
+ */
+void cddb_set_http_proxy_credentials(cddb_conn_t* c,
+                                     const char *username, const char* passwd);
 
 /**
  * Get the error number returned by the last libcddb command.
