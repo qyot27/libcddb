@@ -31,3 +31,6 @@
 
     Bruno Fleisch
         - initial proxy authentication patch
+
+    Adrian Reber
+        - parsing bugfix and new feature ideas
