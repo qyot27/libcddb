@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.53 2005/04/16 20:04:44 airborne Exp $
+    $Id: cddb_cmd.c,v 1.54 2005/05/07 09:33:40 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -448,6 +448,10 @@ int cddb_http_parse_response(cddb_conn_t *c)
         case 200:
             /* HTTP OK */
             break;
+        case 407:
+            cddb_errno_log_error(c, CDDB_ERR_PROXY_AUTH);
+            return FALSE;
+            break;
         default:
             /* anythign else = error */
             cddb_errno_log_error(c, CDDB_ERR_SERVER_ERROR);
@@ -471,8 +475,8 @@ void cddb_http_parse_headers(cddb_conn_t *c)
 
 static int cddb_add_proxy_auth(cddb_conn_t *c)
 {
-    /* send proxy authorization if user name is set */
-    if (c->http_proxy_username) {
+    /* send proxy authorization if credentials are set */
+    if (c->http_proxy_auth) {
         sock_fprintf(c, "Proxy-Authorization: Basic %s\r\n", c->http_proxy_auth);
     }
     return TRUE;
@@ -670,11 +674,11 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                     }
                     track->frame_offset = cddb_regex_get_int(line, matches, 1);
                     track_no++;
+                    break;
                 } else {
                     /* expect disc length now */
                     state = STATE_DISC_LENGTH;
                 }
-                break;
             case STATE_DISC_LENGTH:
                 cddb_log_debug("...state: DISC LENGTH");
                 if (regexec(REGEX_DISC_LENGTH, line, 2, matches, 0) == 0) {
