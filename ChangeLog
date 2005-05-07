@@ -1,3 +1,52 @@
+2005-05-07 11:37  airborne
+
+	* misc/libcddb.ebuild: sync with latest ebuild in portage
+
+2005-05-07 11:36  airborne
+
+	* TODO: [no log message]
+
+2005-05-07 11:35  airborne
+
+	* INSTALL: added entry about running 'ldconfig' after 'make
+	  install'
+
+2005-05-07 11:34  airborne
+
+	* configure.ac: version bumped to 1.0.2
+
+2005-05-07 11:33  airborne
+
+	* lib/cddb_cmd.c: - return error on proxy authentication failure -
+	  bugfix in frame offset parsing
+
+2005-05-07 11:20  airborne
+
+	* include/cddb/cddb_error.h, lib/cddb_error.c: added error code for
+	  failed proxy authentication
+
+2005-05-07 11:18  airborne
+
+	* lib/cddb_conn.c: added new function
+	  cddb_set_http_proxy_credentials
+
+2005-05-07 11:16  airborne
+
+	* include/cddb/cddb_conn.h: add new function
+	  cddb_set_http_proxy_credentials
+
+2005-05-07 11:13  airborne
+
+	* examples/main.c: use new cddb_set_http_proxy_credentials function
+
+2005-04-22 23:48  airborne
+
+	* NEWS: added changes between 1.0.0 and 1.0.1
+
+2005-04-22 23:45  airborne
+
+	* ChangeLog: added 1.0.1 changes
+
 2005-04-22 23:44  airborne
 
 	* include/cddb/cddb_regex.h: extra include for MacOS X compilation
