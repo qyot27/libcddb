@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.21 2005/04/16 19:54:27 airborne Exp $
+    $Id: main.c,v 1.22 2005/05/07 09:13:18 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -214,23 +214,22 @@ static void init_protocol(cddb_conn_t *conn, const char *proto)
             error_exit(GENERIC_ERROR, "environment variable 'http_proxy' invalid");
         }
         host = aux + HTTP_PREFIX_LEN;
-        /* Check if a proxu username:password pair is provided */
+        /* Check if a proxy username:password pair is provided */
         aux = strchr(host, '@');
         if (aux != NULL) {
             *aux = '\0';
             password = strchr(host, ':');
             if (password != NULL) {
-                cddb_set_http_proxy_password(conn, password + 1);
                 *password = '\0';
+                password++;
             }
-            cddb_set_http_proxy_username(conn, host);
+            cddb_set_http_proxy_credentials(conn, host, password);
             host = aux + 1;
         }
         /* Check if a proxy port is specified. */
         portstr = strchr(host, ':');
         if (portstr == NULL) {
-            /* No port, set proxy server name and use default port
-               80. */
+            /* No port, set proxy server name and use default port 80. */
             cddb_set_http_proxy_server_name(conn, host);
             cddb_set_http_proxy_server_port(conn, 80);
         } else {
