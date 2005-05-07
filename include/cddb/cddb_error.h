@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.h,v 1.10 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_error.h,v 1.11 2005/05/07 09:20:03 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -71,6 +71,10 @@ typedef enum {
     CDDB_ERR_INVALID_CHARSET,   /**< invalid character set or unsupported
                                      conversion */
     CDDB_ERR_ICONV_FAIL,        /**< character set conversion failed */
+
+    /* --- new errors added to back of list for backward compatibility --- */
+
+    CDDB_ERR_PROXY_AUTH,        /**< proxy authentication failed */
 
     /* --- terminator --- */
 

@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.c,v 1.10 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_error.c,v 1.11 2005/05/07 09:20:27 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -67,6 +67,9 @@ static const char* err_str[CDDB_ERR_LAST] = {
     "invalid character set or unsupported conversion",
     /* CDDB_ERR_ICONV_FAIL */
     "character set conversion failed",
+
+    /* CDDB_ERR_PROXY_AUTH */
+    "proxy authentication failed",
 
     /** CDDB_ERR_LAST */
 };
