@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.c,v 1.12 2005/03/11 21:19:27 airborne Exp $
+    $Id: cddb_regex.c,v 1.13 2005/05/29 08:20:15 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -38,6 +38,7 @@ regex_t *REGEX_TRACK_TITLE = NULL;
 regex_t *REGEX_TRACK_EXT = NULL;
 regex_t *REGEX_PLAY_ORDER = NULL;
 regex_t *REGEX_QUERY_MATCH = NULL;
+regex_t *REGEX_SITE = NULL;
 
 
 /**
@@ -78,6 +79,11 @@ void cddb_regex_init()
                            "^PLAYORDER=(.*)$");
     rv = cddb_regex_init_1(&REGEX_QUERY_MATCH,
                            "^([[:alpha:]]+)[[:blank:]]([[:xdigit:]]+)[[:blank:]]((.*) / (.*)|(.*))$");
+
+	/* example: freedb.freedb.org cddbp 8880 - N000.00 W000.00 Random freedb server */
+    /*          <server> <proto> <port> <query-url> <latitude> <longitude> <description> */
+    rv = cddb_regex_init_1(&REGEX_SITE,
+                           "^([[:graph:]]+)[[:blank:]]([[:alpha:]]+)[[:blank:]]([[:digit:]]+)[[:blank:]]([[:graph:]]+)[[:blank:]]([NS])([0-9.]+)[[:blank:]]([EW])([0-9.]+)[[:blank:]](.*)$");
 }
 
 static inline void cddb_regfree(regex_t *regex) 
@@ -107,17 +113,23 @@ void cddb_regex_destroy()
 int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx)
 {
     char *buf;
-    int start, end, len, i;
+    int i;
 
-    start = matches[idx].rm_so;
-    end = matches[idx].rm_eo;
-    len = end - start;
-    buf = (char*)malloc(len + 1);
-    strncpy(buf, s + start, len);
-    buf[len] = '\0';
+    buf = cddb_regex_get_string(s, matches, idx);
     i = atoi(buf);
     free(buf);
     return i;
+}
+
+double cddb_regex_get_float(const char *s, regmatch_t matches[], int idx)
+{
+    char *buf;
+    double f;
+
+    buf = cddb_regex_get_string(s, matches, idx);
+    f = atof(buf);
+    free(buf);
+    return f;
 }
 
 char *cddb_regex_get_string(const char *s, regmatch_t matches[], int idx)
@@ -129,9 +141,10 @@ char *cddb_regex_get_string(const char *s, regmatch_t matches[], int idx)
     end = matches[idx].rm_eo;
     len = end - start;
     result = malloc(len + 1);
-    strncpy(result, s+start, len);
+    strncpy(result, s + start, len);
     result[len] = '\0';
     return result;
 }
+
 
 #endif /*HAVE_REGEX_H*/
