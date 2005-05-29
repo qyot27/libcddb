@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.26 2005/05/07 09:16:21 airborne Exp $
+    $Id: cddb_conn.h,v 1.27 2005/05/29 08:09:52 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -29,6 +29,10 @@
 
 #include <stdio.h>
 #include <netinet/in.h>
+
+#include "cddb/ll.h"
+#include "cddb/cddb_site.h"
+
 
 #define CACHE_OFF  0            /**< do not use local CDDB cache, network
                                      only */
@@ -103,9 +107,8 @@ typedef struct cddb_conn_s
 
     cddb_error_t errnum;        /**< error number of last CDDB command */
 
-    cddb_disc_t **query_data;   /**< data structure to keep CDDB query results */
-    int query_idx;              /**< iterator index for query result set */
-    int query_cnt;              /**< number of entries in query result set */
+    list_t *query_data;         /**< list to keep CDDB query results */
+    list_t *sites_data;         /**< list to keep FreeDB mirror sites */
 
     cddb_iconv_t charset;       /**< character set conversion settings */
 } cddb_conn_t;
@@ -533,6 +536,22 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  * @param dir The directory to use for caching.
  */
 int cddb_cache_set_dir(cddb_conn_t *c, const char *dir);
+
+/**
+ * Retrieve the first CDDB mirror site.
+ *
+ * @param c The connection structure.
+ * @return The first mirror site or NULL if not found.
+ */
+cddb_site_t *cddb_first_site(cddb_conn_t *c);
+
+/**
+ * Retrieve the next CDDB mirror site.
+ *
+ * @param c The connection structure.
+ * @return The next mirror site or NULL if not found.
+ */
+cddb_site_t *cddb_next_site(cddb_conn_t *c);
 
 
 #ifdef __cplusplus
