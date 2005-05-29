@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.21 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_disc.c,v 1.22 2005/05/29 08:18:34 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -204,6 +204,7 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc)
     }
     return disc->iterator;
 }
+
 
 /* --- setters / getters --- */
 
