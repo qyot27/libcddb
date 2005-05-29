@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.23 2005/04/22 21:43:23 airborne Exp $
+    $Id: cddb_ni.h,v 1.24 2005/05/29 08:11:49 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -76,6 +76,9 @@
 #define FREE_NOT_NULL(p) if (p) { free(p); p = NULL; }
 #define CONNECTION_OK(c) (c->socket != -1)
 #define STR_OR_NULL(s) ((s) ? s : "NULL")
+
+#define ASSERT(c, e) if (!(c)) { return e; }
+#define ASSERT_NOT_NULL(p) ASSERT(p!=NULL, CDDB_ERR_INVALID)
 
 /**
  * Convert a string to a new character encoding according to the given
