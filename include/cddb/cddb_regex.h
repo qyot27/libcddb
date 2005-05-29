@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.h,v 1.11 2005/04/22 21:44:32 airborne Exp $
+    $Id: cddb_regex.h,v 1.12 2005/05/29 08:12:57 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -49,6 +49,7 @@ extern regex_t *REGEX_TRACK_TITLE;
 extern regex_t *REGEX_TRACK_EXT;
 extern regex_t *REGEX_PLAY_ORDER;
 extern regex_t *REGEX_QUERY_MATCH;
+extern regex_t *REGEX_SITE;
 
 
 /**
@@ -62,6 +63,10 @@ void cddb_regex_destroy(void);
 /**
  */
 int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx);
+
+/**
+ */
+double cddb_regex_get_float(const char *s, regmatch_t matches[], int idx);
 
 /**
  */
