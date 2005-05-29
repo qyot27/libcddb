@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd_ni.h,v 1.9 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_cmd_ni.h,v 1.10 2005/05/29 08:08:15 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -33,6 +33,7 @@ enum { CMD_HELLO = 0,
        CMD_QUERY,
        CMD_WRITE,
        CMD_PROTO,
+       CMD_SITES,
        /* dummy for array size */
        CMD_LAST
 };
@@ -55,10 +56,6 @@ int cddb_get_response_code(cddb_conn_t *c, char **msg);
 /**
  */
 int cddb_send_cmd(cddb_conn_t *c, int cmd, ...);
-
-/**
- */
-void cddb_query_clear(cddb_conn_t *c);
 
 
 #ifdef __cplusplus
