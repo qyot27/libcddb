@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.h,v 1.11 2005/05/07 09:20:03 airborne Exp $
+    $Id: cddb_error.h,v 1.12 2005/05/29 08:11:04 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -75,6 +75,7 @@ typedef enum {
     /* --- new errors added to back of list for backward compatibility --- */
 
     CDDB_ERR_PROXY_AUTH,        /**< proxy authentication failed */
+    CDDB_ERR_INVALID,           /**< invalid input parameter(s) */
 
     /* --- terminator --- */
 
