@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.33 2005/05/07 09:18:27 airborne Exp $
+    $Id: cddb_conn.c,v 1.34 2005/05/29 08:17:51 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -109,9 +109,9 @@ cddb_conn_t *cddb_new(void)
 
         c->errnum = CDDB_ERR_OK;
 
-        c->query_data = NULL;
-        c->query_idx = 0;
-        c->query_cnt = 0;
+        // XXX: handle out-of-memory
+        c->query_data = list_new((elem_destroy_cb*)cddb_disc_destroy);
+        c->sites_data = list_new((elem_destroy_cb*)cddb_site_destroy);
 
         c->charset = malloc(sizeof(struct cddb_iconv_s));
         c->charset->cd_to_freedb = NULL;
@@ -153,7 +153,8 @@ void cddb_destroy(cddb_conn_t *c)
         FREE_NOT_NULL(c->cache_dir);
         FREE_NOT_NULL(c->user);
         FREE_NOT_NULL(c->hostname);
-        cddb_query_clear(c);
+        list_destroy(c->query_data);
+        list_destroy(c->sites_data);
         cddb_close_iconv(c);
         FREE_NOT_NULL(c->charset);
         free(c);
@@ -371,6 +372,28 @@ int cddb_cache_set_dir(cddb_conn_t *c, const char *dir)
         }
     }
     return TRUE;
+}
+
+cddb_site_t *cddb_first_site(cddb_conn_t *c)
+{
+    elem_t *e;
+
+    e = list_first(c->sites_data);
+    if (e) {
+        return element_data(e);
+    }
+    return NULL;
+}
+
+cddb_site_t *cddb_next_site(cddb_conn_t *c)
+{
+    elem_t *e;
+
+    e = list_next(c->sites_data);
+    if (e) {
+        return element_data(e);
+    }
+    return NULL;
 }
 
 

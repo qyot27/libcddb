@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.54 2005/05/07 09:33:40 airborne Exp $
+    $Id: cddb_cmd.c,v 1.55 2005/05/29 08:16:07 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include "cddb/cddb_ni.h"
+#include "cddb/ll.h"
 
 
 static const char *CDDB_COMMANDS[CMD_LAST] = {
@@ -37,10 +38,10 @@ static const char *CDDB_COMMANDS[CMD_LAST] = {
     "cddb query %08x %d %s %d",
     "cddb write %s %08x",
     "proto %d",
+    "sites",
 };
 
 #define WRITE_BUF_SIZE 4096
-#define QUERY_RESULT_SET_INC 10
 
 
 /*
@@ -329,26 +330,6 @@ int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc)
     free(fn);
 
     return TRUE;
-}
-
-
-/* --- miscellaneous --- */
-
-
-void cddb_query_clear(cddb_conn_t *c)
-{
-    int i;
-
-    cddb_log_debug("cddb_query_clear()");
-    if (c->query_data != NULL) {
-        for (i = 0; i < c->query_cnt; i++) {
-            cddb_disc_destroy(c->query_data[i]);
-        }
-        free(c->query_data);
-        c->query_data = NULL;
-        c->query_idx = 0;
-        c->query_cnt = 0;
-    }
 }
 
 
@@ -1029,7 +1010,7 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 
     cddb_log_debug("cddb_query()");
     /* clear previous query result set */
-    cddb_query_clear(c);
+    list_flush(c->query_data);
     
     /* recalculate disc ID to make sure it matches the disc data */
     cddb_disc_calc_discid(disc);
@@ -1099,34 +1080,30 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
         case 211:                   /* found inexact matches, list follows */
             cddb_log_debug("...(in)exact matches");
             {
-                int query_max = 0;
+                cddb_disc_t *aux;
+
                 while ((line = cddb_read_line(c)) != NULL) {
                     /* end of list? */
                     if (*line == CHR_DOT) {
                         break;
                     }
-                    /* check whether there is enough space in query result set */
-                    if (c->query_cnt >= query_max) {
-                        /* realloc */
-                        query_max += QUERY_RESULT_SET_INC;
-                        c->query_data = realloc(c->query_data, query_max*sizeof(cddb_disc_t*));
-                    }
                     /* clone disc and fill in the blanks */
-                    c->query_data[c->query_cnt] = cddb_disc_clone(disc);
-                    if (!cddb_parse_query_data(c, c->query_data[c->query_cnt], line)) {
+                    aux = cddb_disc_clone(disc);
+                    if (!cddb_parse_query_data(c, aux, line)) {
+                        cddb_disc_destroy(aux);
                         return -1;
                     }
-                    c->query_cnt++;
+                    list_append(c->query_data, aux);
                 }
-                if (c->query_cnt == 0) {
+                if (list_size(c->query_data) == 0) {
                     /* empty result set */
                     cddb_errno_log_error(c, CDDB_ERR_INVALID_RESPONSE);
                     return -1;
                 }
                 /* return first disc in result set */
-                cddb_disc_copy(disc, c->query_data[c->query_idx++]);
+                cddb_disc_copy(disc, (cddb_disc_t *)element_data(list_first(c->query_data)));
             }
-            count = c->query_cnt;
+            count = list_size(c->query_data);
             break;
         case 202:                   /* no match found */
             cddb_log_debug("...no match");
@@ -1157,14 +1134,17 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
 
 int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
 {
+    elem_t *aux;
+
     cddb_log_debug("cddb_query_next()");
-    if ((c->query_cnt == 0) || (c->query_idx >= c->query_cnt)) {
+    aux = list_next(c->query_data);
+    if (!aux) {
         /* no more discs */
         cddb_errno_set(c, CDDB_ERR_DISC_NOT_FOUND);
         return FALSE;
     }
     /* return next disc in result set */
-    cddb_disc_copy(disc, c->query_data[c->query_idx++]);
+    cddb_disc_copy(disc, (cddb_disc_t *)element_data(aux));
 
     cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
@@ -1379,4 +1359,67 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
 
     cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
+}
+
+int cddb_sites(cddb_conn_t *c)
+{
+    char *msg, *line;
+    int code, rc;
+    cddb_site_t *site;
+
+    cddb_log_debug("cddb_sites()");
+    /* clear previous sites result set */
+    list_flush(c->sites_data);
+
+    if (!cddb_connect(c)) {
+        /* connection not OK */
+        return FALSE;
+    }
+
+    /* send sites command and check response */
+    if (!cddb_send_cmd(c, CMD_SITES)) {
+        return FALSE;
+    }
+    switch (code = cddb_get_response_code(c, &msg)) {
+        case  -1:
+            return FALSE;
+        case 210:                   /* OK, site information follows */
+            break;
+        case 401:                   /* no site information */
+            /* XXX: clear sites list */
+            return FALSE;
+        default:
+            cddb_errno_log_error(c, CDDB_ERR_UNKNOWN);
+            return FALSE;
+    }
+
+    while ((line = cddb_read_line(c)) != NULL) {
+        /* end of list? */
+        if (*line == CHR_DOT) {
+            break;
+        }
+        site = cddb_site_new();
+        if (!site) {
+            cddb_errno_log_error(c, CDDB_ERR_OUT_OF_MEMORY);
+            return FALSE;
+        }
+        if (!cddb_site_parse(site, line)) {
+            /* skip parsing errors */
+            cddb_log_warn("unable to parse site: %s", line);
+            cddb_site_destroy(site);
+            continue;
+        }
+        if (!list_append(c->sites_data, site)) {
+            cddb_errno_log_error(c, CDDB_ERR_OUT_OF_MEMORY);
+            cddb_site_destroy(site);
+            return FALSE;
+        }
+    }
+
+    /* close connection if using HTTP */
+    if (c->is_http_enabled) {
+        cddb_disconnect(c);
+    }
+
+    return rc;
 }
