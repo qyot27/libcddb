@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_error.c,v 1.11 2005/05/07 09:20:27 airborne Exp $
+    $Id: cddb_error.c,v 1.12 2005/05/29 08:19:09 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -70,6 +70,8 @@ static const char* err_str[CDDB_ERR_LAST] = {
 
     /* CDDB_ERR_PROXY_AUTH */
     "proxy authentication failed",
+    /* CDDB_ERR_INVALID */
+    "invalid input parameter"
 
     /** CDDB_ERR_LAST */
 };
