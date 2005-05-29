@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.22 2005/05/07 09:13:18 airborne Exp $
+    $Id: main.c,v 1.23 2005/05/29 08:21:14 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -40,10 +40,7 @@
 #define HTTP_PREFIX_LEN 7
 
 /* parsed command-line parameters */
-#define CMD_NONE   0
-#define CMD_DISCID 1
-#define CMD_QUERY  2
-#define CMD_READ   3
+enum { CMD_NONE = 0, CMD_DISCID, CMD_QUERY, CMD_READ, CMD_SITES };
 static int quiet = 0;           /* work silently, reports no errors */
 static int command = 0;         /* request command */
 static char *category = NULL;   /* category command-line argument */
@@ -84,6 +81,7 @@ static void usage(void)
     fprintf(stderr, "  query <len> <n> <fo_1> ... <fo_n>\n");
     fprintf(stderr, "                   query CDDB server and list all matching entries\n");
     fprintf(stderr, "  read <cat> <id>  retrieve disc details from CDDB server\n");
+    fprintf(stderr, "  sites            retrieve a list of mirror sites\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Command arguments\n");
     fprintf(stderr, "  <cat>            disc category (see below)\n");
@@ -403,6 +401,13 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
                 error_usage("the read command requires two arguments");
             }
         }
+    } else if (strcmp(argv[optind], "sites") == 0) {
+        /* CDDB read */
+        command = CMD_SITES;
+        if (argc != optind + 1) {
+            error_usage("the sites command expects no arguments");
+        }
+        use_cd = 0;
     } else {
         /* unknown command */
         error_usage("unknown command '%s'", argv[optind]);
@@ -501,6 +506,10 @@ int main(int argc, char **argv)
         FREE_NOT_NULL(category);
         /* Let's display the information that was read. */
         do_display(disc);
+        break;
+    case CMD_SITES:
+        /* Display information about mirror sites. */
+        do_sites(conn);
         break;
     }
     /* Finally, we have to clean up.  With the cddb_disc_destroy
