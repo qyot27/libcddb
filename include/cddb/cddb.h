@@ -1,5 +1,5 @@
 /*
-    $Id: cddb.h,v 1.11 2005/04/08 01:45:48 rockyb Exp $
+    $Id: cddb.h,v 1.12 2005/05/29 08:06:11 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -33,6 +33,7 @@
 #include <cddb/cddb_error.h>
 #include <cddb/cddb_track.h>
 #include <cddb/cddb_disc.h>
+#include <cddb/cddb_site.h>
 #include <cddb/cddb_conn.h>
 #include <cddb/cddb_cmd.h>
 #include <cddb/cddb_log.h>
@@ -57,6 +58,7 @@ void libcddb_init(void);
  * calls after shutting down are bound to give problems.
  */
 void libcddb_shutdown(void);
+
 
 #ifdef __cplusplus
     }

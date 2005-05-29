@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.h,v 1.13 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_cmd.h,v 1.14 2005/05/29 08:07:16 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -120,6 +120,13 @@ int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc);
  * @param disc A non-null CDDB disc structure.
  */
 int cddb_write(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ * Query the currently configured server for a list of mirrors.
+ *
+ * @param c The CDDB connection structure.
+ */
+int cddb_sites(cddb_conn_t *c);
 
 
 #ifdef __cplusplus
