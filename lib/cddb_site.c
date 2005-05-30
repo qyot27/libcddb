@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_site.c,v 1.1 2005/05/29 08:24:05 airborne Exp $
+    $Id: cddb_site.c,v 1.2 2005/05/30 19:35:10 airborne Exp $
 
     Copyright (C) 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -39,6 +39,7 @@ struct cddb_site_s
     cddb_protocol_t protocol;   /**< the protocol used by this site */
     int port;                   /**< port of the CDDB server */
     char *query_path;           /**< query path for HTTP URL */
+    char *submit_path;          /**< submit path for HTTP URL */
     char *desc;                 /**< server description */
     float latitude;             /**< server latitude */
     float longitude;            /**< server longitude */
@@ -64,6 +65,7 @@ cddb_error_t cddb_site_destroy(cddb_site_t *site)
     ASSERT_NOT_NULL(site);
     FREE_NOT_NULL(site->address);
     FREE_NOT_NULL(site->query_path);
+    FREE_NOT_NULL(site->submit_path);
     FREE_NOT_NULL(site->desc);
     free(site);
     return CDDB_ERR_OK;
@@ -79,6 +81,7 @@ cddb_site_t *cddb_site_clone(cddb_site_t *site)
     clone->protocol = site->protocol;
     clone->port = site->port;
     clone->query_path = (site->query_path ? strdup(site->query_path) : NULL);
+    clone->submit_path = (site->submit_path ? strdup(site->submit_path) : NULL);
     clone->desc = (site->desc ? strdup(site->desc) : NULL);
     clone->latitude = site->latitude;
     clone->longitude = site->longitude;
@@ -100,6 +103,20 @@ cddb_error_t cddb_site_get_address(cddb_site_t *site,
     return CDDB_ERR_OK;
 }
 
+cddb_error_t cddb_site_set_address(cddb_site_t *site,
+                                   const char *address, unsigned int port)
+{
+    ASSERT_NOT_NULL(site);
+    ASSERT_NOT_NULL(address);
+    FREE_NOT_NULL(site->address);
+    site->address = strdup(address);
+    if (!site->address) {
+        return CDDB_ERR_OUT_OF_MEMORY;
+    }
+    site->port = port;
+    return CDDB_ERR_OK;
+}
+
 cddb_error_t cddb_site_get_location(cddb_site_t *site,
                                     float *latitude, float *longitude)
 {
@@ -111,12 +128,30 @@ cddb_error_t cddb_site_get_location(cddb_site_t *site,
     return CDDB_ERR_OK;
 }
 
+cddb_error_t cddb_site_set_location(cddb_site_t *site,
+                                    float latitude, float longitude)
+{
+    ASSERT_NOT_NULL(site);
+    ASSERT_RANGE(latitude, -90.0, 90.0);
+    ASSERT_RANGE(longitude, -180.0, 180.0);
+    site->latitude = latitude;
+    site->longitude = longitude;
+    return CDDB_ERR_OK;
+}
+
 cddb_protocol_t cddb_site_get_protocol(cddb_site_t *site)
 {
     if (site) {
         return site->protocol;
     }
     return PROTO_UNKNOWN;
+}
+
+cddb_error_t cddb_site_set_protocol(cddb_site_t *site, cddb_protocol_t proto)
+{
+    ASSERT_NOT_NULL(site);
+    site->protocol = proto;
+    return CDDB_ERR_OK;
 }
 
 cddb_error_t cddb_site_get_query_path(cddb_site_t *site, const char **path)
@@ -127,11 +162,58 @@ cddb_error_t cddb_site_get_query_path(cddb_site_t *site, const char **path)
     return CDDB_ERR_OK;
 }
 
+cddb_error_t cddb_site_set_query_path(cddb_site_t *site, const char *path)
+{
+    ASSERT_NOT_NULL(site);
+    FREE_NOT_NULL(site->query_path);
+    if (path) {
+        site->query_path = strdup(path);
+        if (!site->query_path) {
+            return CDDB_ERR_OUT_OF_MEMORY;
+        }
+    }
+    return CDDB_ERR_OK;
+}
+
+cddb_error_t cddb_site_get_submit_path(cddb_site_t *site, const char **path)
+{
+    ASSERT_NOT_NULL(site);
+    ASSERT_NOT_NULL(path);
+    *path = site->submit_path;
+    return CDDB_ERR_OK;
+}
+
+cddb_error_t cddb_site_set_submit_path(cddb_site_t *site, const char *path)
+{
+    ASSERT_NOT_NULL(site);
+    FREE_NOT_NULL(site->submit_path);
+    if (path) {
+        site->submit_path = strdup(path);
+        if (!site->submit_path) {
+            return CDDB_ERR_OUT_OF_MEMORY;
+        }
+    }
+    return CDDB_ERR_OK;
+}
+
 cddb_error_t cddb_site_get_description(cddb_site_t *site, const char **desc)
 {
     ASSERT_NOT_NULL(site);
     ASSERT_NOT_NULL(desc);
     *desc = site->desc;
+    return CDDB_ERR_OK;
+}
+
+cddb_error_t cddb_site_set_description(cddb_site_t *site, const char *desc)
+{
+    ASSERT_NOT_NULL(site);
+    FREE_NOT_NULL(site->desc);
+    if (desc) {
+        site->desc = strdup(desc);
+        if (!site->desc) {
+            return CDDB_ERR_OUT_OF_MEMORY;
+        }
+    }
     return CDDB_ERR_OK;
 }
 
