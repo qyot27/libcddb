@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_site.h,v 1.1 2005/05/29 08:24:04 airborne Exp $
+    $Id: cddb_site.h,v 1.2 2005/05/30 19:34:17 airborne Exp $
 
     Copyright (C) 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -28,6 +28,9 @@
 
 
 #include "cddb/cddb_error.h"
+
+
+/* --- type and structure definitions */
 
 
 /**
@@ -87,6 +90,18 @@ cddb_error_t cddb_site_get_address(cddb_site_t *site,
                                    const char **address, unsigned int *port);
 
 /**
+ * Set the site's address.  A copy of the address string is made.  So the caller
+ * should free any memory associated with the input parameter.
+ *
+ * @param site The CDDB site structure.
+ * @param address The address of the server.
+ * @param port The port of the server.
+ * @return Error code: CDDB_ERR_OK, CDDB_ERR_INVALID or CDDB_ERR_OUT_OF_MEMORY.
+ */
+cddb_error_t cddb_site_set_address(cddb_site_t *site,
+                                   const char *address, unsigned int port);
+
+/**
  * Get the protocol used by the site.
  *
  * @see cddb_protocol_t
@@ -95,6 +110,17 @@ cddb_error_t cddb_site_get_address(cddb_site_t *site,
  * @return The protocol.
  */
 cddb_protocol_t cddb_site_get_protocol(cddb_site_t *site);
+
+/**
+ * Set the protocol used by the site.
+ *
+ * @see cddb_protocol_t
+ *
+ * @param site The CDDB site structure.
+ * @param The protocol.
+ * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
+ */
+cddb_error_t cddb_site_set_protocol(cddb_site_t *site, cddb_protocol_t proto);
 
 /**
  * Get the query path in case the HTTP protocol is used.
@@ -106,24 +132,87 @@ cddb_protocol_t cddb_site_get_protocol(cddb_site_t *site);
 cddb_error_t cddb_site_get_query_path(cddb_site_t *site, const char **path);
 
 /**
+ * Set the query path in case the HTTP protocol is used.  A copy of the path
+ * string is made.  So the caller should free any memory associated with the
+ * input parameter.
+ *
+ * @param site The CDDB site structure.
+ * @param path The query path.  A value of NULL deletes the current path.
+ * @return Error code: CDDB_ERR_OK, CDDB_ERR_INVALID or CDDB_ERR_OUT_OF_MEMORY.
+ */
+cddb_error_t cddb_site_set_query_path(cddb_site_t *site, const char *path);
+
+/**
+ * Get the submit path in case the HTTP protocol is used.
+ *
+ * @param site The CDDB site structure.
+ * @param path The submit path upon returning.
+ * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
+ */
+cddb_error_t cddb_site_get_submit_path(cddb_site_t *site, const char **path);
+
+/**
+ * Set the submit path in case the HTTP protocol is used.  A copy of the path
+ * string is made.  So the caller should free any memory associated with the
+ * input parameter.
+ *
+ * @param site The CDDB site structure.
+ * @param path The query path.  A value of NULL deletes the current path.
+ * @return Error code: CDDB_ERR_OK, CDDB_ERR_INVALID or CDDB_ERR_OUT_OF_MEMORY.
+ */
+cddb_error_t cddb_site_set_submit_path(cddb_site_t *site, const char *path);
+
+/**
  * Get the site's location.
  *
  * @param site The CDDB site structure.
  * @param latitude Will contain the server's latitude upon returning.
+ *                 A positive number is used for the northern
+ *                 hemisphere, a negative one for the southern
+ *                 hemisphere.
  * @param longitude Will contain the server's longitude upon returning.
+ *                  A positive number is used for the eastern
+ *                  hemisphere, a negative one for the western
+ *                  hemisphere.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
 cddb_error_t cddb_site_get_location(cddb_site_t *site,
                                     float *latitude, float *longitude);
 
 /**
- * Get a description for the site's.
+ * Set the site's location.
+ *
+ * @param site The CDDB site structure.
+ * @param latitude The server's latitude.  Use a positive number for the
+ *                 northern hemisphere, a negative one for the southern
+ *                 hemisphere.
+ * @param longitude The server's longitude.  Use a positive number for the
+ *                  eastern hemisphere, a negative one for the western
+ *                  hemisphere.
+ * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
+ */
+cddb_error_t cddb_site_set_location(cddb_site_t *site,
+                                    float latitude, float longitude);
+
+/**
+ * Get a description of the site.
  *
  * @param site The CDDB site structure.
  * @param desc The description upon returning.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
 cddb_error_t cddb_site_get_description(cddb_site_t *site, const char **desc);
+
+/**
+ * Set a description for the site.  A copy of the description string is made.
+ * So the caller should free any memory associated with the input parameter.
+ *
+ * @param site The CDDB site structure.
+ * @param desc The description.  A value of NULL deletes the current
+ *             description.
+ * @return Error code: CDDB_ERR_OK, CDDB_ERR_INVALID or CDDB_ERR_OUT_OF_MEMORY.
+ */
+cddb_error_t cddb_site_set_description(cddb_site_t *site, const char *desc);
 
 
 /* --- miscellaneous */
