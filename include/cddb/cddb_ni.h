@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.24 2005/05/29 08:11:49 airborne Exp $
+    $Id: cddb_ni.h,v 1.25 2005/05/30 19:36:19 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -79,6 +79,8 @@
 
 #define ASSERT(c, e) if (!(c)) { return e; }
 #define ASSERT_NOT_NULL(p) ASSERT(p!=NULL, CDDB_ERR_INVALID)
+#define ASSERT_RANGE(n,l,h) ASSERT((n>=l)&&(n<=h), CDDB_ERR_INVALID)
+
 
 /**
  * Convert a string to a new character encoding according to the given
