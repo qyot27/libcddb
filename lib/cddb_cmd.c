@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.55 2005/05/29 08:16:07 airborne Exp $
+    $Id: cddb_cmd.c,v 1.56 2005/06/15 16:13:31 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -1386,7 +1386,6 @@ int cddb_sites(cddb_conn_t *c)
         case 210:                   /* OK, site information follows */
             break;
         case 401:                   /* no site information */
-            /* XXX: clear sites list */
             return FALSE;
         default:
             cddb_errno_log_error(c, CDDB_ERR_UNKNOWN);
@@ -1408,6 +1407,11 @@ int cddb_sites(cddb_conn_t *c)
             cddb_log_warn("unable to parse site: %s", line);
             cddb_site_destroy(site);
             continue;
+        }
+        if (!cddb_site_iconv(c->charset->cd_from_freedb, site)) {
+            cddb_errno_log_error(c, CDDB_ERR_ICONV_FAIL);
+            cddb_site_destroy(site);
+            return FALSE;
         }
         if (!list_append(c->sites_data, site)) {
             cddb_errno_log_error(c, CDDB_ERR_OUT_OF_MEMORY);
