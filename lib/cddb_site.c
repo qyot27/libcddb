@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_site.c,v 1.2 2005/05/30 19:35:10 airborne Exp $
+    $Id: cddb_site.c,v 1.3 2005/06/15 16:12:04 airborne Exp $
 
     Copyright (C) 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -49,6 +49,25 @@ struct cddb_site_s
 /* --- private functions */
 
 
+int cddb_site_iconv(iconv_t cd, cddb_site_t *site)
+{ 
+    char *result;
+
+    if (!cd) {
+        return TRUE;            /* no user character set defined */
+    }
+    if (site->desc) {
+        if (cddb_str_iconv(cd, site->desc, &result)) {
+            free(site->desc);
+            site->desc = result;
+        } else {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+
 /* --- construction / destruction */
 
 
@@ -92,7 +111,7 @@ cddb_site_t *cddb_site_clone(cddb_site_t *site)
 /* --- setters / getters --- */
 
 
-cddb_error_t cddb_site_get_address(cddb_site_t *site,
+cddb_error_t cddb_site_get_address(const cddb_site_t *site,
                                    const char **address, unsigned int *port)
 {
     ASSERT_NOT_NULL(site);
@@ -117,7 +136,7 @@ cddb_error_t cddb_site_set_address(cddb_site_t *site,
     return CDDB_ERR_OK;
 }
 
-cddb_error_t cddb_site_get_location(cddb_site_t *site,
+cddb_error_t cddb_site_get_location(const cddb_site_t *site,
                                     float *latitude, float *longitude)
 {
     ASSERT_NOT_NULL(site);
@@ -139,7 +158,7 @@ cddb_error_t cddb_site_set_location(cddb_site_t *site,
     return CDDB_ERR_OK;
 }
 
-cddb_protocol_t cddb_site_get_protocol(cddb_site_t *site)
+cddb_protocol_t cddb_site_get_protocol(const cddb_site_t *site)
 {
     if (site) {
         return site->protocol;
@@ -154,7 +173,8 @@ cddb_error_t cddb_site_set_protocol(cddb_site_t *site, cddb_protocol_t proto)
     return CDDB_ERR_OK;
 }
 
-cddb_error_t cddb_site_get_query_path(cddb_site_t *site, const char **path)
+cddb_error_t cddb_site_get_query_path(const cddb_site_t *site,
+                                      const char **path)
 {
     ASSERT_NOT_NULL(site);
     ASSERT_NOT_NULL(path);
@@ -175,7 +195,8 @@ cddb_error_t cddb_site_set_query_path(cddb_site_t *site, const char *path)
     return CDDB_ERR_OK;
 }
 
-cddb_error_t cddb_site_get_submit_path(cddb_site_t *site, const char **path)
+cddb_error_t cddb_site_get_submit_path(const cddb_site_t *site,
+                                       const char **path)
 {
     ASSERT_NOT_NULL(site);
     ASSERT_NOT_NULL(path);
@@ -196,7 +217,8 @@ cddb_error_t cddb_site_set_submit_path(cddb_site_t *site, const char *path)
     return CDDB_ERR_OK;
 }
 
-cddb_error_t cddb_site_get_description(cddb_site_t *site, const char **desc)
+cddb_error_t cddb_site_get_description(const cddb_site_t *site,
+                                       const char **desc)
 {
     ASSERT_NOT_NULL(site);
     ASSERT_NOT_NULL(desc);
@@ -227,7 +249,6 @@ int cddb_site_parse(cddb_site_t *site, const char *line)
     char *s;
     float f;
 
-    /* XXX: iconv site information */
     if (regexec(REGEX_SITE, line, 10, matches, 0) == REG_NOMATCH) {
         /* invalid repsponse */
         return FALSE;
@@ -267,7 +288,7 @@ int cddb_site_parse(cddb_site_t *site, const char *line)
     return TRUE;
 }
 
-cddb_error_t cddb_site_print(cddb_site_t *site)
+cddb_error_t cddb_site_print(const cddb_site_t *site)
 {
     ASSERT_NOT_NULL(site);
     printf("Address: ");
