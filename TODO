@@ -1,4 +1,4 @@
-$Id: TODO,v 1.23 2005/05/07 09:36:17 airborne Exp $
+$Id: TODO,v 1.24 2005/06/15 16:22:52 airborne Exp $
 
 * check out-of-memory on malloc
 
@@ -13,5 +13,3 @@ $Id: TODO,v 1.23 2005/05/07 09:36:17 airborne Exp $
 * full text search on CDDB server
 
 * add lscat command
-
-* add sites command
