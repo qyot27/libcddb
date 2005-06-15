@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.34 2005/05/29 08:17:51 airborne Exp $
+    $Id: cddb_conn.c,v 1.35 2005/06/15 16:15:15 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -198,6 +198,37 @@ void cddb_set_buf_size(cddb_conn_t *c, unsigned int size)
     c->line = (char*)malloc(c->buf_size);
 }
 
+cddb_error_t cddb_set_site(cddb_conn_t *c, const cddb_site_t *site)
+{
+    cddb_error_t rv;
+    const char *server, *path;
+    unsigned int port;
+    cddb_protocol_t proto;
+
+    ASSERT_NOT_NULL(c);
+    if ((rv = cddb_site_get_address(site, &server, &port)) != CDDB_ERR_OK) {
+        cddb_errno_set(c, rv);
+        return rv;
+    }
+    if ((proto = cddb_site_get_protocol(site)) == PROTO_UNKNOWN) {
+        cddb_errno_set(c, CDDB_ERR_INVALID);
+        return CDDB_ERR_INVALID;
+    }
+    if ((rv = cddb_site_get_query_path(site, &path)) != CDDB_ERR_OK) {
+        cddb_errno_set(c, rv);
+        return rv;
+    }
+    cddb_set_server_name(c, server);
+    cddb_set_server_port(c, port);
+    if (proto == PROTO_CDDBP) {
+        cddb_http_disable(c);
+    } else {
+        cddb_http_enable(c);
+        cddb_set_http_path_query(c, path);
+    }
+    return cddb_errno_set(c, CDDB_ERR_OK);
+}
+
 void cddb_set_server_name(cddb_conn_t *c, const char *server)
 {
     FREE_NOT_NULL(c->server_name);
@@ -374,7 +405,7 @@ int cddb_cache_set_dir(cddb_conn_t *c, const char *dir)
     return TRUE;
 }
 
-cddb_site_t *cddb_first_site(cddb_conn_t *c)
+const cddb_site_t *cddb_first_site(cddb_conn_t *c)
 {
     elem_t *e;
 
@@ -385,7 +416,7 @@ cddb_site_t *cddb_first_site(cddb_conn_t *c)
     return NULL;
 }
 
-cddb_site_t *cddb_next_site(cddb_conn_t *c)
+const cddb_site_t *cddb_next_site(cddb_conn_t *c)
 {
     elem_t *e;
 
