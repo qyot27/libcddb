@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.25 2005/05/30 19:36:19 airborne Exp $
+    $Id: cddb_ni.h,v 1.26 2005/06/15 16:19:43 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -77,9 +77,12 @@
 #define CONNECTION_OK(c) (c->socket != -1)
 #define STR_OR_NULL(s) ((s) ? s : "NULL")
 
-#define ASSERT(c, e) if (!(c)) { return e; }
-#define ASSERT_NOT_NULL(p) ASSERT(p!=NULL, CDDB_ERR_INVALID)
-#define ASSERT_RANGE(n,l,h) ASSERT((n>=l)&&(n<=h), CDDB_ERR_INVALID)
+#define ASSERT(cond, error) \
+            if (!(cond)) { return error; }
+#define ASSERT_NOT_NULL(ptr) \
+            ASSERT(ptr!=NULL, CDDB_ERR_INVALID)
+#define ASSERT_RANGE(num,lo,hi) \
+            ASSERT((num>=lo)&&(num<=hi), CDDB_ERR_INVALID)
 
 
 /**
@@ -97,6 +100,11 @@ int cddb_disc_iconv(iconv_t cd, cddb_disc_t *disc);
  * Converts all track strings to user character encoding.
  */
 int cddb_track_iconv(iconv_t cd, cddb_track_t *track);
+
+/**
+ * Converts all site strings to user character encoding.
+ */
+int cddb_site_iconv(iconv_t cd, cddb_site_t *site);
 
 /**
  * Base64 encode the source string and write it to the destination
