@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.23 2005/05/29 08:21:14 airborne Exp $
+    $Id: main.c,v 1.24 2005/06/15 16:21:52 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -246,7 +246,6 @@ static void init_protocol(cddb_conn_t *conn, const char *proto)
             cddb_set_http_proxy_server_port(conn, port);
         }
     } else {
-        /* XXX: get proxy settings from env var 'http_proxy'!! */
         error_usage("-P, invalid server protocol '%s'", optarg);
     }
 }
