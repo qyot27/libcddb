@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_site.h,v 1.2 2005/05/30 19:34:17 airborne Exp $
+    $Id: cddb_site.h,v 1.3 2005/06/15 16:08:28 airborne Exp $
 
     Copyright (C) 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -86,7 +86,7 @@ cddb_site_t *cddb_site_clone(cddb_site_t *site);
  * @param port The port of the server upon returning.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
-cddb_error_t cddb_site_get_address(cddb_site_t *site,
+cddb_error_t cddb_site_get_address(const cddb_site_t *site,
                                    const char **address, unsigned int *port);
 
 /**
@@ -109,7 +109,7 @@ cddb_error_t cddb_site_set_address(cddb_site_t *site,
  * @param site The CDDB site structure.
  * @return The protocol.
  */
-cddb_protocol_t cddb_site_get_protocol(cddb_site_t *site);
+cddb_protocol_t cddb_site_get_protocol(const cddb_site_t *site);
 
 /**
  * Set the protocol used by the site.
@@ -117,7 +117,7 @@ cddb_protocol_t cddb_site_get_protocol(cddb_site_t *site);
  * @see cddb_protocol_t
  *
  * @param site The CDDB site structure.
- * @param The protocol.
+ * @param proto The protocol.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
 cddb_error_t cddb_site_set_protocol(cddb_site_t *site, cddb_protocol_t proto);
@@ -129,7 +129,8 @@ cddb_error_t cddb_site_set_protocol(cddb_site_t *site, cddb_protocol_t proto);
  * @param path The query path upon returning.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
-cddb_error_t cddb_site_get_query_path(cddb_site_t *site, const char **path);
+cddb_error_t cddb_site_get_query_path(const cddb_site_t *site,
+                                      const char **path);
 
 /**
  * Set the query path in case the HTTP protocol is used.  A copy of the path
@@ -149,7 +150,8 @@ cddb_error_t cddb_site_set_query_path(cddb_site_t *site, const char *path);
  * @param path The submit path upon returning.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
-cddb_error_t cddb_site_get_submit_path(cddb_site_t *site, const char **path);
+cddb_error_t cddb_site_get_submit_path(const cddb_site_t *site,
+                                       const char **path);
 
 /**
  * Set the submit path in case the HTTP protocol is used.  A copy of the path
@@ -176,7 +178,7 @@ cddb_error_t cddb_site_set_submit_path(cddb_site_t *site, const char *path);
  *                  hemisphere.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
-cddb_error_t cddb_site_get_location(cddb_site_t *site,
+cddb_error_t cddb_site_get_location(const cddb_site_t *site,
                                     float *latitude, float *longitude);
 
 /**
@@ -201,7 +203,8 @@ cddb_error_t cddb_site_set_location(cddb_site_t *site,
  * @param desc The description upon returning.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
-cddb_error_t cddb_site_get_description(cddb_site_t *site, const char **desc);
+cddb_error_t cddb_site_get_description(const cddb_site_t *site,
+                                       const char **desc);
 
 /**
  * Set a description for the site.  A copy of the description string is made.
@@ -222,7 +225,6 @@ cddb_error_t cddb_site_set_description(cddb_site_t *site, const char *desc);
  * Parses one line of data as returned by the sites command and
  * populates the given structure.
  *
- * @param c The CDDB connection structure.
  * @param site The CDDB site structure.
  * @param line The result line.
  * @return True in case of success or false on failure.
@@ -236,7 +238,7 @@ int cddb_site_parse(cddb_site_t *site, const char *line);
  * @param site The CDDB site structure.
  * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
  */
-cddb_error_t cddb_site_print(cddb_site_t *site);
+cddb_error_t cddb_site_print(const cddb_site_t *site);
 
 
 #ifdef __cplusplus
