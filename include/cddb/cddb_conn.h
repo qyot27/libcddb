@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.27 2005/05/29 08:09:52 airborne Exp $
+    $Id: cddb_conn.h,v 1.28 2005/06/15 16:18:12 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -157,6 +157,21 @@ int cddb_set_charset(cddb_conn_t *c, const char *cs);
  * @param size The new buffer size.
  */
 void cddb_set_buf_size(cddb_conn_t *c, unsigned int size);
+
+/**
+ * Set all server details in one go through the use of a site structure.  This
+ * function initializzes the server address, port, protocol and query path in
+ * case of HTTP.
+ *
+ * @see cddb_sites
+ * @see cddb_first_site
+ * @see cddb_next_site
+ *
+ * @param c The connection structure.
+ * @param site The site to use.
+ * @return Error code: CDDB_ERR_OK or CDDB_ERR_INVALID.
+ */
+cddb_error_t cddb_set_site(cddb_conn_t *c, const cddb_site_t *site);
 
 /**
  * Get the host name of the CDDB server that is currently being used.
@@ -543,7 +558,7 @@ int cddb_cache_set_dir(cddb_conn_t *c, const char *dir);
  * @param c The connection structure.
  * @return The first mirror site or NULL if not found.
  */
-cddb_site_t *cddb_first_site(cddb_conn_t *c);
+const cddb_site_t *cddb_first_site(cddb_conn_t *c);
 
 /**
  * Retrieve the next CDDB mirror site.
@@ -551,7 +566,7 @@ cddb_site_t *cddb_first_site(cddb_conn_t *c);
  * @param c The connection structure.
  * @return The next mirror site or NULL if not found.
  */
-cddb_site_t *cddb_next_site(cddb_conn_t *c);
+const cddb_site_t *cddb_next_site(cddb_conn_t *c);
 
 
 #ifdef __cplusplus
