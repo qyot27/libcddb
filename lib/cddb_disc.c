@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.22 2005/05/29 08:18:34 airborne Exp $
+    $Id: cddb_disc.c,v 1.23 2005/07/09 08:37:13 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -126,7 +126,7 @@ void cddb_disc_destroy(cddb_disc_t *disc)
     }
 }
 
-cddb_disc_t *cddb_disc_clone(cddb_disc_t *disc)
+cddb_disc_t *cddb_disc_clone(const cddb_disc_t *disc)
 {
     cddb_disc_t *clone;
     cddb_track_t *track;
@@ -176,7 +176,7 @@ void cddb_disc_add_track(cddb_disc_t *disc, cddb_track_t *track)
     track->disc = disc;
 }
 
-cddb_track_t *cddb_disc_get_track(cddb_disc_t *disc, int track_no)
+cddb_track_t *cddb_disc_get_track(const cddb_disc_t *disc, int track_no)
 {
     cddb_track_t *track;
     
@@ -209,6 +209,35 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc)
 /* --- setters / getters --- */
 
 
+unsigned int cddb_disc_get_discid(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->discid;
+    } return 0;
+}
+
+void cddb_disc_set_discid(cddb_disc_t *disc, unsigned int id)
+{
+    if (disc) {
+        disc->discid = id;
+    }
+}
+
+cddb_cat_t cddb_disc_get_category(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->category;
+    }
+    return CDDB_CAT_INVALID;
+}
+
+void cddb_disc_set_category(cddb_disc_t *disc, cddb_cat_t cat)
+{
+    if (disc) {
+        disc->category = cat;
+    }
+}
+
 const char *cddb_disc_get_category_str(cddb_disc_t *disc)
 {
     if (disc) {
@@ -233,12 +262,66 @@ void cddb_disc_set_category_str(cddb_disc_t *disc, const char *cat)
     }
 }
 
+const char *cddb_disc_get_genre(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->genre;
+    }
+    return NULL;
+}
+
 void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre)
 {
     if (disc) {
         FREE_NOT_NULL(disc->genre);
         disc->genre = strdup(genre);
     }
+}
+
+unsigned int cddb_disc_get_length(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->length;
+    }
+    return 0;
+}
+
+void cddb_disc_set_length(cddb_disc_t *disc, unsigned int l)
+{
+    if (disc) {
+        disc->length = l;
+    }
+}
+
+unsigned int cddb_disc_get_year(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->year;
+    }
+    return 0;
+}
+
+void cddb_disc_set_year(cddb_disc_t *disc, unsigned int y)
+{
+    if (disc) {
+        disc->year = y;
+    }
+}
+
+int cddb_disc_get_track_count(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->track_cnt;
+    }
+    return -1;
+}
+
+const char *cddb_disc_get_title(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->title;
+    }
+    return NULL;
 }
 
 void cddb_disc_set_title(cddb_disc_t *disc, const char *title)
@@ -267,6 +350,14 @@ void cddb_disc_append_title(cddb_disc_t *disc, const char *title)
     }
 }
 
+const char *cddb_disc_get_artist(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->artist;
+    }
+    return NULL;
+}
+
 void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist)
 {
     if (disc) {
@@ -291,6 +382,14 @@ void cddb_disc_append_artist(cddb_disc_t *disc, const char *artist)
         strcpy(disc->artist+old_len, artist);
         disc->artist[old_len+len] = '\0';
     }
+}
+
+const char *cddb_disc_get_ext_data(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->ext_data;
+    }
+    return NULL;
 }
 
 void cddb_disc_set_ext_data(cddb_disc_t *disc, const char *ext_data)

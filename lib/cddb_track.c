@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.18 2005/03/11 21:29:30 airborne Exp $
+    $Id: cddb_track.c,v 1.19 2005/07/09 08:35:58 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -97,7 +97,7 @@ void cddb_track_destroy(cddb_track_t *track)
     }
 }
 
-cddb_track_t *cddb_track_clone(cddb_track_t *track)
+cddb_track_t *cddb_track_clone(const cddb_track_t *track)
 {
     cddb_track_t *clone;
 
@@ -116,6 +116,37 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track)
 
 /* --- getters & setters --- */
 
+
+int cddb_track_get_number(const cddb_track_t *track)
+{
+    if (track) {
+        return track->num;
+    }
+    return -1;                  /* invalid track */
+}
+
+int cddb_track_get_frame_offset(const cddb_track_t *track)
+{
+    if (track) {
+        return track->frame_offset;
+    }
+    return -1;                  /* invalid track */
+}
+
+void cddb_track_set_frame_offset(cddb_track_t *track, int offset)
+{
+    if (track) {
+        track->frame_offset = offset;
+    }
+}
+
+const char *cddb_track_get_title(const cddb_track_t *track)
+{
+    if (track) {
+        return track->title;
+    }
+    return NULL;
+}
 
 void cddb_track_set_title(cddb_track_t *track, const char *title)
 {
@@ -237,6 +268,14 @@ void cddb_track_append_artist(cddb_track_t *track, const char *artist)
         strcpy(track->artist+old_len, artist);
         track->artist[old_len+len] = '\0';
     }
+}
+
+const char *cddb_track_get_ext_data(cddb_track_t *track)
+{
+    if (track) {
+        return track->ext_data;
+    }
+    return NULL;
 }
 
 void cddb_track_set_ext_data(cddb_track_t *track, const char *ext_data)

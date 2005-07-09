@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.35 2005/06/15 16:15:15 airborne Exp $
+    $Id: cddb_conn.c,v 1.36 2005/07/09 08:37:56 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -229,15 +229,54 @@ cddb_error_t cddb_set_site(cddb_conn_t *c, const cddb_site_t *site)
     return cddb_errno_set(c, CDDB_ERR_OK);
 }
 
+const char *cddb_get_server_name(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->server_name;
+    }
+    return NULL;
+}
+
 void cddb_set_server_name(cddb_conn_t *c, const char *server)
 {
     FREE_NOT_NULL(c->server_name);
     c->server_name = strdup(server);
 }
 
+unsigned int cddb_get_server_port(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->server_port;
+    }
+    return 0;
+}
+
 void cddb_set_server_port(cddb_conn_t *c, int port)
 {
     c->server_port = port;
+}
+
+unsigned int cddb_get_timeout(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->timeout;
+    }
+    return 0;
+}
+
+void cddb_set_timeout(cddb_conn_t *c, unsigned int t)
+{
+    if (c) {
+        c->timeout = t;
+    }
+}
+
+const char *cddb_get_http_path_query(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->http_path_query;
+    }
+    return NULL;
 }
 
 void cddb_set_http_path_query(cddb_conn_t *c, const char *path)
@@ -246,10 +285,26 @@ void cddb_set_http_path_query(cddb_conn_t *c, const char *path)
     c->http_path_query = strdup(path);
 }
 
+const char *cddb_get_http_path_submit(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->http_path_submit;
+    }
+    return NULL;
+}
+
 void cddb_set_http_path_submit(cddb_conn_t *c, const char *path)
 {
     FREE_NOT_NULL(c->http_path_submit);
     c->http_path_submit = strdup(path);
+}
+
+unsigned int cddb_is_http_enabled(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->is_http_enabled;
+    }
+    return FALSE;
 }
 
 void cddb_http_enable(cddb_conn_t *c)
@@ -262,6 +317,14 @@ void cddb_http_disable(cddb_conn_t *c)
 {
     c->is_http_enabled = FALSE;
     cddb_errno_set(c, CDDB_ERR_OK);
+}
+
+unsigned int cddb_is_http_proxy_enabled(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->is_http_proxy_enabled;
+    }
+    return FALSE;
 }
 
 void cddb_http_proxy_enable(cddb_conn_t *c)
@@ -278,10 +341,26 @@ void cddb_http_proxy_disable(cddb_conn_t *c)
     cddb_errno_set(c, CDDB_ERR_OK);
 }
 
+const char *cddb_get_http_proxy_server_name(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->http_proxy_server;
+    }
+    return NULL;
+}
+
 void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server)
 {
     FREE_NOT_NULL(c->http_proxy_server);
     c->http_proxy_server = strdup(server);
+}
+
+unsigned int cddb_get_http_proxy_server_port(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->http_proxy_server_port;
+    }
+    return 0;
 }
 
 void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port)
@@ -315,6 +394,14 @@ static void cddb_set_http_proxy_auth(cddb_conn_t *c,
     free(auth);
 }
 
+const char *cddb_get_http_proxy_username(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->http_proxy_username;
+    }
+    return NULL;
+}
+
 void cddb_set_http_proxy_username(cddb_conn_t *c, const char *username)
 {
     FREE_NOT_NULL(c->http_proxy_username);
@@ -323,6 +410,14 @@ void cddb_set_http_proxy_username(cddb_conn_t *c, const char *username)
     }
     /* remake authentication credentials */
     cddb_set_http_proxy_auth(c, c->http_proxy_username, c->http_proxy_password);
+}
+
+const char *cddb_get_http_proxy_password(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->http_proxy_password;
+    }
+    return NULL;
 }
 
 void cddb_set_http_proxy_password(cddb_conn_t *c, const char *password)
@@ -343,6 +438,14 @@ void cddb_set_http_proxy_credentials(cddb_conn_t* c,
     FREE_NOT_NULL(c->http_proxy_password);
     /* remake authentication credentials */
     cddb_set_http_proxy_auth(c, username, password);
+}
+
+cddb_error_t cddb_errno(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->errnum;
+    }
+    return CDDB_ERR_INVALID;
 }
 
 void cddb_set_client(cddb_conn_t *c, const char *cname, const char *cversion)
@@ -382,6 +485,43 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email)
     cddb_log_debug("...host name = '%s'", c->hostname);
 
     return TRUE;
+}
+
+cddb_cache_mode_t cddb_cache_mode(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->use_cache;
+    }
+    return CACHE_OFF;
+}
+
+void cddb_cache_enable(cddb_conn_t *c)
+{
+    if (c) {
+        c->use_cache = CACHE_ON;
+    }
+}
+
+void cddb_cache_only(cddb_conn_t *c)
+{
+    if (c) {
+        c->use_cache = CACHE_ONLY;
+    }
+}
+
+void cddb_cache_disable(cddb_conn_t *c)
+{
+    if (c) {
+        c->use_cache = CACHE_OFF;
+    }
+}
+
+const char *cddb_cache_get_dir(const cddb_conn_t *c)
+{
+    if (c) {
+        return c->cache_dir;;
+    }
+    return NULL;
 }
 
 int cddb_cache_set_dir(cddb_conn_t *c, const char *dir)
