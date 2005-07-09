@@ -1,5 +1,5 @@
 /*
-    $Id: do_display.c,v 1.7 2005/03/11 21:29:27 airborne Exp $
+    $Id: do_display.c,v 1.8 2005/07/09 08:25:10 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -35,7 +35,7 @@ void do_display(cddb_disc_t *disc)
 {
     cddb_track_t *track = NULL; /* libcddb track structure */
     int length;
-    char *s;
+    const char *s;
 
     /* 1. The artist name, disc title and extended data. */
     printf("Artist:   %s\n", STR_OR_NULL(cddb_disc_get_artist(disc)));
