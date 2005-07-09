@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.20 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_disc.h,v 1.21 2005/07/09 08:32:48 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -74,20 +74,7 @@ extern const char *CDDB_CATEGORY[CDDB_CAT_LAST];
  * The CDDB disc structure.  Contains all information associated with
  * a full CD.
  */
-typedef struct cddb_disc_s
-{
-    unsigned int discid;        /**< four byte disc ID */
-    cddb_cat_t category;        /**< CDDB category */
-    char *genre;                /**< disc genre */
-    char *title;                /**< disc title */
-    char *artist;               /**< disc artist */
-    int length;                 /**< disc length in seconds */
-    int year;                   /**< (optional) disc year YYYY */
-    char *ext_data;             /**< (optional) extended disc data  */
-    int track_cnt;              /**< number of tracks on the disc */
-    cddb_track_t *tracks;       /**< pointer to the first track */
-    cddb_track_t *iterator;     /**< track iterator */
-} cddb_disc_t;
+typedef struct cddb_disc_s cddb_disc_t;
 
 
 /* --- construction / destruction */
@@ -113,7 +100,7 @@ void cddb_disc_destroy(cddb_disc_t *disc);
  *
  * @param disc The CDDB disc structure.
  */
-cddb_disc_t *cddb_disc_clone(cddb_disc_t *disc);
+cddb_disc_t *cddb_disc_clone(const cddb_disc_t *disc);
 
 
 /* --- track manipulation */
@@ -135,7 +122,7 @@ void cddb_disc_add_track(cddb_disc_t *disc, cddb_track_t *track);
  * @param disc The CDDB disc structure.
  * @param track_no The track number; starting at 0.
  */
-cddb_track_t *cddb_disc_get_track(cddb_disc_t *disc, int track_no);
+cddb_track_t *cddb_disc_get_track(const cddb_disc_t *disc, int track_no);
 
 /**
  * Returns the first track of the disc.  If there is no such track
@@ -166,12 +153,12 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc);
 
 
 /**
- * Get the ID of the disc.  If this disc ID is not yet initialized 0
- * will be returned.
+ * Get the ID of the disc.  If the disc is invalid or the disc ID is
+ * not yet initialized 0 will be returned.
  *
  * @param disc The CDDB disc structure.
  */
-#define cddb_disc_get_discid(disc) (disc)->discid
+unsigned int cddb_disc_get_discid(const cddb_disc_t *disc);
 
 /**
  * Set the ID of the disc.  When the disc ID is not known yet, then it
@@ -184,13 +171,13 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc);
  * @param disc The CDDB disc structure.
  * @param id The disc ID.
  */
-#define cddb_disc_set_discid(disc, id) (disc)->discid = id
+void cddb_disc_set_discid(cddb_disc_t *disc, unsigned int id);
 
 /**
- * Get the disc CDDB category ID.  If no category is set for this disc
- * then CDDB_CAT_INVALID will be returned.  If you want a string
- * representation of the category use the cddb_disc_get_category_str
- * function.
+ * Get the disc CDDB category ID.  If the disc is invalid or no
+ * category is set then CDDB_CAT_INVALID will be returned.  If you
+ * want a string representation of the category use the
+ * cddb_disc_get_category_str function.
  *
  * @see cddb_disc_set_category
  * @see cddb_disc_get_category_str
@@ -201,7 +188,7 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc);
  * @param disc The CDDB disc structure.
  * @return The CDDB category ID.
  */
-#define cddb_disc_get_category(disc) (disc)->category
+cddb_cat_t cddb_disc_get_category(const cddb_disc_t *disc);
 
 /**
  * Set the disc CDDB category ID.
@@ -215,7 +202,7 @@ cddb_track_t *cddb_disc_get_track_next(cddb_disc_t *disc);
  * @param disc The CDDB disc structure.
  * @param cat  The CDDB category ID.
  */
-#define cddb_disc_set_category(disc, cat) (disc)->category = cat
+void cddb_disc_set_category(cddb_disc_t *disc, cddb_cat_t cat);
 
 /**
  * Get the disc CDDB category as a string.  If no category is set for
@@ -254,7 +241,7 @@ void cddb_disc_set_category_str(cddb_disc_t *disc, const char *cat);
  * @param disc The CDDB disc structure.
  * @return The disc genre.
  */
-#define cddb_disc_get_genre(disc) (disc)->genre
+const char *cddb_disc_get_genre(const cddb_disc_t *disc);
 
 /**
  * Set the disc genre.  As opposed to the disc category, this field is
@@ -276,7 +263,7 @@ void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre);
  * @param disc The CDDB disc structure.
  * @return The disc length in seconds.
  */
-#define cddb_disc_get_length(disc) (disc)->length
+unsigned int cddb_disc_get_length(const cddb_disc_t *disc);
 
 /**
  * Set the disc length.
@@ -284,7 +271,7 @@ void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre);
  * @param disc The CDDB disc structure.
  * @param l    The disc length in seconds.
  */
-#define cddb_disc_set_length(disc, l) (disc)->length = l
+void cddb_disc_set_length(cddb_disc_t *disc, unsigned int l);
 
 /**
  * Get the year of publication for this disc.  If no year is defined 0
@@ -293,7 +280,7 @@ void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre);
  * @param disc The CDDB disc structure.
  * @return The disc year.
  */
-#define cddb_disc_get_year(disc) (disc)->year
+unsigned int cddb_disc_get_year(const cddb_disc_t *disc);
 
 /**
  * Set the year of publication for this disc.
@@ -301,24 +288,25 @@ void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre);
  * @param disc The CDDB disc structure.
  * @param y    The disc year.
  */
-#define cddb_disc_set_year(disc, y) (disc)->year = y
+void cddb_disc_set_year(cddb_disc_t *disc, unsigned int y);
 
 /**
- * Get the number of tracks on the disc.
+ * Get the number of tracks on the disc.  If the disc is invalid -1 is
+ * returned.
  *
  * @param disc The CDDB disc structure.
  * @return The number of tracks.
  */
-#define cddb_disc_get_track_count(disc) (disc)->track_cnt
+int cddb_disc_get_track_count(const cddb_disc_t *disc);
 
 /**
- * Get the disc title.  If no title is set for this disc then NULL
- * will be returned.
+ * Get the disc title.  If the disc is invalid or no title is set then
+ * NULL will be returned.
  *
  * @param disc The CDDB disc structure.
  * @return The disc title.
  */
-#define cddb_disc_get_title(disc) (disc)->title
+const char *cddb_disc_get_title(const cddb_disc_t *disc);
 
 /**
  * Set the disc title.  If the disc already had a title, then the
@@ -342,13 +330,13 @@ void cddb_disc_set_title(cddb_disc_t *disc, const char *title);
 void cddb_disc_append_title(cddb_disc_t *disc, const char *title);
 
 /**
- * Get the disc artist name.  If no artist is set for this disc then
- * NULL will be returned.
+ * Get the disc artist name.  If the disc is invalid or no artist is
+ * set then NULL will be returned.
  *
  * @param disc The CDDB disc structure.
  * @return The disc artist name.
  */
-#define cddb_disc_get_artist(disc) (disc)->artist
+const char *cddb_disc_get_artist(const cddb_disc_t *disc);
 
 /**
  * Set the disc artist name.  If the disc already had an artist name,
@@ -372,13 +360,13 @@ void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist);
 void cddb_disc_append_artist(cddb_disc_t *disc, const char *artist);
 
 /**
- * Get the extended disc data.  If no extended data is set for this
- * disc then NULL will be returned.
+ * Get the extended disc data.  If the disc is invalid or no extended
+ * data is set then NULL will be returned.
  *
  * @param disc The CDDB disc structure.
  * @return The extended data.
  */
-#define cddb_disc_get_ext_data(disc) (disc)->ext_data
+const char *cddb_disc_get_ext_data(const cddb_disc_t *disc);
 
 /**
  * Set the extended data for the disc.  If the disc already had
