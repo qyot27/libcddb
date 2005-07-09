@@ -15,7 +15,7 @@ AC_CONFIG_FILES([Makefile              \
 AM_INIT_AUTOMAKE(libcddb, 1.1.0)
 AM_MAINTAINER_MODE
 
-LIBCDDB_VERSION_NUM=1
+LIBCDDB_VERSION_NUM=110
 AC_SUBST(LIBCDDB_VERSION_NUM)
 
 dnl Process custom command-line options
