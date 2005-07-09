@@ -1,3 +1,200 @@
+2005-07-09 11:07  airborne
+
+	* NEWS: addede 1.1.0 changes
+
+2005-07-09 10:45  airborne
+
+	* configure.ac: updated LIBCDDB_VERSION_NUM version to 110
+
+2005-07-09 10:35  airborne
+
+	* lib/: cddb_track.c, cddb_disc.c, cddb_conn.c: added function
+	  implementations for previously #defined functions
+
+2005-07-09 10:34  airborne
+
+	* include/cddb/cddb_conn_ni.h: moved actual defintion of connection
+	  structure to this file
+
+2005-07-09 10:33  airborne
+
+	* include/cddb/cddb_ni.h: moved definitions of track and disc
+	  structures to this file
+
+2005-07-09 10:32  airborne
+
+	* include/cddb/cddb_disc.h: moved actual definition of cddb_disc_t
+	  structure to cddb_ni.h converted #defined functions to regular
+	  functions
+
+2005-07-09 10:31  airborne
+
+	* include/cddb/cddb_track.h: moved actual definition of
+	  cddb_track_t structure to cddb_ni.h converted #defined functions
+	  to regular functions
+
+2005-07-09 10:29  airborne
+
+	* include/cddb/cddb_conn.h: converted cache mode to enumerated type
+	  actual definition of connection structure moved to cddb_conn_ni.h
+	  converted #defined functions into regular functions
+
+2005-07-09 10:25  airborne
+
+	* examples/do_display.c: added const keyword for strings returned
+	  by library
+
+2005-07-09 10:20  airborne
+
+	* examples/cd_access.c: use LBA instead of LSN
+
+2005-07-09 10:18  airborne
+
+	* configure.ac: bump version to 1.1.0
+
+2005-06-15 18:22  airborne
+
+	* TODO: removed sites command to do
+
+2005-06-15 18:21  airborne
+
+	* examples/main.c: removed obsolete comment
+
+2005-06-15 18:21  airborne
+
+	* examples/do_sites.c: a lot more documentation
+
+2005-06-15 18:19  airborne
+
+	* include/cddb/cddb_ni.h: added site iconv function, updated ASSERT
+	  macros
+
+2005-06-15 18:18  airborne
+
+	* include/cddb/cddb_conn.h: added site setter, some const keyowrds
+
+2005-06-15 18:15  airborne
+
+	* lib/cddb_conn.c: added site setter, some const keywords
+
+2005-06-15 18:13  airborne
+
+	* lib/cddb_cmd.c: iconv support for sites
+
+2005-06-15 18:12  airborne
+
+	* lib/cddb_site.c: added const keyword where appropriate, added
+	  iconv function
+
+2005-06-15 18:08  airborne
+
+	* include/cddb/cddb_site.h: added const keywords where appropriate,
+	  fixed some docs
+
+2005-05-30 21:36  airborne
+
+	* include/cddb/cddb_ni.h: added range assert macro
+
+2005-05-30 21:35  airborne
+
+	* lib/cddb_site.c: added setters and the submit path
+
+2005-05-30 21:34  airborne
+
+	* include/cddb/cddb_site.h: added setters and the HTTP submit path
+
+2005-05-29 10:24  airborne
+
+	* examples/do_sites.c, include/cddb/cddb_site.h, include/cddb/ll.h,
+	  lib/cddb_site.c, lib/ll.c: initial revision
+
+2005-05-29 10:22  airborne
+
+	* examples/Makefile.am: extra source do_sites.c
+
+2005-05-29 10:21  airborne
+
+	* examples/main.h: sites command integration
+
+2005-05-29 10:21  airborne
+
+	* examples/main.c: added code for sites command
+
+2005-05-29 10:20  airborne
+
+	* lib/cddb_regex.c: sites command regular expression function to
+	  retrieve floating point match code clean-up
+
+2005-05-29 10:19  airborne
+
+	* lib/cddb_error.c: new error code for invalid input parameters
+
+2005-05-29 10:18  airborne
+
+	* lib/cddb_disc.c: comment clean-up
+
+2005-05-29 10:16  airborne
+
+	* lib/: cddb_cmd.c, cddb_conn.c: sites command integration query
+	  result now uses linked list
+
+2005-05-29 10:12  airborne
+
+	* include/cddb/cddb_regex.h: added sites command regex added
+	  function to retrieve floating point match
+
+2005-05-29 10:11  airborne
+
+	* include/cddb/cddb_ni.h: added ASSERT macros
+
+2005-05-29 10:11  airborne
+
+	* include/cddb/cddb_error.h: added error code to signal invalid
+	  input parameters
+
+2005-05-29 10:09  airborne
+
+	* include/cddb/cddb_conn.h: sites command integration query results
+	  now use the generic linked list structure
+
+2005-05-29 10:08  airborne
+
+	* include/cddb/cddb_cmd_ni.h: sites command integration query
+	  results now use linked list (removed clear function)
+
+2005-05-29 10:06  airborne
+
+	* include/cddb/: cddb.h, cddb_cmd.h: sites command integration
+
+2005-05-29 10:03  airborne
+
+	* include/cddb/Makefile.am: sites command integration
+
+2005-05-29 09:59  airborne
+
+	* lib/Makefile.am: sites command integration, library version
+	  bumped (new interface)
+
+2005-05-29 09:54  airborne
+
+	* configure.ac: version bumped to 1.1.0-cvs
+
+2005-05-07 11:59  airborne
+
+	* THANKS: [no log message]
+
+2005-05-07 11:54  airborne
+
+	* lib/Makefile.am: library implementation version incremented
+
+2005-05-07 11:42  airborne
+
+	* ChangeLog: added 1.0.2 changes
+
+2005-05-07 11:41  airborne
+
+	* NEWS: added changes between 1.0.1 and 1.0.2
+
 2005-05-07 11:37  airborne
 
 	* misc/libcddb.ebuild: sync with latest ebuild in portage
