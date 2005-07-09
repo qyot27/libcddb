@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.h,v 1.18 2005/03/11 21:29:29 airborne Exp $
+    $Id: cddb_track.h,v 1.19 2005/07/09 08:31:32 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -27,26 +27,12 @@
 #endif
 
 
-/* Forward declaration of the disc structure. */
-struct cddb_disc_c;
-
 /**
  * The CDDB track structure.  Contains all information associated with
  * a single CD track.  This structure will be used to populate the
  * tracks linked list of the cddb_disc_s structure.
  */
-typedef struct cddb_track_s
-{
-    int num;                    /**< track number on the disc */
-    int frame_offset;           /**< frame offset of the track on the disc */
-    int length;                 /**< track length in seconds */
-    char *title;                /**< track title */
-    char *artist;               /**< (optional) track artist */
-    char *ext_data;             /**< (optional) extended disc data */
-    struct cddb_track_s *prev;  /**< pointer to previous track, or NULL */
-    struct cddb_track_s *next;  /**< pointer to next track, or NULL */
-    struct cddb_disc_s *disc;   /**< disc of which this is a track */
-} cddb_track_t;
+typedef struct cddb_track_s cddb_track_t;
 
 
 /* --- construction / destruction */
@@ -74,7 +60,7 @@ void cddb_track_destroy(cddb_track_t *track);
  *
  * @param track The CDDB track structure.
  */
-cddb_track_t *cddb_track_clone(cddb_track_t *track);
+cddb_track_t *cddb_track_clone(const cddb_track_t *track);
 
 
 /* --- getters & setters --- */
@@ -82,20 +68,22 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
 
 /**
  * Get the number of this track.  This track number starts counting at
- * 1.  If the track number is not defined -1 will be returned.
+ * 1.  If the track is invalid or the track number is not defined -1
+ * will be returned.
  *
  * @param track The CDDB track structure.
  * @return The track number.
  */
-#define cddb_track_get_number(track) (track)->num
+int cddb_track_get_number(const cddb_track_t *track);
 
 /**
- * Get the frame offset of this track on the disc.
+ * Get the frame offset of this track on the disc.  If the track is
+ * invalid -1 will be returned.
  *
  * @param track The CDDB track structure.
  * @return The frame offset.
  */
-#define cddb_track_get_frame_offset(track) (track)->frame_offset
+int cddb_track_get_frame_offset(const cddb_track_t *track);
 
 /**
  * Set the frame offset of this track on the disc.
@@ -104,7 +92,7 @@ cddb_track_t *cddb_track_clone(cddb_track_t *track);
  * @param offset The frame offset.
  * @return The frame offset.
  */
-#define cddb_track_set_frame_offset(track, offset) (track)->frame_offset = offset
+void cddb_track_set_frame_offset(cddb_track_t *track, int offset);
 
 /**
  * Get the length of the track in seconds.  If the track length is not
@@ -131,13 +119,13 @@ int cddb_track_get_length(cddb_track_t *track);
 void cddb_track_set_length(cddb_track_t *track, int length);
 
 /**
- * Get the track title.  If no title is set for this track then NULL
- * will be returned.
+ * Get the track title.  If the track is invalid or no title is set
+ * for this track then NULL will be returned.
  *
  * @param track The CDDB track structure.
  * @return The track title.
  */
-#define cddb_track_get_title(track) (track)->title
+const char *cddb_track_get_title(const cddb_track_t *track);
 
 /**
  * Set the track title.  If the track already had a title, then the
@@ -197,7 +185,7 @@ void cddb_track_append_artist(cddb_track_t *track, const char *artist);
  * @param track The CDDB track structure.
  * @return The extended data.
  */
-#define cddb_track_get_ext_data(track) (track)->ext_data
+        const char *cddb_track_get_ext_data(cddb_track_t *track);
 
 /**
  * Set the extended data for the track.  If the track already had
