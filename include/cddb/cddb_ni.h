@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.26 2005/06/15 16:19:43 airborne Exp $
+    $Id: cddb_ni.h,v 1.27 2005/07/09 08:33:49 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -83,6 +83,43 @@
             ASSERT(ptr!=NULL, CDDB_ERR_INVALID)
 #define ASSERT_RANGE(num,lo,hi) \
             ASSERT((num>=lo)&&(num<=hi), CDDB_ERR_INVALID)
+
+
+/* --- type definitions */
+
+
+/** Actual definition of track structure. */
+struct cddb_track_s
+{
+    int num;                    /**< track number on the disc */
+    int frame_offset;           /**< frame offset of the track on the disc */
+    int length;                 /**< track length in seconds */
+    char *title;                /**< track title */
+    char *artist;               /**< (optional) track artist */
+    char *ext_data;             /**< (optional) extended disc data */
+    struct cddb_track_s *prev;  /**< pointer to previous track, or NULL */
+    struct cddb_track_s *next;  /**< pointer to next track, or NULL */
+    struct cddb_disc_s *disc;   /**< disc of which this is a track */
+};
+
+/** Actual definition of disc structure. */
+struct cddb_disc_s
+{
+    unsigned int discid;        /**< four byte disc ID */
+    cddb_cat_t category;        /**< CDDB category */
+    char *genre;                /**< disc genre */
+    char *title;                /**< disc title */
+    char *artist;               /**< disc artist */
+    unsigned int length;        /**< disc length in seconds */
+    unsigned int year;          /**< (optional) disc year YYYY */
+    char *ext_data;             /**< (optional) extended disc data  */
+    int track_cnt;              /**< number of tracks on the disc */
+    cddb_track_t *tracks;       /**< pointer to the first track */
+    cddb_track_t *iterator;     /**< track iterator */
+};
+
+
+/* --- non-exported function prototypes */
 
 
 /**
