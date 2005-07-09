@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.28 2005/06/15 16:18:12 airborne Exp $
+    $Id: cddb_conn.h,v 1.29 2005/07/09 08:29:19 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -30,15 +30,16 @@
 #include <stdio.h>
 #include <netinet/in.h>
 
-#include "cddb/ll.h"
 #include "cddb/cddb_site.h"
 
 
-#define CACHE_OFF  0            /**< do not use local CDDB cache, network
+typedef enum {
+    CACHE_OFF = 0,              /**< do not use local CDDB cache, network
                                      only */
-#define CACHE_ON   1            /**< use local CDDB cache, if possible */
-#define CACHE_ONLY 2            /**< only use local CDDB cache, no network
+    CACHE_ON,                   /**< use local CDDB cache, if possible */
+    CACHE_ONLY                  /**< only use local CDDB cache, no network
                                      access */
+} cddb_cache_mode_t;
 
 /**
  * Forward declaration of opaque structure used for character set
@@ -50,68 +51,7 @@ typedef struct cddb_iconv_s *cddb_iconv_t;
  * An opaque structure for keeping state about the connection to a
  * CDDB server.
  */
-typedef struct cddb_conn_s 
-{
-    unsigned int buf_size;      /**< maximum line/buffer size, defaults to 1024
-                                     (see DEFAULT_BUF_SIZE) */
-    char *line;                 /**< last line read */
-
-    int is_connected;           /**< are we already connected to the server? */
-    struct sockaddr_in sa;      /**< the socket address structure for
-                                     connecting to the CDDB server */
-    int socket;                 /**< the socket file descriptor */
-    char *server_name;          /**< host name of the CDDB server, defaults
-                                     to 'freedb.org' (see DEFAULT_SERVER) */
-    int server_port;            /**< port of the CDDB server, defaults to 888 
-                                     (see DEFAULT_PORT) */
-    int timeout;                /**< time out interval (in seconds) used during
-                                     network operations, defaults to 10 seconds
-                                     (see DEFAULT_TIMEOUT) */
-
-    char *http_path_query;      /**< URL for querying the server through HTTP,
-                                     defaults to /~cddb/cddb.cgi'
-                                     (see DEFAULT_PATH_QUERY) */
-    char *http_path_submit;     /**< URL for submitting to the server through HTTP,
-                                     defaults to /~cddb/submit.cgi'
-                                     (see DEFAULT_PATH_SUBMIT) */
-    int is_http_enabled;        /**< use HTTP, disabled by default */
-
-    int is_http_proxy_enabled;  /**< use HTTP through a proxy server,
-                                     disabled by default */
-    char *http_proxy_server;    /**< host name of the HTTP proxy server */
-    int http_proxy_server_port; /**< port of the HTTP proxy server,
-                                     defaults to 8080 (see DEFAULT_PROXY_PORT) */
-    char *http_proxy_username;  /**< HTTP proxy user name */
-    char *http_proxy_password;  /**< HTTP proxy password */
-    char *http_proxy_auth;      /**< Base64 encoded username:password */
-
-    FILE *cache_fp;             /**< a file pointer to a cached CDDB entry or
-                                     NULL if no cached version is available */
-    int use_cache;              /**< field to specify local CDDB cache behaviour, 
-                                     enabled by default (CACHE_ON) */
-    char *cache_dir;            /**< CDDB slave cache, defaults to 
-                                     '~/.cddbslave' (see DEFAULT_CACHE) */
-    int cache_read;             /**< read data from cached file instead of
-                                     from the network */
-
-    char *cname;                /**< name of the client program, 'libcddb' by
-                                     default */
-    char *cversion;             /**< version of the client program, current 
-                                     libcddb version by default */
-    char *user;                 /**< user name supplied to CDDB server, defaults
-                                     to the value of the 'USER' environment 
-                                     variable or 'anonymous' if undefined */
-    char *hostname;             /**< host name of the local machine, defaults
-                                     to the value of the 'HOSTNAME' environment
-                                     variable or 'localhost' if undefined */
-
-    cddb_error_t errnum;        /**< error number of last CDDB command */
-
-    list_t *query_data;         /**< list to keep CDDB query results */
-    list_t *sites_data;         /**< list to keep FreeDB mirror sites */
-
-    cddb_iconv_t charset;       /**< character set conversion settings */
-} cddb_conn_t;
+typedef struct cddb_conn_s cddb_conn_t;
 
 
 /* --- construction / destruction --- */
@@ -145,8 +85,8 @@ void cddb_destroy(cddb_conn_t *c);
  *
  * @param c The connection structure.
  * @param cs The character set that will be used.
- * @return FALSE if the specified character set is unknown, or no conversion
- *         from/to UTF-8 is available.  TRUE otherwise.
+ * @return False if the specified character set is unknown, or no conversion
+ *         from/to UTF-8 is available.  True otherwise.
  */
 int cddb_set_charset(cddb_conn_t *c, const char *cs);
 
@@ -181,7 +121,7 @@ cddb_error_t cddb_set_site(cddb_conn_t *c, const cddb_site_t *site);
  * @param c The connection structure.
  * @return The server host name.
  */
-#define cddb_get_server_name(c) (c)->server_name
+const char *cddb_get_server_name(const cddb_conn_t *c);
 
 /**
  * Set the host name of the CDDB server.  The default value for the
@@ -202,7 +142,7 @@ void cddb_set_server_name(cddb_conn_t *c, const char *server);
  * @param c The connection structure.
  * @return The server port.
  */
-#define cddb_get_server_port(c) (c)->server_port
+unsigned int cddb_get_server_port(const cddb_conn_t *c);
 
 /**
  * Set the port of the CDDB server.  The default value is 888.
@@ -222,7 +162,7 @@ void cddb_set_server_port(cddb_conn_t *c, int port);
  * @param c The connection structure.
  * @return The current time out in seconds.
  */
-#define cddb_get_timeout(c) (c)->timeout
+unsigned int cddb_get_timeout(const cddb_conn_t *c);
 
 /**
  * Set the network time out value (in seconds).  The default is 10
@@ -233,7 +173,7 @@ void cddb_set_server_port(cddb_conn_t *c, int port);
  * @param c The connection structure.
  * @param t The new time out in seconds.
  */
-#define cddb_set_timeout(c, t) (c)->timeout = t
+void cddb_set_timeout(cddb_conn_t *c, unsigned int t);
 
 /**
  * Get the URL path for querying a CDDB server through HTTP.
@@ -243,7 +183,7 @@ void cddb_set_server_port(cddb_conn_t *c, int port);
  * @param c The connection structure.
  * @return The URL path.
  */
-#define cddb_get_http_path_query(c) (c)->http_path_query
+const char *cddb_get_http_path_query(const cddb_conn_t *c);
 
 /**
  * Set the URL path for querying a CDDB server through HTTP.  The
@@ -264,7 +204,7 @@ void cddb_set_http_path_query(cddb_conn_t *c, const char *path);
  * @param c The connection structure.
  * @return The URL path.
  */
-#define cddb_get_http_path_submit(c) (c)->http_path_submit
+const char *cddb_get_http_path_submit(const cddb_conn_t *c);
 
 /**
  * Set the URL path for submitting to a CDDB server through HTTP.  The
@@ -287,7 +227,7 @@ void cddb_set_http_path_submit(cddb_conn_t *c, const char *path);
  * @param c The CDDB connection structure.
  * @return True or false.
  */
-#define cddb_is_http_enabled(c) (c)->is_http_enabled
+unsigned int cddb_is_http_enabled(const cddb_conn_t *c);
 
 /**
  * Enable HTTP tunneling to connect to the CDDB server.  By default
@@ -323,7 +263,7 @@ void cddb_http_disable(cddb_conn_t *c);
  * @param c The CDDB connection structure.
  * @return True or false.
  */
-#define cddb_is_http_proxy_enabled(c) (c)->is_http_proxy_enabled
+unsigned int cddb_is_http_proxy_enabled(const cddb_conn_t *c);
 
 /**
  * Enable HTTP tunneling through an HTTP proxy server to connect to
@@ -357,7 +297,7 @@ void cddb_http_proxy_disable(cddb_conn_t *c);
  * @param c The connection structure.
  * @return The proxy server host name.
  */
-#define cddb_get_http_proxy_server_name(c) (c)->http_proxy_server
+const char *cddb_get_http_proxy_server_name(const cddb_conn_t *c);
 
 /**
  * Set the host name of the HTTP proxy server.  There is no default
@@ -378,7 +318,7 @@ void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server);
  * @param c The connection structure.
  * @return The proxy server port.
  */
-#define cddb_get_http_proxy_server_port(c) (c)->http_proxy_server_port
+unsigned int cddb_get_http_proxy_server_port(const cddb_conn_t *c);
 
 /**
  * Set the port of the HTTP proxy server.  The default value is 8080.
@@ -397,7 +337,6 @@ void cddb_set_http_proxy_server_port(cddb_conn_t *c, int port);
  * @param c        The connection structure.
  * @param username The user name.
  */
- 
 void cddb_set_http_proxy_username(cddb_conn_t* c, const char* username);
 
 /**
@@ -406,8 +345,7 @@ void cddb_set_http_proxy_username(cddb_conn_t* c, const char* username);
  * @param c The connection structure.
  * @return The user name.
  */
- 
-#define cddb_get_http_proxy_username(c) (c)->http_proxy_username
+const char *cddb_get_http_proxy_username(const cddb_conn_t *c);
 
 /**
  * Set the HTTP proxy password which is used when Basic Authentication
@@ -416,7 +354,6 @@ void cddb_set_http_proxy_username(cddb_conn_t* c, const char* username);
  * @param c      The connection structure.
  * @param passwd The password.
  */
- 
 void cddb_set_http_proxy_password(cddb_conn_t* c, const char* passwd);
 
 /**
@@ -425,8 +362,7 @@ void cddb_set_http_proxy_password(cddb_conn_t* c, const char* passwd);
  * @param c The connection structure.
  * @return The password.
  */
- 
-#define cddb_get_http_proxy_password(c) (c)->http_proxy_password
+const char *cddb_get_http_proxy_password(const cddb_conn_t *c);
 
 /**
  * Set the HTTP proxy user name and password in one go.  These
@@ -448,7 +384,7 @@ void cddb_set_http_proxy_credentials(cddb_conn_t* c,
  * @param c The CDDB connection structure.
  * @return The error number.
  */
-#define cddb_errno(c) (c)->errnum
+cddb_error_t cddb_errno(const cddb_conn_t *c);
 
 /**
  * Set the name and version of the client program overwriting the
@@ -487,7 +423,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  *
  * @param c The connection structure.
  */
-#define cddb_cache_mode(c) (c)->use_cache
+cddb_cache_mode_t cddb_cache_mode(const cddb_conn_t *c);
 
 /**
  * Enable caching of CDDB entries locally.  Caching is enabled by
@@ -500,7 +436,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  *
  * @param c The connection structure.
  */
-#define cddb_cache_enable(c) (c)->use_cache = CACHE_ON
+void cddb_cache_enable(cddb_conn_t *c);
 
 /**
  * Only use the local CDDB cache.  Never contact a server to retrieve
@@ -513,7 +449,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  *
  * @param c The connection structure.
  */
-#define cddb_cache_only(c) (c)->use_cache = CACHE_ONLY
+void cddb_cache_only(cddb_conn_t *c);
 
 /**
  * Disable caching of CDDB entries locally.  All data will be fetched
@@ -526,7 +462,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  *
  * @param c The connection structure.
  */
-#define cddb_cache_disable(c) (c)->use_cache = CACHE_OFF
+void cddb_cache_disable(cddb_conn_t *c);
 
 /**
  * Return the directory currently being used for caching.
@@ -536,7 +472,7 @@ int cddb_set_email_address(cddb_conn_t *c, const char *email);
  * @param c The connection structure.
  * @return The directory being used for caching.
  */
-#define cddb_cache_get_dir(c) (c)->cache_dir;
+const char *cddb_cache_get_dir(const cddb_conn_t *c);
 
 /**
  * Change the directory used for caching CDDB entries locally.  The
