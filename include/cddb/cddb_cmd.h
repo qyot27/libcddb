@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.h,v 1.14 2005/05/29 08:07:16 airborne Exp $
+    $Id: cddb_cmd.h,v 1.15 2005/07/09 10:53:22 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -123,6 +123,8 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc);
 
 /**
  * Query the currently configured server for a list of mirrors.
+ * Accessing the list of mirror sites is done with the iterator
+ * functions #cddb_first_site and #cddb_next_site.
  *
  * @param c The CDDB connection structure.
  */
