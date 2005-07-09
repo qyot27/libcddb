@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.12 2005/05/07 09:41:42 airborne Exp $
+$Id: NEWS,v 1.13 2005/07/09 09:07:28 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -8,7 +8,31 @@ change made to the code tree.  An overview of the CVS changes can be
 found in the Changelog file.
 
 
-CHANGES 1.0.2 -> 1.0.1
+CHANGES 1.0.2 -> 1.1.0
+
+* [IMPORTANT] The installed header files now no longer contain any
+  actual structure definitions.  All libcddb structures are now truly
+  opaque for the user of the library.  Some of the structures have
+  also been updated.  This means that the library is not binary
+  compatible with the previous version.  It should however be possible
+  to just recompile any software using libcddb and link it against
+  this new library.  The API is backwards compatible so no changes to
+  the software should be necessary.
+
+* [NEW] Support for the FreeDB sites command that can be used to get a
+  list of mirror servers.  A function was also added to initialize the
+  libcddb server connection data using one of the servers returned by
+  this command
+
+* [NEW] A new error code was added (CDDB_ERR_INVALID) that is returned
+  when invalid input parameters are passed to one of the library
+  functions.
+
+* [UPDATE] The value of the LIBCDDB_VERSION_NUM defined variable is
+  now 110.
+
+
+CHANGES 1.0.1 -> 1.0.2
 
 * [NEW] Added cddb_set_http_proxy_credentials function that allows you
   to specify proxy user name and password in one go.  It also does not
