@@ -1,5 +1,5 @@
 /*
-    $Id: cd_access.c,v 1.12 2005/04/22 21:42:18 airborne Exp $
+    $Id: cd_access.c,v 1.13 2005/07/09 08:20:07 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -48,7 +48,7 @@ cddb_disc_t *cd_read(char *device)
 
     CdIo_t *cdio;               /* libcdio CD access structure */
     track_t cnt, t;             /* track counters */
-    lsn_t lsn;                  /* Logical Sector Number */
+    lba_t lba;                  /* Logical Block Address */
     int *foffset = NULL;        /* list of frame offsets */
 
     /* Get the name of the default CD-ROM device. */
@@ -85,25 +85,24 @@ cddb_disc_t *cd_read(char *device)
         }
 
         /* Get frame offset of next track. */
-        lsn = cdio_get_track_lsn(cdio, t);
-        if (lsn == CDIO_INVALID_LSN) {
-            libcdio_error_exit("track %d has invalid Logical Sector Number", t);
+        lba = cdio_get_track_lba(cdio, t);
+        if (lba == CDIO_INVALID_LBA) {
+            libcdio_error_exit("track %d has invalid Logical Block Address", t);
         }
 
-        /* Add this offset to the list.  We have to make sure that we
-           add two seconds of lead-in.*/
-        foffset[t - 1] = lsn + SECONDS_TO_FRAMES(2);
+        /* Add this offset to the list. */
+        foffset[t - 1] = lba;
     }
 
     /* Now all we still have to do, is calculate the length of the
        disc in seconds.  We use the LEADOUT_TRACK for this. */
-    lsn = cdio_get_track_lsn(cdio, CDIO_CDROM_LEADOUT_TRACK);
-    if (lsn == CDIO_INVALID_LSN) {
-        libcdio_error_exit("LEADOUT_TRACK has invalid Logical Sector Number");
+    lba = cdio_get_track_lba(cdio, CDIO_CDROM_LEADOUT_TRACK);
+    if (lba == CDIO_INVALID_LBA) {
+        libcdio_error_exit("LEADOUT_TRACK has invalid Logical Block Address");
     }
 
     /* Now we have to create the libcddb disc structure. */
-    disc = cd_create(FRAMES_TO_SECONDS(lsn), cnt, foffset, 0);
+    disc = cd_create(FRAMES_TO_SECONDS(lba), cnt, foffset, 0);
 
     /* Free all resources held by libcdio CD access structure. */
     cdio_destroy(cdio);
