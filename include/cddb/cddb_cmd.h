@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.h,v 1.15 2005/07/09 10:53:22 airborne Exp $
+    $Id: cddb_cmd.h,v 1.16 2005/07/17 09:46:33 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -87,9 +87,7 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc);
  *
  * If there are multiple matches then only the first one will be
  * returned by this function.  For other matches you will have to use
- * the cddb_query_next function.
- *
- * @see cddb_query_next
+ * the #cddb_query_next function.
  *
  * @param c    The CDDB connection structure.
  * @param disc A non-null CDDB disc structure.
@@ -100,14 +98,38 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc);
 
 /**
  * Returns the next match in a CDDB query result set.  This function
- * should be used in conjunction with cddb_query.
- *
- * @see cddb_query
+ * should be used in conjunction with #cddb_query.
  *
  * @param c    The CDDB connection structure.
  * @param disc A non-null CDDB disc structure.
  */
 int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ * Perform a text search in the CDDB database.  Instead of actually
+ * needing information about a real disc like in #cddb_query this
+ * function accept a string that is used for searching the database.
+ *
+ * If there are multiple matches then only the first one will be
+ * returned by this function.  For other matches you will have to use
+ * the #cddb_search_next function.
+ *
+ * @param c    The CDDB connection structure.
+ * @param disc A non-null CDDB disc structure.
+ * @param str  The search string
+ *
+ * @return The number of matches found or -1 on error.
+ */
+int cddb_search(cddb_conn_t *c, cddb_disc_t *disc, const char *str);
+
+/**
+ * Returns the next match in a CDDB search result set.  This function
+ * should be used in conjunction with #cddb_search.
+ *
+ * @param c    The CDDB connection structure.
+ * @param disc A non-null CDDB disc structure.
+ */
+int cddb_search_next(cddb_conn_t *c, cddb_disc_t *disc);
 
 /**
  * Submit a new or updated disc to the CDDB database.  This function
