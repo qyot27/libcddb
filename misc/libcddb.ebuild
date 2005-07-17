@@ -1,6 +1,6 @@
 # Copyright 1999-2005 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /cvsroot/libcddb/libcddb/misc/libcddb.ebuild,v 1.8 2005/05/07 09:37:35 airborne Exp $
+# $Header: /cvsroot/libcddb/libcddb/misc/libcddb.ebuild,v 1.9 2005/07/17 09:59:50 airborne Exp $
 
 IUSE="doc"
 
@@ -9,15 +9,14 @@ HOMEPAGE="http://libcddb.sourceforge.net/"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 LICENSE="LGPL-2"
 
-DEPEND=">=dev-libs/libcdio-0.67
-	doc? ( app-doc/doxygen )"
+DEPEND="doc? ( app-doc/doxygen )"
 
 SLOT="0"
 KEYWORDS="~x86"
 
 
 src_compile() {
-	econf || die
+	econf --without-cdio || die
 	emake || die
 
 	# Create API docs if needed and possible
