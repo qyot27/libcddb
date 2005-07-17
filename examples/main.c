@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.24 2005/06/15 16:21:52 airborne Exp $
+    $Id: main.c,v 1.25 2005/07/17 09:44:50 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -40,7 +40,7 @@
 #define HTTP_PREFIX_LEN 7
 
 /* parsed command-line parameters */
-enum { CMD_NONE = 0, CMD_DISCID, CMD_QUERY, CMD_READ, CMD_SITES };
+enum { CMD_NONE = 0, CMD_DISCID, CMD_QUERY, CMD_READ, CMD_SITES, CMD_SEARCH };
 static int quiet = 0;           /* work silently, reports no errors */
 static int command = 0;         /* request command */
 static char *category = NULL;   /* category command-line argument */
@@ -53,6 +53,7 @@ static char *device = NULL;     /* device to use if use_cd == 1. NULL means
                                    to find a suitable CD-ROM drive. */
 static int use_time = 0;        /* use track times (in seconds) instead of frame offsets */
 static char *charset = NULL;    /* requested character set encoding */
+static char *searchstr = NULL;  /* text search string */
 
 /* print usage message */
 static void usage(void)
@@ -81,6 +82,7 @@ static void usage(void)
     fprintf(stderr, "  query <len> <n> <fo_1> ... <fo_n>\n");
     fprintf(stderr, "                   query CDDB server and list all matching entries\n");
     fprintf(stderr, "  read <cat> <id>  retrieve disc details from CDDB server\n");
+    fprintf(stderr, "  search <str>     perform a text search against the CDDB database\n");
     fprintf(stderr, "  sites            retrieve a list of mirror sites\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Command arguments\n");
@@ -90,6 +92,7 @@ static void usage(void)
     fprintf(stderr, "  <id>             disc ID in hexadecimal\n");
     fprintf(stderr, "  <len>            disc length in seconds\n");
     fprintf(stderr, "  <n>              track count\n");
+    fprintf(stderr, "  <str>            search string\n");
     fprintf(stderr, "\n");
 #ifdef HAVE_LIBCDIO
     fprintf(stderr, "If you do not specify any arguments for a command, the program\n");
@@ -115,6 +118,10 @@ static void usage(void)
     fprintf(stderr, "  To read the details of the CD 'Mezzanine' from Massive Attack:\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "\tcddb_query read misc 0x920ef00b\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "  To search for all CDs with the string 'Mezzanine':\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "\tcddb_query search Mezzanine\n");
 }
 
 /* print error message */
@@ -401,10 +408,20 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
             }
         }
     } else if (strcmp(argv[optind], "sites") == 0) {
-        /* CDDB read */
+        /* CDDB sites */
         command = CMD_SITES;
         if (argc != optind + 1) {
             error_usage("the sites command expects no arguments");
+        }
+        use_cd = 0;
+    } else if (strcmp(argv[optind], "search") == 0) {
+        /* CDDB search */
+        command = CMD_SEARCH;
+        if (argc == optind + 2) {
+            /* one more argument is needed */
+            searchstr = strdup(argv[optind+1]);
+        } else {
+            error_usage("the search command requires one argument");
         }
         use_cd = 0;
     } else {
@@ -509,6 +526,10 @@ int main(int argc, char **argv)
     case CMD_SITES:
         /* Display information about mirror sites. */
         do_sites(conn);
+        break;
+    case CMD_SEARCH:
+        /* Search the CDDB database for possibly matches. */
+        do_search(conn, searchstr, quiet);
         break;
     }
     /* Finally, we have to clean up.  With the cddb_disc_destroy
