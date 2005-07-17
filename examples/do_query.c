@@ -1,5 +1,5 @@
 /*
-    $Id: do_query.c,v 1.7 2005/03/11 21:29:27 airborne Exp $
+    $Id: do_query.c,v 1.8 2005/07/17 09:42:12 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -54,13 +54,13 @@ void do_query(cddb_conn_t *conn, cddb_disc_t *disc, int quiet)
     }
 
     printf("Number of matches: %d\n", matches);
-    /* A CDDB query command will not return the all the disc
-       informatioon.  It will return a subset that can afterwards be
-       used to do a CDDB read.  This enables you to first show a
-       pop-up listing the found matches before doing further reads for
-       the full data.  The data that is returned for each match is:
-       the disc CDDB category, the disc ID as known by the server, the
-       disc title and the artist's name. */
+    /* A CDDB query command will not return all the disc information.
+       It will return a subset that can afterwards be used to do a
+       CDDB read.  This enables you to first show a pop-up listing the
+       found matches before doing further reads for the full data.
+       The data that is returned for each match is: the disc CDDB
+       category, the disc ID as known by the server, the disc title
+       and the artist's name. */
 
     /* Let's loop over the matches. */
     i = 0;
