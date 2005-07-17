@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.56 2005/06/15 16:13:31 airborne Exp $
+    $Id: cddb_cmd.c,v 1.57 2005/07/17 09:56:49 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -39,6 +39,11 @@ static const char *CDDB_COMMANDS[CMD_LAST] = {
     "cddb write %s %08x",
     "proto %d",
     "sites",
+    /* special full text search command (only HTTP) */
+    "words=%s&allfields=NO&"               \
+             "fields=artist&fields=title&" \
+             "allcats=YES&"                \
+             "grouping=none",
 };
 
 #define WRITE_BUF_SIZE 4096
@@ -67,52 +72,31 @@ char *cddb_read_line(cddb_conn_t *c);
  */
 int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc);
 
-/**
- */
 int cddb_http_parse_response(cddb_conn_t *c);
 
-/**
- */
 void cddb_http_parse_headers(cddb_conn_t *c);
 
-/**
- */
-int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args);
+int cddb_http_send_cmd(cddb_conn_t *c, cddb_cmd_t cmd, va_list args);
 
-/**
- */
 int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc);
 
-/**
- */
 int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line);
 
-/**
- */
+static int cddb_parse_search_data(cddb_conn_t *c, cddb_disc_t **disc,
+                                  char *line, regmatch_t *matches);
+
 char *cddb_cache_file_name(cddb_conn_t *c, cddb_disc_t *disc);
 
-/**
- */
 int cddb_cache_exists(cddb_conn_t *c, cddb_disc_t *disc);
 
-/**
- */
 int cddb_cache_open(cddb_conn_t *c, cddb_disc_t *disc, const char* mode);
 
-/**
- */
 void cddb_cache_close(cddb_conn_t *c);
 
-/**
- */
 int cddb_cache_read(cddb_conn_t *c, cddb_disc_t *disc);
 
-/**
- */
 int cddb_cache_query(cddb_conn_t *c, cddb_disc_t *disc);
 
-/**
- */
 int cddb_cache_query_disc(cddb_conn_t *c, cddb_disc_t *disc);
 
 /**
@@ -120,8 +104,6 @@ int cddb_cache_query_disc(cddb_conn_t *c, cddb_disc_t *disc);
  */
 void cddb_cache_query_init(void);
 
-/**
- */
 int cddb_cache_mkdir(cddb_conn_t *c, cddb_disc_t *disc);
 
 
@@ -463,7 +445,7 @@ static int cddb_add_proxy_auth(cddb_conn_t *c)
     return TRUE;
 }
 
-int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
+int cddb_http_send_cmd(cddb_conn_t *c, cddb_cmd_t cmd, va_list args)
 {
     cddb_log_debug("cddb_http_send_cmd()");
     switch (cmd) {
@@ -505,11 +487,11 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
                 
                 if (c->is_http_proxy_enabled) {
                     /* use an HTTP proxy */
-                    sock_fprintf(c, "GET http://%s:%d%s", 
+                    sock_fprintf(c, "GET http://%s:%d%s?", 
                                  c->server_name, c->server_port, c->http_path_query);
                 } else {
                     /* direct connection */
-                    sock_fprintf(c, "GET %s", c->http_path_query);
+                    sock_fprintf(c, "GET %s?", c->http_path_query);
                 }
 
                 buf = (char*)malloc(c->buf_size);
@@ -520,12 +502,15 @@ int cddb_http_send_cmd(cddb_conn_t *c, int cmd, va_list args)
                     return FALSE;
                 }
                 url_encode(buf);
-                sock_fprintf(c, "?cmd=%s&", buf);
+                if (cmd == CMD_SEARCH) {
+                    sock_fprintf(c, "%s", buf);
+                } else {
+                    sock_fprintf(c, "cmd=%s&", buf);
+                    sock_fprintf(c, "hello=%s+%s+%s+%s&", 
+                                 c->user, c->hostname, c->cname, c->cversion);
+                    sock_fprintf(c, "proto=%d", DEFAULT_PROTOCOL_VERSION);
+                }
                 free(buf);
-
-                sock_fprintf(c, "hello=%s+%s+%s+%s&", 
-                             c->user, c->hostname, c->cname, c->cversion);
-                sock_fprintf(c, "proto=%d", DEFAULT_PROTOCOL_VERSION);
                 sock_fprintf(c, " HTTP/1.0\r\n");
 
                 if (c->is_http_proxy_enabled) {
@@ -1148,6 +1133,112 @@ int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
 
     cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
+}
+
+static int cddb_parse_search_data(cddb_conn_t *c, cddb_disc_t **disc,
+                                  char *line, regmatch_t *matches)
+{
+    regmatch_t pre_matches[11];
+    char *buf;
+
+    /* HACK: because of greedy matching of POSIX regular expressions
+       we first need to check whether the prefix remainder also
+       contains a valid match. */
+    buf = cddb_regex_get_string(line, matches, 1);
+    if (regexec(REGEX_TEXT_SEARCH, buf, 11, pre_matches, 0) == 0) {
+        cddb_parse_search_data(c, disc, buf, pre_matches);
+    }
+    free(buf);
+    /* clone so that duplicate matches get correct artist and title */
+    if (*disc) {
+        *disc = cddb_disc_clone(*disc);
+    } else {
+        *disc = cddb_disc_new();
+    }
+    if (*disc == NULL) {
+        cddb_errno_log_error(c, CDDB_ERR_OUT_OF_MEMORY);
+        return FALSE;
+    }
+    /* fill in the results in the new disc */
+    buf = cddb_regex_get_string(line, matches, 2);
+    cddb_disc_set_category_str(*disc, buf);
+    free(buf);
+    cddb_disc_set_discid(*disc, cddb_regex_get_hex(line, matches, 3));
+    if (matches[6].rm_so != -1) {
+        buf = cddb_regex_get_string(line, matches, 6);
+        cddb_disc_set_artist(*disc, buf);
+        free(buf);
+        buf = cddb_regex_get_string(line, matches, 7);
+        cddb_disc_set_title(*disc, buf);
+        free(buf);
+    } else if (matches[8].rm_so != -1) {
+        buf = cddb_regex_get_string(line, matches, 8);
+        cddb_disc_set_artist(*disc, buf);
+        cddb_disc_set_title(*disc, buf);
+        free(buf);
+    } else if (matches[10].rm_so != -1) {
+        /* nothing to do, values should be correct because of cloning */
+    }
+    // XXX: what about character set conversion??
+    list_append(c->query_data, *disc);
+    return TRUE;
+}
+
+int cddb_search(cddb_conn_t *c, cddb_disc_t *disc, const char *str)
+{
+    regmatch_t matches[11];
+    char *line;
+    int count;
+    cddb_disc_t *aux = NULL;
+
+    /* NOTE: For server access this function uses the special
+             'cddb_search_conn' connection structure. */
+    // XXX: proxy parameters need to be copied from 'c' to 'cddb_search_conn'
+
+    cddb_log_debug("cddb_search()");
+    /* clear previous query result set */
+    list_flush(c->query_data);
+    
+    if (!cddb_connect(cddb_search_conn)) {
+        /* connection not OK, copy error code */
+        cddb_errno_set(c, cddb_errno(cddb_search_conn));
+        return -1;
+    }
+
+    /* send query command and check response */
+    if (!cddb_send_cmd(cddb_search_conn, CMD_SEARCH, str)) {
+        /* sending command failed, copy error code */
+        cddb_errno_set(c, cddb_errno(cddb_search_conn));
+        return -1;
+    }
+
+    /* parse HTML response page */
+    while ((line = cddb_read_line(cddb_search_conn)) != NULL) {
+        if (regexec(REGEX_TEXT_SEARCH, line, 11, matches, 0) == 0) {
+            /* process matching result line */
+            if (!cddb_parse_search_data(c, &aux, line, matches)) {
+                return -1;
+            }
+        }
+    }
+    /* return first disc in result set */
+    count = list_size(c->query_data);
+    if (count  != 0) {
+        cddb_disc_copy(disc, 
+                       (cddb_disc_t *)element_data(list_first(c->query_data)));
+    }
+    /* close connection */
+    cddb_disconnect(cddb_search_conn);
+
+    cddb_log_debug("...number of matches: %d", count);
+    cddb_errno_set(c, CDDB_ERR_OK);
+    return count;
+}
+
+int cddb_search_next(cddb_conn_t *c, cddb_disc_t *disc)
+{
+    cddb_log_debug("cddb_search_next() ->");
+    return cddb_query_next(c, disc);
 }
 
 int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc)
