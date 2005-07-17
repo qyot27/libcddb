@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.27 2005/07/09 08:33:49 airborne Exp $
+    $Id: cddb_ni.h,v 1.28 2005/07/17 09:48:41 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -117,6 +117,13 @@ struct cddb_disc_s
     cddb_track_t *tracks;       /**< pointer to the first track */
     cddb_track_t *iterator;     /**< track iterator */
 };
+
+
+/* --- global variables */
+
+
+/** Server connection used especially for text searches. */
+extern cddb_conn_t *cddb_search_conn;
 
 
 /* --- non-exported function prototypes */
