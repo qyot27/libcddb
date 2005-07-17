@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.c,v 1.13 2005/05/29 08:20:15 airborne Exp $
+    $Id: cddb_regex.c,v 1.14 2005/07/17 09:58:22 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -39,10 +39,9 @@ regex_t *REGEX_TRACK_EXT = NULL;
 regex_t *REGEX_PLAY_ORDER = NULL;
 regex_t *REGEX_QUERY_MATCH = NULL;
 regex_t *REGEX_SITE = NULL;
+regex_t *REGEX_TEXT_SEARCH = NULL;
 
 
-/**
- */
 static int cddb_regex_init_1(regex_t **p, const char *regex)
 {
     if ((*p = (regex_t*)malloc(sizeof(regex_t))) == NULL) {
@@ -84,6 +83,13 @@ void cddb_regex_init()
     /*          <server> <proto> <port> <query-url> <latitude> <longitude> <description> */
     rv = cddb_regex_init_1(&REGEX_SITE,
                            "^([[:graph:]]+)[[:blank:]]([[:alpha:]]+)[[:blank:]]([[:digit:]]+)[[:blank:]]([[:graph:]]+)[[:blank:]]([NS])([0-9.]+)[[:blank:]]([EW])([0-9.]+)[[:blank:]](.*)$");
+
+    /* example: ...<a href="http://www.freedb.org/freedb_search_fmt.php?cat=rock&id=8e0eee0b">Massive Attack / Mezzanine</a>... */
+    /*          ...<a href="http://www.freedb.org/freedb_search_fmt.php?cat=soundtrack&id=b30ed30b"><font size=-1>3</font></a>... */
+    /*          <1:greedy_remains> <2:category> <3:discid> <6:artist> <7:title> <8:artist_title> <10:duplicate_number> */
+    rv = cddb_regex_init_1(&REGEX_TEXT_SEARCH,
+                           "^(.*)/freedb_search_fmt\\.php\\?cat=([[:alpha:]]+)&id=([[:xdigit:]]+)\">"
+                           "((([^<]+) / ([^<]+))|([^<]+)|([^>]*>([[:digit:]]+)<.*))</a>.*$");
 }
 
 static inline void cddb_regfree(regex_t *regex) 
@@ -108,6 +114,7 @@ void cddb_regex_destroy()
     cddb_regfree(REGEX_TRACK_EXT);
     cddb_regfree(REGEX_PLAY_ORDER);
     cddb_regfree(REGEX_QUERY_MATCH);
+    cddb_regfree(REGEX_TEXT_SEARCH);
 }
 
 int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx)
@@ -119,6 +126,17 @@ int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx)
     i = atoi(buf);
     free(buf);
     return i;
+}
+
+unsigned long cddb_regex_get_hex(const char *s, regmatch_t matches[], int idx)
+{
+    char *buf, *endp;
+    long long h;
+
+    buf = cddb_regex_get_string(s, matches, idx);
+    h = strtoll(buf, &endp, 16);
+    free(buf);
+    return (unsigned long)(h & 0xffffffff);
 }
 
 double cddb_regex_get_float(const char *s, regmatch_t matches[], int idx)
