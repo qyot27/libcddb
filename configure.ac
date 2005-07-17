@@ -12,10 +12,10 @@ AC_CONFIG_FILES([Makefile              \
                  examples/Makefile     \
                  tests/Makefile        \
                  tests/settings.sh])
-AM_INIT_AUTOMAKE(libcddb, 1.1.0)
+AM_INIT_AUTOMAKE(libcddb, 1.2.0-cvs)
 AM_MAINTAINER_MODE
 
-LIBCDDB_VERSION_NUM=110
+LIBCDDB_VERSION_NUM=120
 AC_SUBST(LIBCDDB_VERSION_NUM)
 
 dnl Process custom command-line options
