@@ -1,5 +1,5 @@
 /*
-    $Id: cddb.c,v 1.1 2005/03/11 21:11:54 airborne Exp $
+    $Id: cddb.c,v 1.2 2005/07/17 09:53:49 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -23,16 +23,29 @@
 #include "cddb/cddb_ni.h"
 
 
-/**
- */
+/* --- global variables */
+
+
+cddb_conn_t *cddb_search_conn;
+
+/** Library initialized or not? */
 static int initialized = 0;
+
+
+/* --- public functions */
 
 
 void libcddb_init(void)
 {
     if (!initialized) {
         cddb_regex_init();
-        initialized = 1;
+        initialized = 1;        /* before the call to cddb_new() below to avoid
+                                   deadlock */
+        /* Initialize connection structure for text search */
+        cddb_search_conn = cddb_new();
+        cddb_http_enable(cddb_search_conn);
+        cddb_set_server_port(cddb_search_conn, 80);
+        cddb_set_http_path_query(cddb_search_conn, "/freedb_search.php");
     }
 }
 
@@ -40,6 +53,7 @@ void libcddb_shutdown(void)
 {
     if (initialized) {
         cddb_regex_destroy();
+        cddb_destroy(cddb_search_conn);
         initialized = 0;
     }
 }
