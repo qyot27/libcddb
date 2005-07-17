@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.h,v 1.12 2005/05/29 08:12:57 airborne Exp $
+    $Id: cddb_regex.h,v 1.13 2005/07/17 09:51:57 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -36,8 +36,7 @@
 #include <sys/types.h>          /* need for MacOS X */
 #include <regex.h>
 
-/**
- */
+
 extern regex_t *REGEX_TRACK_FRAME_OFFSETS;
 extern regex_t *REGEX_TRACK_FRAME_OFFSET;
 extern regex_t *REGEX_DISC_LENGTH;
@@ -50,26 +49,19 @@ extern regex_t *REGEX_TRACK_EXT;
 extern regex_t *REGEX_PLAY_ORDER;
 extern regex_t *REGEX_QUERY_MATCH;
 extern regex_t *REGEX_SITE;
+extern regex_t *REGEX_TEXT_SEARCH;
 
 
-/**
- */
 void cddb_regex_init(void);
 
-/**
- */
 void cddb_regex_destroy(void);
 
-/**
- */
 int cddb_regex_get_int(const char *s, regmatch_t matches[], int idx);
 
-/**
- */
+unsigned long cddb_regex_get_hex(const char *s, regmatch_t matches[], int idx);
+
 double cddb_regex_get_float(const char *s, regmatch_t matches[], int idx);
 
-/**
- */
 char *cddb_regex_get_string(const char *s, regmatch_t matches[], int idx);
 
 
