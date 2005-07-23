@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.13 2005/07/09 09:07:28 airborne Exp $
+$Id: NEWS,v 1.14 2005/07/23 09:55:01 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -6,6 +6,16 @@ between different libcddb releases.  These changes might impact the
 programs that use this library.  It does not describe every single
 change made to the code tree.  An overview of the CVS changes can be
 found in the Changelog file.
+
+
+CHANGES 1.1.0 -> 1.2.0
+
+* [NEW] Support for searching the FreeDB database using a text string
+  has been added.  This feature has a similar API as the query
+  command but uses a string instead of actual disc data.
+
+* [UPDATE] The value of the LIBCDDB_VERSION_NUM defined variable is
+  now 120.
 
 
 CHANGES 1.0.2 -> 1.1.0
