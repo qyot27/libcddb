@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn_ni.h,v 1.12 2005/07/09 08:34:56 airborne Exp $
+    $Id: cddb_conn_ni.h,v 1.13 2005/07/23 07:20:19 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -111,21 +111,25 @@ struct cddb_conn_s
 /* --- getters & setters --- */
 
 
-/**
- */
 #define cddb_cache_file(c) (c)->cache_fp
 
 
 /* --- connecting / disconnecting --- */
 
 
-/**
- */
 int cddb_connect(cddb_conn_t *c);
 
-/**
- */
 void cddb_disconnect(cddb_conn_t *c);
+
+
+/* --- miscellaneous --- */
+
+
+/**
+ * Clone proxy settings from source connection to destinaton
+ * connection.
+ */
+void cddb_clone_proxy(cddb_conn_t *dst, cddb_conn_t *src);
 
 
 /* --- error handling --- */
