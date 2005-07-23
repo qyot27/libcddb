@@ -1,5 +1,5 @@
 /*
-    $Id: do_search.c,v 1.1 2005/07/17 10:01:35 airborne Exp $
+    $Id: do_search.c,v 1.2 2005/07/23 07:10:57 airborne Exp $
 
     Copyright (C) 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -22,14 +22,9 @@
 #include "main.h"
 
 
-void do_search(cddb_conn_t *conn, const char *str, int quiet)
+void do_search(cddb_conn_t *conn, cddb_disc_t *disc, const char *str, int quiet)
 {
     int matches, i;
-    cddb_disc_t *disc;
-
-    /* First create a new (empty) disc structure.  It will be filled
-       with the first match (if any) by the search command. */
-    disc = cddb_disc_new();
 
     /* Try searching the database for any discs matching the provided
        search string.  This function will return the number of matches
