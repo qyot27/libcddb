@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: check_server.sh,v 1.7 2004/03/03 12:35:50 rockyb Exp $
+# $Id: check_server.sh,v 1.8 2005/07/23 09:43:17 airborne Exp $
 
 . ./settings.sh
 
@@ -22,45 +22,52 @@ fi
 # Query disc with single match
 #
 QUERY_DATA='2259 8 155 25947 47357 66630 91222 110355 124755 148317'
-QUERY_HASH='b2bba00e1890d659'
 
-start_test 'CDDBP disc query '${QUERY_HASH}
+start_test 'CDDBP disc query (single match)'
 cddb_query -c off -D $CDDB_CACHE -P cddbp query $QUERY_DATA
-check_query $? $QUERY_HASH
+check_query $?
 
-start_test 'HTTP  disc query '${QUERY_HASH}
+start_test 'HTTP  disc query (single match)'
 cddb_query -c off -D $CDDB_CACHE -P http  query $QUERY_DATA
-check_query $? $QUERY_HASH
+check_query $?
 
-start_test 'PROXY disc query '${QUERY_HASH}
+start_test 'PROXY disc query (single match)'
 if test $NO_PROXY -eq 1; then
     skip $NO_PROXY_REASON
 else
     cddb_query -c off -D $CDDB_CACHE -P proxy query $QUERY_DATA
-    check_query $? $QUERY_HASH
+    check_query $?
 fi
 
 #
 # Query disc with multiple matches
 #
 QUERY_DATA='3822 11 150 28690 51102 75910 102682 121522 149040 175772 204387 231145 268065'
-QUERY_HASH='56c2171b89496518'
 
-start_test 'CDDBP disc query '${QUERY_HASH}
+start_test 'CDDBP disc query (multiple matches)'
 cddb_query -c off -D $CDDB_CACHE -P cddbp query $QUERY_DATA
-check_query $? $QUERY_HASH
+check_query $?
 
-start_test 'HTTP  disc query '${QUERY_HASH}
+start_test 'HTTP  disc query (multiple matches)'
 cddb_query -c off -D $CDDB_CACHE -P http  query $QUERY_DATA
-check_query $? $QUERY_HASH
+check_query $?
 
-start_test 'PROXY disc query '${QUERY_HASH}
+start_test 'PROXY disc query (multiple matches)'
 if test $NO_PROXY -eq 1; then
     skip $NO_PROXY_REASON
 else
     cddb_query -c off -D $CDDB_CACHE -P proxy query $QUERY_DATA
-    check_query $? $QUERY_HASH
+    check_query $?
 fi
+
+#
+# Search string (multiple matches)
+#
+SEARCH_DATA='mezzanine'
+
+start_test 'HTTP  text search (multiple matches)'
+cddb_query search $SEARCH_DATA
+check_query $?
 
 #
 # Read disc data from server
