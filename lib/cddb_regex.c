@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.c,v 1.14 2005/07/17 09:58:22 airborne Exp $
+    $Id: cddb_regex.c,v 1.15 2005/07/23 07:23:24 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -114,6 +114,7 @@ void cddb_regex_destroy()
     cddb_regfree(REGEX_TRACK_EXT);
     cddb_regfree(REGEX_PLAY_ORDER);
     cddb_regfree(REGEX_QUERY_MATCH);
+    cddb_regfree(REGEX_SITE);
     cddb_regfree(REGEX_TEXT_SEARCH);
 }
 
