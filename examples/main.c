@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.26 2005/07/23 07:17:34 airborne Exp $
+    $Id: main.c,v 1.27 2005/07/23 09:42:16 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -551,6 +551,11 @@ int main(int argc, char **argv)
 
     /* Also destroy any global resources reserved by the library. */
     libcddb_shutdown();
+
+    FREE_NOT_NULL(charset);
+    FREE_NOT_NULL(device);
+    FREE_NOT_NULL(category);
+    FREE_NOT_NULL(searchstr);
 
     return 0;
 }
