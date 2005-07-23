@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.25 2005/07/17 09:44:50 airborne Exp $
+    $Id: main.c,v 1.26 2005/07/23 07:17:34 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -475,6 +475,13 @@ int main(int argc, char **argv)
         /* The frame offset data is no longer needed because it is now
            also present in the disc structure. */
         FREE_NOT_NULL(foffset);
+    } else if (command == CMD_SEARCH) {
+        /* Create an empty disc structure for the search command.  It
+           will be used to store the search results. */
+        disc = cddb_disc_new();
+        if (!disc) {
+            error_exit(GENERIC_ERROR, "could not create disc structure");
+        }
     }
 
     /* Execute requested command. */
@@ -529,7 +536,7 @@ int main(int argc, char **argv)
         break;
     case CMD_SEARCH:
         /* Search the CDDB database for possibly matches. */
-        do_search(conn, searchstr, quiet);
+        do_search(conn, disc, searchstr, quiet);
         break;
     }
     /* Finally, we have to clean up.  With the cddb_disc_destroy
