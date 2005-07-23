@@ -1,4 +1,6 @@
-$Id: TODO,v 1.24 2005/06/15 16:22:52 airborne Exp $
+$Id: TODO,v 1.25 2005/07/23 07:09:52 airborne Exp $
+
+* charset conversion for full text search results??
 
 * check out-of-memory on malloc
 
@@ -9,7 +11,5 @@ $Id: TODO,v 1.24 2005/06/15 16:22:52 airborne Exp $
 * support for writing multi-lined fields
 
 * create some sort of local CDDB query index?
-
-* full text search on CDDB server
 
 * add lscat command
