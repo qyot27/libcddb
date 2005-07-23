@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.57 2005/07/17 09:56:49 airborne Exp $
+    $Id: cddb_cmd.c,v 1.58 2005/07/23 07:22:23 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -1179,7 +1179,6 @@ static int cddb_parse_search_data(cddb_conn_t *c, cddb_disc_t **disc,
     } else if (matches[10].rm_so != -1) {
         /* nothing to do, values should be correct because of cloning */
     }
-    // XXX: what about character set conversion??
     list_append(c->query_data, *disc);
     return TRUE;
 }
@@ -1193,9 +1192,9 @@ int cddb_search(cddb_conn_t *c, cddb_disc_t *disc, const char *str)
 
     /* NOTE: For server access this function uses the special
              'cddb_search_conn' connection structure. */
-    // XXX: proxy parameters need to be copied from 'c' to 'cddb_search_conn'
-
     cddb_log_debug("cddb_search()");
+    /* copy proxy parameters */
+    cddb_clone_proxy(cddb_search_conn, c);
     /* clear previous query result set */
     list_flush(c->query_data);
     
