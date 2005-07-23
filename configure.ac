@@ -12,11 +12,14 @@ AC_CONFIG_FILES([Makefile              \
                  examples/Makefile     \
                  tests/Makefile        \
                  tests/settings.sh])
-AM_INIT_AUTOMAKE(libcddb, 1.2.0-cvs)
+AM_INIT_AUTOMAKE(libcddb, 1.2.0)
 AM_MAINTAINER_MODE
 
 LIBCDDB_VERSION_NUM=120
 AC_SUBST(LIBCDDB_VERSION_NUM)
+
+dnl iconv uses gettext macros (dependency on config.rpath)
+AM_GNU_GETTEXT_VERSION(0.14.4)
 
 dnl Process custom command-line options
 AC_ARG_ENABLE([loglevel],
