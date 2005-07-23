@@ -10,4 +10,5 @@ libtoolize --force --copy
 autoheader
 automake --add-missing --copy
 autoconf
+autopoint                       # for iconv/gettext/config.rpath dependency
 #configure --enable-maintainer-mode
