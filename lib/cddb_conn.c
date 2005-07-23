@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.36 2005/07/09 08:37:56 airborne Exp $
+    $Id: cddb_conn.c,v 1.37 2005/07/23 07:21:14 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -683,4 +683,25 @@ void cddb_disconnect(cddb_conn_t *c)
         c->socket = -1;
     }
     cddb_errno_set(c, CDDB_ERR_OK);
+}
+
+
+/* --- miscellaneous --- */
+
+
+void cddb_clone_proxy(cddb_conn_t *dst, cddb_conn_t *src)
+{
+    if (cddb_is_http_proxy_enabled(src)) {
+        /* XXX: optimize? */
+        FREE_NOT_NULL(dst->http_proxy_server);
+        if (src->http_proxy_server) {
+            dst->http_proxy_server = strdup(src->http_proxy_server);
+        }
+        dst->http_proxy_server_port = src->http_proxy_server_port;
+        FREE_NOT_NULL(dst->http_proxy_auth);
+        if (src->http_proxy_auth) {
+            dst->http_proxy_auth = strdup(src->http_proxy_auth);
+        }
+        cddb_http_proxy_enable(dst);
+    }
 }
