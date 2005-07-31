@@ -143,7 +143,8 @@ else
     WARN_CFLAGS="$WARN_CFLAGS -Wunused -Wpointer-arith -Wwrite-strings -Wnested-externs"
     WARN_CFLAGS="$WARN_CFLAGS -Wno-sign-compare"
 dnl MAINTAINER_CFLAGS="-std=c99 -pedantic -Werror -O0"
-    MAINTAINER_CFLAGS="-Werror -O0"
+dnl MAINTAINER_CFLAGS="-Werror -O0"
+    MAINTAINER_CFLAGS="-Werror"
 
     if test "x$enable_maintainer_mode" = "xyes"; then
         maintainer_flags=""
