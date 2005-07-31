@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.58 2005/07/23 07:22:23 airborne Exp $
+    $Id: cddb_cmd.c,v 1.59 2005/07/31 11:08:59 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -1454,7 +1454,7 @@ int cddb_write(cddb_conn_t *c, cddb_disc_t *disc)
 int cddb_sites(cddb_conn_t *c)
 {
     char *msg, *line;
-    int code, rc;
+    int code;
     cddb_site_t *site;
 
     cddb_log_debug("cddb_sites()");
@@ -1515,5 +1515,5 @@ int cddb_sites(cddb_conn_t *c)
         cddb_disconnect(c);
     }
 
-    return rc;
+    return TRUE;
 }
