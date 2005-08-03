@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.37 2005/07/23 07:21:14 airborne Exp $
+    $Id: cddb_conn.c,v 1.38 2005/08/03 18:28:22 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -58,7 +58,8 @@ static int cddb_handshake(cddb_conn_t *c);
  * Reset proxy authentication credentials.
  */
 static void cddb_set_http_proxy_auth(cddb_conn_t *c,
-                                     const char *username, const char *password);
+                                     const char *username,
+                                     const char *password);
 
 
 /* --- construction / destruction --- */
@@ -116,6 +117,9 @@ cddb_conn_t *cddb_new(void)
         c->charset = malloc(sizeof(struct cddb_iconv_s));
         c->charset->cd_to_freedb = NULL;
         c->charset->cd_from_freedb = NULL;
+
+        c->srch.fields = SEARCH_ARTIST | SEARCH_TITLE;
+        c->srch.cats = SEARCH_ALL;
     } else {
         cddb_log_crit(cddb_error_str(CDDB_ERR_OUT_OF_MEMORY));
     }
@@ -567,6 +571,15 @@ const cddb_site_t *cddb_next_site(cddb_conn_t *c)
     return NULL;
 }
 
+void cddb_search_set_fields(cddb_conn_t *c, unsigned int fields)
+{
+    c->srch.fields = fields;
+}
+
+void cddb_search_set_categories(cddb_conn_t *c, unsigned int cats)
+{
+    c->srch.cats = cats;
+}
 
 /* --- connecting / disconnecting --- */
 
