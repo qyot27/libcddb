@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.59 2005/07/31 11:08:59 airborne Exp $
+    $Id: cddb_cmd.c,v 1.60 2005/08/03 18:35:06 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -40,10 +40,7 @@ static const char *CDDB_COMMANDS[CMD_LAST] = {
     "proto %d",
     "sites",
     /* special full text search command (only HTTP) */
-    "words=%s&allfields=NO&"               \
-             "fields=artist&fields=title&" \
-             "allcats=YES&"                \
-             "grouping=none",
+    "words=%s%s",
 };
 
 #define WRITE_BUF_SIZE 4096
@@ -84,6 +81,9 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line);
 
 static int cddb_parse_search_data(cddb_conn_t *c, cddb_disc_t **disc,
                                   char *line, regmatch_t *matches);
+
+static void cddb_search_param_str(cddb_search_params_t *params,
+                                  char *buf, int len);
 
 char *cddb_cache_file_name(cddb_conn_t *c, cddb_disc_t *disc);
 
@@ -1183,12 +1183,56 @@ static int cddb_parse_search_data(cddb_conn_t *c, cddb_disc_t **disc,
     return TRUE;
 }
 
+/**
+ * Build the search parameter string.
+ */
+static void cddb_search_param_str(cddb_search_params_t *params,
+                                  char *buf, int len)
+{
+    char *p = buf;
+    int i;
+
+    /* XXX: to buffer overflow checking */
+    strcpy(p, "&allfields="); p += 11;
+    if (params->fields == SEARCH_ALL) {
+        strcpy(p, "YES"); p += 3;
+    } else {
+        strcpy(p, "NO"); p += 2;
+        if (params->fields & SEARCH_ARTIST) {
+            strcpy(p, "&fields=artist"); p += 14;
+        }
+        if (params->fields & SEARCH_TITLE) {
+            strcpy(p, "&fields=title"); p += 13;
+        }
+        if (params->fields & SEARCH_TRACK) {
+            strcpy(p, "&fields=track"); p += 13;
+        }
+        if (params->fields & SEARCH_OTHER) {
+            strcpy(p, "&fields=rest"); p += 12;
+        }
+    }
+    strcpy(p, "&allcats="); p += 9;
+    if (params->cats == SEARCH_ALL) {
+        strcpy(p, "YES"); p += 3;
+    } else {
+        strcpy(p, "NO"); p += 2;
+        for (i = 0; i < CDDB_CAT_INVALID; i++) {
+            if (params->cats & SEARCHCAT(i)) {
+                strcpy(p, "&cats="); p += 6;
+                strcpy(p, CDDB_CATEGORY[i]); p += strlen(CDDB_CATEGORY[i]);
+            }
+        }
+    }
+    strcpy(p, "&grouping=none"); p += 14;
+}
+
 int cddb_search(cddb_conn_t *c, cddb_disc_t *disc, const char *str)
 {
     regmatch_t matches[11];
     char *line;
     int count;
     cddb_disc_t *aux = NULL;
+    char paramstr[1024];        /* big enough! */
 
     /* NOTE: For server access this function uses the special
              'cddb_search_conn' connection structure. */
@@ -1204,8 +1248,11 @@ int cddb_search(cddb_conn_t *c, cddb_disc_t *disc, const char *str)
         return -1;
     }
 
+    /* prepare search parameters string */
+    cddb_search_param_str(&c->srch, paramstr, sizeof(paramstr));
+    
     /* send query command and check response */
-    if (!cddb_send_cmd(cddb_search_conn, CMD_SEARCH, str)) {
+    if (!cddb_send_cmd(cddb_search_conn, CMD_SEARCH, str, paramstr)) {
         /* sending command failed, copy error code */
         cddb_errno_set(c, cddb_errno(cddb_search_conn));
         return -1;
