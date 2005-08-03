@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.29 2005/07/09 08:29:19 airborne Exp $
+    $Id: cddb_conn.h,v 1.30 2005/08/03 18:25:01 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -52,6 +52,25 @@ typedef struct cddb_iconv_s *cddb_iconv_t;
  * CDDB server.
  */
 typedef struct cddb_conn_s cddb_conn_t;
+
+/**
+ * Which fields to use for the full text search is defined by one or
+ * more of the constants below.
+ */
+typedef enum {
+    SEARCH_NONE = 0,            /**< no fields */
+    SEARCH_ARTIST = 1,          /**< artist name field */
+    SEARCH_TITLE = 2,           /**< disc title field */
+    SEARCH_TRACK = 4,           /**< track title field */
+    SEARCH_OTHER = 8,           /**< other fields */
+    SEARCH_ALL = ~0,            /**< all fields */
+} cddb_search_t;
+
+/**
+ * Macro to be used for building the category search bit-string from
+ * the values of #cddb_cat_t.
+ */
+#define SEARCHCAT(c) (1 << (c))
 
 
 /* --- construction / destruction --- */
@@ -503,6 +522,35 @@ const cddb_site_t *cddb_first_site(cddb_conn_t *c);
  * @return The next mirror site or NULL if not found.
  */
 const cddb_site_t *cddb_next_site(cddb_conn_t *c);
+
+/**
+ * Set the bit-string specifying which fields to examine when
+ * performing a text search.  By default only the artist and disc
+ * title fields are searched.
+ *
+ * @param c The connection structure.
+ * @param fields A bitwise ORed set of values from #cddb_search_t.
+ */
+void cddb_search_set_fields(cddb_conn_t *c, unsigned int fields);
+
+/**
+ * Set the bit-string specifying which categories to examine when
+ * performing a text search.  The #SEARCHCAT macro needs to be used to
+ * build the actual bit-string from individual categories.  The
+ * #cddb_search_t values #SEARCH_NONE and #SEARCH_ALL are also valid.
+ * The example below shows some possible combinations.  By default all
+ * categories are searched.
+ *
+ * @code
+ * unsigned int cats = SEARCHCAT(CDDB_CAT_ROCK) | SEARCHCAT(CDDB_CAT_MISC);
+ * unsigned int cats = SEARCH_ALL;
+ * unsigned int cats = SEARCH_NONE;
+ * @endcode
+ *
+ * @param c The connection structure.
+ * @param cats A bitwise ORed set of values from #SEARCHCAT(#cddb_cat_t).
+ */
+void cddb_search_set_categories(cddb_conn_t *c, unsigned int cats);
 
 
 #ifdef __cplusplus
