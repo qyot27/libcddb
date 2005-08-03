@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn_ni.h,v 1.13 2005/07/23 07:20:19 airborne Exp $
+    $Id: cddb_conn_ni.h,v 1.14 2005/08/03 18:27:19 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -42,6 +42,15 @@ struct cddb_iconv_s
     iconv_t cd_from_freedb;     /**< character set conversion descriptor for
                                      converting from FreeDB to user format */
 };
+
+/** Actual definition of serach parameters structure. */
+typedef struct cddb_search_params_s
+{
+    unsigned int fields;        /**< fields to search (cddb_search_t
+                                     bit string) */
+    unsigned int cats;          /**< categories to search (cddb_cat_t
+                                     bit string) */
+} cddb_search_params_t;
 
 /** Actual definition of connection structure. */
 struct cddb_conn_s 
@@ -103,6 +112,7 @@ struct cddb_conn_s
 
     list_t *query_data;         /**< list to keep CDDB query results */
     list_t *sites_data;         /**< list to keep FreeDB mirror sites */
+    cddb_search_params_t srch;  /**< parameters for text search */
 
     cddb_iconv_t charset;       /**< character set conversion settings */
 };
