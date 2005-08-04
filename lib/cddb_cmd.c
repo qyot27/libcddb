@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.60 2005/08/03 18:35:06 airborne Exp $
+    $Id: cddb_cmd.c,v 1.61 2005/08/04 18:44:27 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -1223,7 +1223,7 @@ static void cddb_search_param_str(cddb_search_params_t *params,
             }
         }
     }
-    strcpy(p, "&grouping=none"); p += 14;
+    strcpy(p, "&grouping=cats"); p += 14;
 }
 
 int cddb_search(cddb_conn_t *c, cddb_disc_t *disc, const char *str)
