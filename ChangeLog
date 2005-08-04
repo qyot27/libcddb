@@ -1,3 +1,52 @@
+2005-08-04 20:55  airborne
+
+	* lib/Makefile.am: library version info bumped to 3:1:1
+
+2005-08-04 20:48  airborne
+
+	* configure.ac: version bumped to 1.2.1
+
+2005-08-04 20:44  airborne
+
+	* lib/cddb_cmd.c: changed default text search grouping to per
+	category (iso none)
+
+2005-08-03 20:35  airborne
+
+	* lib/cddb_cmd.c: use text search parameters provided by user
+
+2005-08-03 20:28  airborne
+
+	* lib/cddb_conn.c: added functions to set text search parameters,
+	initialize default parameters at creation of connection
+
+2005-08-03 20:27  airborne
+
+	* include/cddb/cddb_conn_ni.h: added text search parameter
+	structure
+
+2005-08-03 20:25  airborne
+
+	* include/cddb/cddb_conn.h: added functions and constants for
+	setting text search parameters
+
+2005-07-31 13:25  airborne
+
+	* configure.ac: remove -O0 in maintainer mode so that uninitialized
+	variables are reported
+
+2005-07-31 13:08  airborne
+
+	* lib/cddb_cmd.c: fix uninitialized variable (return value)
+
+2005-07-23 12:28  airborne
+
+	* configure.ac: use bzip2 for distribution archive
+
+2005-07-23 11:54  airborne
+
+	* ChangeLog, NEWS: added 1.2.0 changes
+
 2005-07-23 11:51  airborne
 
 	* lib/Makefile.am: updated library version
