@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.14 2005/07/23 09:55:01 airborne Exp $
+$Id: NEWS,v 1.15 2005/08/04 18:56:54 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -6,6 +6,18 @@ between different libcddb releases.  These changes might impact the
 programs that use this library.  It does not describe every single
 change made to the code tree.  An overview of the CVS changes can be
 found in the Changelog file.
+
+
+CHANGES 1.2.0 -> 1.2.1
+
+* [NEW] It is now possible to fine tune the text search by specifying
+  which fields and categories to consider.
+
+* [BUGFIX] Fixed cddb_sites function returning random values due to
+  uninitialized value.
+
+* [UPDATE] The value of the LIBCDDB_VERSION_NUM defined variable is
+  now 121.
 
 
 CHANGES 1.1.0 -> 1.2.0
