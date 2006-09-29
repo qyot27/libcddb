@@ -1,3 +1,20 @@
+2006-09-29 18:02  airborne
+
+	* lib/Makefile.am: library version info bumped to 3:2:1
+
+2006-09-29 18:01  airborne
+
+	* examples/cd_access.c: updated includes for libcdio
+
+2006-09-29 18:00  airborne
+
+	* configure.ac: version bumped to 1.2.1 libcdio required version
+	  bumped to 0.76
+
+2006-09-29 17:38  airborne
+
+	* ChangeLog: [no log message]
+
 2006-09-29 17:36  airborne
 
 	* NEWS: added 1.2.2 news
