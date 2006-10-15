@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd_ni.h,v 1.11 2005/07/17 09:47:54 airborne Exp $
+    $Id: cddb_cmd_ni.h,v 1.12 2006/10/15 08:59:20 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -36,6 +36,7 @@ typedef enum {
        CMD_PROTO,
        CMD_SITES,
        CMD_SEARCH,
+       CMD_ALBUM,
        /* dummy for array size */
        CMD_LAST
 } cddb_cmd_t;
