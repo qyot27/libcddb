@@ -1,5 +1,5 @@
 /*
-    $Id: main.c,v 1.27 2005/07/23 09:42:16 airborne Exp $
+    $Id: main.c,v 1.28 2006/10/15 08:57:10 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -40,7 +40,8 @@
 #define HTTP_PREFIX_LEN 7
 
 /* parsed command-line parameters */
-enum { CMD_NONE = 0, CMD_DISCID, CMD_QUERY, CMD_READ, CMD_SITES, CMD_SEARCH };
+enum { CMD_NONE = 0, CMD_DISCID, CMD_QUERY, CMD_READ, CMD_SITES, CMD_SEARCH,
+       CMD_ALBUM, };
 static int quiet = 0;           /* work silently, reports no errors */
 static int command = 0;         /* request command */
 static char *category = NULL;   /* category command-line argument */
@@ -54,6 +55,8 @@ static char *device = NULL;     /* device to use if use_cd == 1. NULL means
 static int use_time = 0;        /* use track times (in seconds) instead of frame offsets */
 static char *charset = NULL;    /* requested character set encoding */
 static char *searchstr = NULL;  /* text search string */
+static char *artist = NULL;     /* artist's name */
+static char *title = NULL;      /* album title */
 
 /* print usage message */
 static void usage(void)
@@ -83,6 +86,9 @@ static void usage(void)
     fprintf(stderr, "                   query CDDB server and list all matching entries\n");
     fprintf(stderr, "  read <cat> <id>  retrieve disc details from CDDB server\n");
     fprintf(stderr, "  search <str>     perform a text search against the CDDB database\n");
+    fprintf(stderr, "  album <artist> <title>\n");
+    fprintf(stderr, "                   perform a text search against the CDDB database (only\n");
+    fprintf(stderr, "                   works on freedb2.org servers)\n");
     fprintf(stderr, "  sites            retrieve a list of mirror sites\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Command arguments\n");
@@ -122,6 +128,8 @@ static void usage(void)
     fprintf(stderr, "  To search for all CDs with the string 'Mezzanine':\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "\tcddb_query search Mezzanine\n");
+    fprintf(stderr, "  or\n");
+    fprintf(stderr, "\tcddb_query album '' Mezzanine\n");
 }
 
 /* print error message */
@@ -424,6 +432,19 @@ static void parse_cmdline(int argc, char **argv, cddb_conn_t *conn)
             error_usage("the search command requires one argument");
         }
         use_cd = 0;
+    } else if (strcmp(argv[optind], "album") == 0) {
+        /* CDDB album */
+        command = CMD_ALBUM;
+        if ((argc >= optind + 2) && (argc <= optind + 3)) {
+            /* one or two more arguments are needed */
+            artist = strdup(argv[optind+1]);
+            if (argc == optind + 3) {
+              title = strdup(argv[optind+2]);
+            }
+        } else {
+            error_usage("the album command requires one or two arguments");
+        }
+        use_cd = 0;
     } else {
         /* unknown command */
         error_usage("unknown command '%s'", argv[optind]);
@@ -475,12 +496,19 @@ int main(int argc, char **argv)
         /* The frame offset data is no longer needed because it is now
            also present in the disc structure. */
         FREE_NOT_NULL(foffset);
-    } else if (command == CMD_SEARCH) {
+    } else if ((command == CMD_SEARCH) || (command == CMD_ALBUM)) {
         /* Create an empty disc structure for the search command.  It
            will be used to store the search results. */
         disc = cddb_disc_new();
         if (!disc) {
             error_exit(GENERIC_ERROR, "could not create disc structure");
+        }
+        if (command == CMD_ALBUM) {
+          /* Fill out the artist and album title */
+          cddb_disc_set_artist(disc, artist);
+          if (title) {
+            cddb_disc_set_title(disc, title);
+          }
         }
     }
 
@@ -537,6 +565,10 @@ int main(int argc, char **argv)
     case CMD_SEARCH:
         /* Search the CDDB database for possibly matches. */
         do_search(conn, disc, searchstr, quiet);
+        break;
+    case CMD_ALBUM:
+        /* Search the CDDB server for possibly matches. */
+        do_album(conn, disc, quiet);
         break;
     }
     /* Finally, we have to clean up.  With the cddb_disc_destroy
