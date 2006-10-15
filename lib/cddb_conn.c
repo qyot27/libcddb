@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.c,v 1.38 2005/08/03 18:28:22 airborne Exp $
+    $Id: cddb_conn.c,v 1.39 2006/10/15 11:53:11 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -235,10 +235,12 @@ cddb_error_t cddb_set_site(cddb_conn_t *c, const cddb_site_t *site)
 
 const char *cddb_get_server_name(const cddb_conn_t *c)
 {
+    const char *server = NULL;
+
     if (c) {
-        return c->server_name;
+        server = c->server_name;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(server);
 }
 
 void cddb_set_server_name(cddb_conn_t *c, const char *server)
@@ -277,10 +279,12 @@ void cddb_set_timeout(cddb_conn_t *c, unsigned int t)
 
 const char *cddb_get_http_path_query(const cddb_conn_t *c)
 {
+    const char *path = NULL;
+
     if (c) {
-        return c->http_path_query;
+        path = c->http_path_query;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(path);
 }
 
 void cddb_set_http_path_query(cddb_conn_t *c, const char *path)
@@ -291,10 +295,12 @@ void cddb_set_http_path_query(cddb_conn_t *c, const char *path)
 
 const char *cddb_get_http_path_submit(const cddb_conn_t *c)
 {
+    const char *path = NULL;
+
     if (c) {
-        return c->http_path_submit;
+        path = c->http_path_submit;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(path);
 }
 
 void cddb_set_http_path_submit(cddb_conn_t *c, const char *path)
@@ -347,10 +353,12 @@ void cddb_http_proxy_disable(cddb_conn_t *c)
 
 const char *cddb_get_http_proxy_server_name(const cddb_conn_t *c)
 {
+    const char *server = NULL;
+
     if (c) {
-        return c->http_proxy_server;
+        server = c->http_proxy_server;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(server);
 }
 
 void cddb_set_http_proxy_server_name(cddb_conn_t *c, const char *server)
@@ -400,10 +408,12 @@ static void cddb_set_http_proxy_auth(cddb_conn_t *c,
 
 const char *cddb_get_http_proxy_username(const cddb_conn_t *c)
 {
+    const char *user = NULL;
+
     if (c) {
-        return c->http_proxy_username;
+        user = c->http_proxy_username;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(user);
 }
 
 void cddb_set_http_proxy_username(cddb_conn_t *c, const char *username)
@@ -418,10 +428,12 @@ void cddb_set_http_proxy_username(cddb_conn_t *c, const char *username)
 
 const char *cddb_get_http_proxy_password(const cddb_conn_t *c)
 {
+    const char *password = NULL;
+
     if (c) {
-        return c->http_proxy_password;
+        password = c->http_proxy_password;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(password);
 }
 
 void cddb_set_http_proxy_password(cddb_conn_t *c, const char *password)

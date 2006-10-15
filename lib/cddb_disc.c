@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.23 2005/07/09 08:37:13 airborne Exp $
+    $Id: cddb_disc.c,v 1.24 2006/10/15 11:54:23 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -240,11 +240,12 @@ void cddb_disc_set_category(cddb_disc_t *disc, cddb_cat_t cat)
 
 const char *cddb_disc_get_category_str(cddb_disc_t *disc)
 {
+    const char *cat = NULL;
+
     if (disc) {
-        return CDDB_CATEGORY[disc->category];
-    } else {
-        return NULL;
+        cat = CDDB_CATEGORY[disc->category];
     }
+    RETURN_STR_OR_EMPTY(cat);
 }
 
 void cddb_disc_set_category_str(cddb_disc_t *disc, const char *cat)
@@ -264,10 +265,12 @@ void cddb_disc_set_category_str(cddb_disc_t *disc, const char *cat)
 
 const char *cddb_disc_get_genre(const cddb_disc_t *disc)
 {
+    const char *genre = NULL;
+
     if (disc) {
-        return disc->genre;
+        genre = disc->genre;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(genre);
 }
 
 void cddb_disc_set_genre(cddb_disc_t *disc, const char *genre)
@@ -318,10 +321,12 @@ int cddb_disc_get_track_count(const cddb_disc_t *disc)
 
 const char *cddb_disc_get_title(const cddb_disc_t *disc)
 {
+    const char *title = NULL;
+
     if (disc) {
-        return disc->title;
+        title = disc->title;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(title);
 }
 
 void cddb_disc_set_title(cddb_disc_t *disc, const char *title)
@@ -352,10 +357,12 @@ void cddb_disc_append_title(cddb_disc_t *disc, const char *title)
 
 const char *cddb_disc_get_artist(const cddb_disc_t *disc)
 {
+    const char *artist = NULL;
+
     if (disc) {
-        return disc->artist;
+        artist = disc->artist;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(artist);
 }
 
 void cddb_disc_set_artist(cddb_disc_t *disc, const char *artist)
@@ -386,10 +393,12 @@ void cddb_disc_append_artist(cddb_disc_t *disc, const char *artist)
 
 const char *cddb_disc_get_ext_data(const cddb_disc_t *disc)
 {
+    const char *ext_data = NULL;
+
     if (disc) {
-        return disc->ext_data;
+        ext_data = disc->ext_data;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(ext_data);
 }
 
 void cddb_disc_set_ext_data(cddb_disc_t *disc, const char *ext_data)
