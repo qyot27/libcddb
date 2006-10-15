@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.64 2006/10/15 09:03:19 airborne Exp $
+    $Id: cddb_cmd.c,v 1.65 2006/10/15 10:10:56 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -1184,6 +1184,7 @@ int cddb_album(cddb_conn_t *c, cddb_disc_t *disc)
 
 int cddb_album_next(cddb_conn_t *c, cddb_disc_t *disc)
 {
+  cddb_log_debug("cddb_album_next() ->");
   return cddb_query_next(c, disc);
 }
 
