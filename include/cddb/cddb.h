@@ -1,5 +1,5 @@
 /*
-    $Id: cddb.h,v 1.12 2005/05/29 08:06:11 airborne Exp $
+    $Id: cddb.h,v 1.13 2006/10/15 11:48:39 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -44,6 +44,22 @@
  */
 
 
+#define BIT(n) (1 << n)
+
+/**
+ * An enumeration of flags that influence the behaviour of the
+ * library.  You can set (enable) or reset (disable) these flags using
+ * the #libcddb_set_flags and #libcddb_reset_flags fucntions.
+ */
+typedef enum {
+    CDDB_F_EMPTY_STR = BIT(0),    /**< never return NULL pointer strings
+                                       (default), return an empty string
+                                       instead */
+    CDDB_F_NO_TRACK_ARTIST = BIT(1), /**< do not return the disc artist as the
+                                       track artist (default), return NULL
+                                       instead */
+} cddb_flag_t;
+
 /**
  * Initializes the library.  This is used to setup any globally used
  * variables.  The first time you create a new CDDB connection structure
@@ -58,6 +74,20 @@ void libcddb_init(void);
  * calls after shutting down are bound to give problems.
  */
 void libcddb_shutdown(void);
+
+/**
+ * Set one or more flags that influence the library behvaiour
+ *
+ * @param flag A bitwise ORed set of values from #cddb_flag_t.
+ */
+void libcddb_set_flags(unsigned int flags);
+
+/**
+ * Reset one or more flags that influence the library behvaiour
+ *
+ * @param flag A bitwise ORed set of values from #cddb_flag_t.
+ */
+void libcddb_reset_flags(unsigned int flags);
 
 
 #ifdef __cplusplus
