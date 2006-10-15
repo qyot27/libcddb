@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.63 2006/10/15 06:53:40 airborne Exp $
+    $Id: cddb_cmd.c,v 1.64 2006/10/15 09:03:19 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -39,8 +39,8 @@ static const char *CDDB_COMMANDS[CMD_LAST] = {
     "cddb write %s %08x",
     "proto %d",
     "sites",
-    /* special full text search command (only HTTP) */
-    "words=%s%s",
+    "words=%s%s",           /* special full text search command (only HTTP) */
+    "cddb album %s / %s",
 };
 
 #define WRITE_BUF_SIZE 4096
@@ -77,7 +77,10 @@ int cddb_http_send_cmd(cddb_conn_t *c, cddb_cmd_t cmd, va_list args);
 
 int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc);
 
-int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line);
+static int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc,
+                                 const char *line);
+
+static int cddb_handle_response_list(cddb_conn_t *c, cddb_disc_t *disc);
 
 static int cddb_parse_search_data(cddb_conn_t *c, cddb_disc_t **disc,
                                   char *line, regmatch_t *matches);
@@ -954,7 +957,8 @@ int cddb_read(cddb_conn_t *c, cddb_disc_t *disc)
     return rc;
 }
 
-int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
+static int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc,
+                                 const char *line)
 {
     char *aux;
     regmatch_t matches[7];
@@ -991,71 +995,11 @@ int cddb_parse_query_data(cddb_conn_t *c, cddb_disc_t *disc, const char *line)
     return TRUE;
 }
 
-int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
+static int cddb_handle_response_list(cddb_conn_t *c, cddb_disc_t *disc)
 {
     char *msg, *line;
     int code, count;
-    char *buf, offset[32];
-    cddb_track_t *track;
 
-    cddb_log_debug("cddb_query()");
-    /* clear previous query result set */
-    list_flush(c->query_data);
-    
-    /* recalculate disc ID to make sure it matches the disc data */
-    cddb_disc_calc_discid(disc);
-
-    /* check whether we have enough info to execute the command */
-    cddb_log_debug("...disc->discid    = %08x", disc->discid);
-    cddb_log_debug("...disc->length    = %d", disc->length);
-    cddb_log_debug("...disc->track_cnt = %d", disc->track_cnt);
-    if ((disc->discid == 0) || (disc->length == 0) || (disc->track_cnt == 0)) {
-        cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
-        return -1;
-    }
-
-    if (cddb_cache_query(c, disc)) {
-        /* cached version found */
-        return TRUE;
-    } else if (c->use_cache == CACHE_ONLY) {
-        /* no network access allowed */
-        cddb_errno_set(c, CDDB_ERR_DISC_NOT_FOUND);
-        return FALSE;
-    }
-
-    buf = (char*)malloc(c->buf_size);
-    /* check track offsets and generate offset list */
-    buf[0] = CHR_EOS;
-    for (track = cddb_disc_get_track_first(disc); 
-         track != NULL; 
-         track = cddb_disc_get_track_next(disc)) {
-        if (track->frame_offset == -1) {
-            cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
-            free(buf);
-            return -1;
-        }
-        snprintf(offset, sizeof(offset), "%d ", track->frame_offset);
-        if (strlen(buf) + strlen(offset) >= c->buf_size) {
-            /* buffer is too small */
-            cddb_errno_log_crit(c, CDDB_ERR_LINE_SIZE);
-            free(buf);
-            return -1;
-        }
-        strcat(buf, offset);
-    }
-
-    if (!cddb_connect(c)) {
-        /* connection not OK */
-        free(buf);
-        return -1;
-    }
-
-    /* send query command and check response */
-    if (!cddb_send_cmd(c, CMD_QUERY, disc->discid, disc->track_cnt, buf, disc->length)) {
-        free(buf);
-        return -1;
-    }
-    free(buf);
     switch (code = cddb_get_response_code(c, &msg)) {
         case  -1:
             return -1;
@@ -1122,6 +1066,72 @@ int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
     return count;
 }
 
+int cddb_query(cddb_conn_t *c, cddb_disc_t *disc)
+{
+    char *buf, offset[32];
+    cddb_track_t *track;
+
+    cddb_log_debug("cddb_query()");
+    /* clear previous query result set */
+    list_flush(c->query_data);
+    
+    /* recalculate disc ID to make sure it matches the disc data */
+    cddb_disc_calc_discid(disc);
+
+    /* check whether we have enough info to execute the command */
+    cddb_log_debug("...disc->discid    = %08x", disc->discid);
+    cddb_log_debug("...disc->length    = %d", disc->length);
+    cddb_log_debug("...disc->track_cnt = %d", disc->track_cnt);
+    if ((disc->discid == 0) || (disc->length == 0) || (disc->track_cnt == 0)) {
+        cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
+        return -1;
+    }
+
+    if (cddb_cache_query(c, disc)) {
+        /* cached version found */
+        return TRUE;
+    } else if (c->use_cache == CACHE_ONLY) {
+        /* no network access allowed */
+        cddb_errno_set(c, CDDB_ERR_DISC_NOT_FOUND);
+        return FALSE;
+    }
+
+    buf = (char*)malloc(c->buf_size);
+    /* check track offsets and generate offset list */
+    buf[0] = CHR_EOS;
+    for (track = cddb_disc_get_track_first(disc); 
+         track != NULL; 
+         track = cddb_disc_get_track_next(disc)) {
+        if (track->frame_offset == -1) {
+            cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
+            free(buf);
+            return -1;
+        }
+        snprintf(offset, sizeof(offset), "%d ", track->frame_offset);
+        if (strlen(buf) + strlen(offset) >= c->buf_size) {
+            /* buffer is too small */
+            cddb_errno_log_crit(c, CDDB_ERR_LINE_SIZE);
+            free(buf);
+            return -1;
+        }
+        strcat(buf, offset);
+    }
+
+    if (!cddb_connect(c)) {
+        /* connection not OK */
+        free(buf);
+        return -1;
+    }
+
+    /* send query command and check response */
+    if (!cddb_send_cmd(c, CMD_QUERY, disc->discid, disc->track_cnt, buf, disc->length)) {
+        free(buf);
+        return -1;
+    }
+    free(buf);
+    return cddb_handle_response_list(c, disc);
+}
+
 int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
 {
     elem_t *aux;
@@ -1138,6 +1148,43 @@ int cddb_query_next(cddb_conn_t *c, cddb_disc_t *disc)
 
     cddb_errno_set(c, CDDB_ERR_OK);
     return TRUE;
+}
+
+int cddb_album(cddb_conn_t *c, cddb_disc_t *disc)
+{
+    cddb_log_debug("cddb_album()");
+    /* clear previous query result set */
+    list_flush(c->query_data);
+    
+    /* check whether we have enough info to execute the command */
+    cddb_log_debug("...disc->artist = %s", STR_OR_NULL(disc->artist));
+    cddb_log_debug("...disc->title  = %s", STR_OR_NULL(disc->title));
+    if (!disc->title && !disc->artist) {
+        cddb_errno_log_error(c, CDDB_ERR_DATA_MISSING);
+        return -1;
+    }
+
+    if (c->use_cache == CACHE_ONLY) {
+        /* no network access allowed */
+        cddb_errno_set(c, CDDB_ERR_DISC_NOT_FOUND);
+        return FALSE;
+    }
+
+    if (!cddb_connect(c)) {
+        /* connection not OK */
+        return -1;
+    }
+
+    /* send query command and check response */
+    if (!cddb_send_cmd(c, CMD_ALBUM, STR_OR_EMPTY(disc->artist), STR_OR_EMPTY(disc->title))) {
+        return -1;
+    }
+    return cddb_handle_response_list(c, disc);
+}
+
+int cddb_album_next(cddb_conn_t *c, cddb_disc_t *disc)
+{
+  return cddb_query_next(c, disc);
 }
 
 static int cddb_parse_search_data(cddb_conn_t *c, cddb_disc_t **disc,

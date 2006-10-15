@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.h,v 1.16 2005/07/17 09:46:33 airborne Exp $
+    $Id: cddb_cmd.h,v 1.17 2006/10/15 08:58:51 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -130,6 +130,31 @@ int cddb_search(cddb_conn_t *c, cddb_disc_t *disc, const char *str);
  * @param disc A non-null CDDB disc structure.
  */
 int cddb_search_next(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ * Perform a text search in the CDDB database.  It uses the album
+ * command implemented on the freedb2.org servers.  Either the album
+ * title or artist's name should be filled in, in the disc structure.
+ *
+ * If there are multiple matches then only the first one will be
+ * returned by this function.  For other matches you will have to use
+ * the #cddb_album_next function.
+ *
+ * @param c The CDDB connection structure.
+ * @param disc A non-null CDDB disc structure.
+ *
+ * @return The number of matches found or -1 on error.
+ */
+int cddb_album(cddb_conn_t *c, cddb_disc_t *disc);
+
+/**
+ * Returns the next match in a CDDB album result set.  This function
+ * should be used in conjunction with #cddb_album.
+ *
+ * @param c    The CDDB connection structure.
+ * @param disc A non-null CDDB disc structure.
+ */
+int cddb_album_next(cddb_conn_t *c, cddb_disc_t *disc);
 
 /**
  * Submit a new or updated disc to the CDDB database.  This function
