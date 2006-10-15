@@ -1,3 +1,107 @@
+2006-10-15 14:11  airborne
+
+	* lib/Makefile.am: library version info bumped to 4:3:2
+
+2006-10-15 14:09  airborne
+
+	* NEWS: added 1.3.0 news
+
+2006-10-15 13:55  airborne
+
+	* lib/cddb_track.c: use RETURN_STR_OR_EMPTY whenever a string is
+	  returned, do no return disc artist for track if
+	  CDDB_F_NO_TRACK_ARTIST is set
+
+2006-10-15 13:53  airborne
+
+	* lib/: cddb_conn.c, cddb_disc.c: use RETURN_STR_OR_EMPTY whenever
+	  a string is returned
+
+2006-10-15 13:51  airborne
+
+	* lib/cddb.c: added libcddb_flags, libcddb_set_flags and
+	  libcddb_reset_flags functions
+
+2006-10-15 13:50  airborne
+
+	* include/cddb/cddb_ni.h: added libcddb_flags function and
+	  RETURN_STR_OR_EMPTY macro
+
+2006-10-15 13:48  airborne
+
+	* include/cddb/cddb.h: added cddb_flag_t enum, libcddb_set_flags
+	  and libcddb_reset_flags functions
+
+2006-10-15 12:10  airborne
+
+	* lib/cddb_cmd.c: added debug trace to cddb_album_next
+
+2006-10-15 12:08  airborne
+
+	* tests/check_server.sh: added test for album command, disabled
+	  text search test (no longer supported on server)
+
+2006-10-15 12:07  airborne
+
+	* tests/settings.sh.in: fix query result check
+
+2006-10-15 11:09  airborne
+
+	* configure.ac: version bumped to 1.3.0
+
+2006-10-15 11:04  airborne
+
+	* examples/do_album.c: initial version
+
+2006-10-15 11:03  airborne
+
+	* lib/cddb_cmd.c: added cddb_album and cddb_album_next functions
+
+2006-10-15 10:59  airborne
+
+	* include/cddb/cddb_ni.h: added STR_OR_EMPTY macro
+
+2006-10-15 10:59  airborne
+
+	* include/cddb/cddb_cmd_ni.h: added CMD_ALBUM
+
+2006-10-15 10:58  airborne
+
+	* include/cddb/cddb_cmd.h: added cddb_album and cddb_album_next
+	  functions
+
+2006-10-15 10:57  airborne
+
+	* examples/main.c: added support for the album command
+
+2006-10-15 10:54  airborne
+
+	* examples/main.h: added do_album function
+
+2006-10-15 10:53  airborne
+
+	* examples/Makefile.am: added do_album.c
+
+2006-10-15 08:53  airborne
+
+	* lib/cddb_cmd.c: fix extended data processing
+
+2006-10-15 08:52  airborne
+
+	* lib/cddb_util.c: fix compiler warnings
+
+2006-10-15 08:51  airborne
+
+	* include/cddb/cddb_track.h: fix indent
+
+2006-10-15 08:50  airborne
+
+	* examples/do_display.c: handle empty strings in output
+
+2006-09-29 18:03  airborne
+
+	* ChangeLog: [no log message]
+
 2006-09-29 18:02  airborne
 
 	* lib/Makefile.am: library version info bumped to 3:2:1
@@ -2058,6 +2162,11 @@
 	* Makefile.am: added tests directory, moved examples from src to
 	  examples
 
+2003-04-13 10:58  airborne
+
+	* src/: main.c, .cvsignore, Makefile.am: Examples are now in the
+	  examples directory.
+
 2003-04-13 10:56  airborne
 
 	* examples/: Makefile.am, do_read.c: Initial revision
@@ -2110,7 +2219,8 @@
 
 2003-04-11 22:29  airborne
 
-	* lib/Makefile.am: more compiler options to improve code sanity
+	* lib/Makefile.am, src/Makefile.am: more compiler options to
+	  improve code sanity
 
 2003-04-11 22:27  airborne
 
@@ -2139,7 +2249,8 @@
 
 2003-03-04 20:53  airborne
 
-	* lib/Makefile.am: treat compiler warnings as errors
+	* lib/Makefile.am, src/Makefile.am: treat compiler warnings as
+	  errors
 
 2003-03-04 20:51  airborne
 
@@ -2279,6 +2390,10 @@
 
 2002-11-17 17:45  airborne
 
+	* src/main.c: replaces tabs with spaces
+
+2002-11-17 17:45  airborne
+
 	* lib/cddb_track.c: support for disc reference, added track artist
 	  getter function
 
@@ -2324,7 +2439,7 @@
 2002-11-10 17:20  airborne
 
 	* include/cddb/cddb_conn.h, include/cddb/cddb_ni.h, lib/cddb_cmd.c,
-	  lib/cddb_conn.c, TODO: added HTTP proxy support
+	  lib/cddb_conn.c, src/main.c, TODO: added HTTP proxy support
 
 2002-11-08 18:41  airborne
 
@@ -2406,7 +2521,8 @@
 2002-11-02 09:21  airborne
 
 	* .cvsignore, doc/.cvsignore, include/.cvsignore,
-	  include/cddb/.cvsignore, lib/.cvsignore: Initial revision
+	  include/cddb/.cvsignore, lib/.cvsignore, src/.cvsignore: Initial
+	  revision
 
 2002-11-02 09:13  airborne
 
@@ -2449,5 +2565,6 @@
 	  include/cddb/cddb_regex.h, include/cddb/cddb_track.h,
 	  include/cddb/debug.h, lib/Makefile.am, lib/cddb_cmd.c,
 	  lib/cddb_conn.c, lib/cddb_disc.c, lib/cddb_error.c,
-	  lib/cddb_regex.c, lib/cddb_track.c: Initial revision
+	  lib/cddb_regex.c, lib/cddb_track.c, src/Makefile.am, src/main.c:
+	  Initial revision
 
