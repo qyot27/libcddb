@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.h,v 1.19 2005/07/09 08:31:32 airborne Exp $
+    $Id: cddb_track.h,v 1.20 2006/10/15 06:51:11 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -185,7 +185,7 @@ void cddb_track_append_artist(cddb_track_t *track, const char *artist);
  * @param track The CDDB track structure.
  * @return The extended data.
  */
-        const char *cddb_track_get_ext_data(cddb_track_t *track);
+const char *cddb_track_get_ext_data(cddb_track_t *track);
 
 /**
  * Set the extended data for the track.  If the track already had
