@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.28 2005/07/17 09:48:41 airborne Exp $
+    $Id: cddb_ni.h,v 1.29 2006/10/15 08:59:52 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -76,6 +76,7 @@
 #define FREE_NOT_NULL(p) if (p) { free(p); p = NULL; }
 #define CONNECTION_OK(c) (c->socket != -1)
 #define STR_OR_NULL(s) ((s) ? s : "NULL")
+#define STR_OR_EMPTY(s) ((s) ? s : "")
 
 #define ASSERT(cond, error) \
             if (!(cond)) { return error; }
