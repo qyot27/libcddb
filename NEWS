@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.16 2006/09/29 15:36:49 airborne Exp $
+$Id: NEWS,v 1.17 2006/10/15 12:09:02 airborne Exp $
 
 
 This file describes the external changes and important bug fixes
@@ -6,6 +6,36 @@ between different libcddb releases.  These changes might impact the
 programs that use this library.  It does not describe every single
 change made to the code tree.  An overview of the CVS changes can be
 found in the Changelog file.
+
+
+CHANGES 1.2.2 -> 1.3.0
+
+* [IMPORTANT] The text search functionality currently does not work
+  anymore.  This feature uses the search form on the freedb.org
+  website.  But since this form has disappeared, text search fails.
+  In the mean time you might make use of the album command of the
+  freedb2.org servers (see below).
+
+* [NEW] Support was added for the 'album' command of the freedb2.org
+  servers.  This feature can be used to do a text search for a certain
+  album.  It does not perform any HTML page parsing but uses an
+  extension of the CDDB protocol.  As input the function needs a disc
+  with either the artist or title filled in.  The results are similar
+  as for the query command; i.e. a list of matching disc IDs together
+  with their categories.  The example program also supports this
+  feature.
+
+* [NEW] Functions where added to set (libcddb_set_flags) or reset
+  (libcddb_reset_flags) some flags.  The flags used influence the
+  behaviour of the library.  By default all flags are disabled.
+  Currently the following flags are available:
+  - CDDB_F_EMPTY_STR: When this flag is set, the library will never
+    return a NULL pointer for a string.  Instead the empty string will
+    be returned.
+  - CDDB_F_NO_TRACK_ARTIST: When this flag is set, the library will
+    not return the disc artist if the track artist is undefined.  A
+    NULL pointer (or the empty string if CDDB_F_EMPTY_STR is set) will
+    be returned instead.
 
 
 CHANGES 1.2.1 -> 1.2.2
