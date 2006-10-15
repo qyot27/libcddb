@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_track.c,v 1.19 2005/07/09 08:35:58 airborne Exp $
+    $Id: cddb_track.c,v 1.20 2006/10/15 11:55:25 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -142,10 +142,12 @@ void cddb_track_set_frame_offset(cddb_track_t *track, int offset)
 
 const char *cddb_track_get_title(const cddb_track_t *track)
 {
+    const char *title = NULL;
+
     if (track) {
-        return track->title;
+        title = track->title;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(title);
 }
 
 void cddb_track_set_title(cddb_track_t *track, const char *title)
@@ -238,10 +240,12 @@ const char *cddb_track_get_artist(cddb_track_t *track)
         if (track->artist) {
             artist = track->artist;
         } else {
-            artist =  track->disc->artist; /* might be NULL */
+            if (!(libcddb_flags() & CDDB_F_NO_TRACK_ARTIST)) {
+                artist =  track->disc->artist; /* might be NULL */
+            }
         }
     }
-    return artist;
+    RETURN_STR_OR_EMPTY(artist);
 }
 
 void cddb_track_set_artist(cddb_track_t *track, const char *artist)
@@ -272,10 +276,12 @@ void cddb_track_append_artist(cddb_track_t *track, const char *artist)
 
 const char *cddb_track_get_ext_data(cddb_track_t *track)
 {
+    const char *ext_data = NULL;
+
     if (track) {
-        return track->ext_data;
+        ext_data = track->ext_data;
     }
-    return NULL;
+    RETURN_STR_OR_EMPTY(ext_data);
 }
 
 void cddb_track_set_ext_data(cddb_track_t *track, const char *ext_data)
