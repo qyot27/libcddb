@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.29 2006/10/15 08:59:52 airborne Exp $
+    $Id: cddb_ni.h,v 1.30 2006/10/15 11:50:15 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -78,6 +78,9 @@
 #define STR_OR_NULL(s) ((s) ? s : "NULL")
 #define STR_OR_EMPTY(s) ((s) ? s : "")
 
+#define RETURN_STR_OR_EMPTY(s) \
+            return (!s && (libcddb_flags() & CDDB_F_EMPTY_STR)) ? "" : s
+
 #define ASSERT(cond, error) \
             if (!(cond)) { return error; }
 #define ASSERT_NOT_NULL(ptr) \
@@ -129,6 +132,8 @@ extern cddb_conn_t *cddb_search_conn;
 
 /* --- non-exported function prototypes */
 
+
+unsigned int libcddb_flags(void);
 
 /**
  * Convert a string to a new character encoding according to the given
