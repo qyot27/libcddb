@@ -1,5 +1,5 @@
 /*
-    $Id: cddb.c,v 1.2 2005/07/17 09:53:49 airborne Exp $
+    $Id: cddb.c,v 1.3 2006/10/15 11:51:33 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -31,6 +31,9 @@ cddb_conn_t *cddb_search_conn;
 /** Library initialized or not? */
 static int initialized = 0;
 
+/** Library flags. */
+static unsigned int _flags = 0;
+
 
 /* --- public functions */
 
@@ -56,4 +59,19 @@ void libcddb_shutdown(void)
         cddb_destroy(cddb_search_conn);
         initialized = 0;
     }
+}
+
+unsigned int libcddb_flags(void)
+{
+  return _flags;
+}
+
+void libcddb_set_flags(unsigned int flags)
+{
+    _flags |= flags;
+}
+
+void libcddb_reset_flags(unsigned int flags)
+{
+    _flags &= ~flags;
 }
