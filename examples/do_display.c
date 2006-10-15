@@ -1,5 +1,5 @@
 /*
-    $Id: do_display.c,v 1.8 2005/07/09 08:25:10 airborne Exp $
+    $Id: do_display.c,v 1.9 2006/10/15 06:50:15 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -76,8 +76,11 @@ void do_display(cddb_disc_t *disc)
         printf("  [%02d]", cddb_track_get_number(track));
 
         /* 5.b. The track artist name and title. */
-        printf(" '%s' by %s", cddb_track_get_title(track), 
-               cddb_track_get_artist(track));
+        printf(" '%s'", cddb_track_get_title(track));
+        s = cddb_track_get_artist(track);
+        if (s) {
+            printf(" by %s", s); 
+        }
 
         /* 5.c. The track length. */
         length = cddb_track_get_length(track);
@@ -89,7 +92,7 @@ void do_display(cddb_disc_t *disc)
 
         /* 5.d. The extended track data. */
         s = cddb_track_get_ext_data(track);
-        if (s && strlen(s) > 0) {
+        if (s) {
             printf(" [%s]\n", s);
         } else {
             printf("\n");
