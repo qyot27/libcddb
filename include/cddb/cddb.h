@@ -1,5 +1,5 @@
 /*
-    $Id: cddb.h,v 1.13 2006/10/15 11:48:39 airborne Exp $
+    $Id: cddb.h,v 1.14 2006/10/15 12:54:33 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -48,8 +48,8 @@
 
 /**
  * An enumeration of flags that influence the behaviour of the
- * library.  You can set (enable) or reset (disable) these flags using
- * the #libcddb_set_flags and #libcddb_reset_flags fucntions.
+ * library.  You can set or reset these flags using the
+ * #libcddb_set_flags and #libcddb_reset_flags functions.
  */
 typedef enum {
     CDDB_F_EMPTY_STR = BIT(0),    /**< never return NULL pointer strings
@@ -78,14 +78,14 @@ void libcddb_shutdown(void);
 /**
  * Set one or more flags that influence the library behvaiour
  *
- * @param flag A bitwise ORed set of values from #cddb_flag_t.
+ * @param flags A bitwise ORed set of values from #cddb_flag_t.
  */
 void libcddb_set_flags(unsigned int flags);
 
 /**
  * Reset one or more flags that influence the library behvaiour
  *
- * @param flag A bitwise ORed set of values from #cddb_flag_t.
+ * @param flags A bitwise ORed set of values from #cddb_flag_t.
  */
 void libcddb_reset_flags(unsigned int flags);
 
