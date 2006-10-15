@@ -1,5 +1,5 @@
 /*
-    $Id: main.h,v 1.14 2005/07/23 07:19:09 airborne Exp $
+    $Id: main.h,v 1.15 2006/10/15 08:54:27 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -52,3 +52,5 @@ cddb_disc_t *cd_create(int dlength, int tcount, int *foffset, int use_time);
 void do_sites(cddb_conn_t *conn);
 
 void do_search(cddb_conn_t *conn, cddb_disc_t *disc, const char *str, int quiet);
+
+void do_album(cddb_conn_t *conn, cddb_disc_t *disc, int quiet);
