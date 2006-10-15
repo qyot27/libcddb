@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: check_server.sh,v 1.8 2005/07/23 09:43:17 airborne Exp $
+# $Id: check_server.sh,v 1.9 2006/10/15 10:08:51 airborne Exp $
 
 . ./settings.sh
 
@@ -65,8 +65,13 @@ fi
 #
 SEARCH_DATA='mezzanine'
 
-start_test 'HTTP  text search (multiple matches)'
-cddb_query search $SEARCH_DATA
+start_test 'HTTP  text search (multiple matches, freedb.org)'
+skip "no longer suported on freedb.org"
+#cddb_query search $SEARCH_DATA
+#check_query $?
+
+start_test 'HTTP  album search (multiple matches, freedb2.org)'
+cddb_query -s freedb2.org -P http album '' $SEARCH_DATA
 check_query $?
 
 #
