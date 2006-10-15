@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.62 2006/09/29 15:34:53 airborne Exp $
+    $Id: cddb_cmd.c,v 1.63 2006/10/15 06:53:40 airborne Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -794,7 +794,9 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                         multi_line = MULTI_EXT;
                     }
                     buf = cddb_regex_get_string(line, matches, 1);
-                    cddb_disc_append_ext_data(disc, buf);
+                    if (*buf) {
+                        cddb_disc_append_ext_data(disc, buf);
+                    }
                     free(buf);
                     break;
                 }
@@ -819,7 +821,9 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                         cddb_track_set_ext_data(track, NULL);
                     }
                     buf = cddb_regex_get_string(line, matches, 2);
-                    cddb_track_append_ext_data(track, buf);
+                    if (*buf) {
+                        cddb_track_append_ext_data(track, buf);
+                    }
                     free(buf);
                     break;
                 }
