@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.c,v 1.24 2006/10/15 11:54:23 airborne Exp $
+    $Id: cddb_disc.c,v 1.25 2007/08/07 03:12:53 jcaratzas Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -140,6 +140,7 @@ cddb_disc_t *cddb_disc_clone(const cddb_disc_t *disc)
     clone->title = (disc->title ? strdup(disc->title) : NULL);
     clone->artist = (disc->artist ? strdup(disc->artist) : NULL);
     clone->length = disc->length;
+    clone->revision = disc->revision;
     clone->ext_data = (disc->ext_data ? strdup(disc->ext_data) : NULL);
     /* clone the tracks */
     track = disc->tracks;
@@ -293,6 +294,21 @@ void cddb_disc_set_length(cddb_disc_t *disc, unsigned int l)
 {
     if (disc) {
         disc->length = l;
+    }
+}
+
+unsigned int cddb_disc_get_revision(const cddb_disc_t *disc)
+{
+    if (disc) {
+        return disc->revision;
+    }
+    return 0;
+}
+
+void cddb_disc_set_revision(cddb_disc_t *disc, unsigned int rev)
+{
+    if (disc) {
+        disc->revision = rev;
     }
 }
 
@@ -460,6 +476,9 @@ void cddb_disc_copy(cddb_disc_t *dst, cddb_disc_t *src)
     if (src->length != 0) {
         dst->length = src->length;
     }
+    if (src->revision != 0) {
+        dst->revision = src->revision;
+    }
     if (src->ext_data != NULL) {
         FREE_NOT_NULL(dst->ext_data);
         dst->ext_data = strdup(src->ext_data);
@@ -525,6 +544,7 @@ void cddb_disc_print(cddb_disc_t *disc)
     printf("Title: '%s'\n", STR_OR_NULL(disc->title));
     printf("Extended data: '%s'\n", STR_OR_NULL(disc->ext_data));
     printf("Length: %d seconds\n", disc->length);
+    printf("Revision: %d\n", disc->revision);
     printf("Number of tracks: %d\n", disc->track_cnt);
     track = disc->tracks;
     cnt = 1;

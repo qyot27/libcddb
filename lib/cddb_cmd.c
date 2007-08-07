@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_cmd.c,v 1.65 2006/10/15 10:10:56 airborne Exp $
+    $Id: cddb_cmd.c,v 1.66 2007/08/07 03:12:53 jcaratzas Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -574,15 +574,16 @@ int cddb_send_cmd(cddb_conn_t *c, int cmd, ...)
 #define STATE_START         0
 #define STATE_TRACK_OFFSETS 1
 #define STATE_DISC_LENGTH   2
-#define STATE_DISC_TITLE    3
-#define STATE_DISC_YEAR     4
-#define STATE_DISC_GENRE    5
-#define STATE_DISC_EXT      6
-#define STATE_TRACK_TITLE   7
-#define STATE_TRACK_EXT     8
-#define STATE_PLAY_ORDER    9
-#define STATE_END_DOT       10
-#define STATE_STOP          11
+#define STATE_DISC_REVISION 3
+#define STATE_DISC_TITLE    4
+#define STATE_DISC_YEAR     5
+#define STATE_DISC_GENRE    6
+#define STATE_DISC_EXT      7
+#define STATE_TRACK_TITLE   8
+#define STATE_TRACK_EXT     9
+#define STATE_PLAY_ORDER    10
+#define STATE_END_DOT       11
+#define STATE_STOP          12
 
 #define MULTI_NONE          0
 #define MULTI_ARTIST        1
@@ -653,6 +654,14 @@ int cddb_parse_record(cddb_conn_t *c, cddb_disc_t *disc)
                 cddb_log_debug("...state: DISC LENGTH");
                 if (regexec(REGEX_DISC_LENGTH, line, 2, matches, 0) == 0) {
                     disc->length = cddb_regex_get_int(line, matches, 1);
+                    /* expect disc revision now */
+                    state = STATE_DISC_REVISION;
+                }            
+                break;
+            case STATE_DISC_REVISION:
+                cddb_log_debug("...state: DISC REVISION");
+                if (regexec(REGEX_DISC_REVISION, line, 2, matches, 0) == 0) {
+                    disc->revision = cddb_regex_get_int(line, matches, 1);
                     /* expect disc title now */
                     state = STATE_DISC_TITLE;
                 }            
@@ -1365,7 +1374,7 @@ int cddb_write_data(cddb_conn_t *c, char *buf, int size, cddb_disc_t *disc)
     /* disc length */
     CDDB_WRITE_APPEND(26+6, "#\n# Disc length: %6d seconds\n", disc->length);
     /* submission info */
-    CDDB_WRITE_APPEND(16, "#\n# Revision: 0\n");
+    CDDB_WRITE_APPEND(15+8, "#\n# Revision: %8d\n", disc->revision);
     CDDB_WRITE_APPEND(21+strlen(c->cname)+strlen(c->cversion),
                       "# Submitted via: %s %s\n#\n", c->cname, c->cversion);
     /* disc data */

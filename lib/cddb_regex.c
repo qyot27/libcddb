@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_regex.c,v 1.15 2005/07/23 07:23:24 airborne Exp $
+    $Id: cddb_regex.c,v 1.16 2007/08/07 03:12:53 jcaratzas Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -30,6 +30,7 @@
 regex_t *REGEX_TRACK_FRAME_OFFSETS = NULL;
 regex_t *REGEX_TRACK_FRAME_OFFSET = NULL;
 regex_t *REGEX_DISC_LENGTH = NULL;
+regex_t *REGEX_DISC_REVISION = NULL;
 regex_t *REGEX_DISC_TITLE = NULL;
 regex_t *REGEX_DISC_YEAR = NULL;
 regex_t *REGEX_DISC_GENRE = NULL;
@@ -62,6 +63,8 @@ void cddb_regex_init()
                            "^#[[:blank:]]*([0-9]+)[[:blank:]]*$");
     rv = cddb_regex_init_1(&REGEX_DISC_LENGTH,
                            "^#[[:blank:]]*Disc length:[[:blank:]]+([0-9]+)( seconds)*[[:blank:]]*$");
+    rv = cddb_regex_init_1(&REGEX_DISC_REVISION,
+                           "^#[[:blank:]]*Revision:[[:blank:]]+([0-9]+)[[:blank:]]*$");
     rv = cddb_regex_init_1(&REGEX_DISC_TITLE,
                            "^DTITLE=((.*) / (.*)|(.*))$");
     rv = cddb_regex_init_1(&REGEX_DISC_YEAR,
@@ -106,6 +109,7 @@ void cddb_regex_destroy()
     cddb_regfree(REGEX_TRACK_FRAME_OFFSETS);
     cddb_regfree(REGEX_TRACK_FRAME_OFFSET);
     cddb_regfree(REGEX_DISC_LENGTH);
+    cddb_regfree(REGEX_DISC_REVISION);
     cddb_regfree(REGEX_DISC_TITLE);
     cddb_regfree(REGEX_DISC_YEAR);
     cddb_regfree(REGEX_DISC_GENRE);

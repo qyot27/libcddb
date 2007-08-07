@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_disc.h,v 1.21 2005/07/09 08:32:48 airborne Exp $
+    $Id: cddb_disc.h,v 1.22 2007/08/07 03:12:53 jcaratzas Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -272,6 +272,21 @@ unsigned int cddb_disc_get_length(const cddb_disc_t *disc);
  * @param l    The disc length in seconds.
  */
 void cddb_disc_set_length(cddb_disc_t *disc, unsigned int l);
+
+/**
+ * Get the revision number of the disc.
+ *
+ * @param disc The CDDB disc structure.
+ */
+unsigned int cddb_disc_get_revision(const cddb_disc_t *disc);
+
+/**
+ * Set the revision number of the disc.
+ *
+ * @param disc The CDDB disc structure.
+ * @param rev The revision number.
+ */
+void cddb_disc_set_revision(cddb_disc_t *disc, unsigned int rev);
 
 /**
  * Get the year of publication for this disc.  If no year is defined 0

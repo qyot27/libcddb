@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.30 2006/10/15 11:50:15 airborne Exp $
+    $Id: cddb_ni.h,v 1.31 2007/08/07 03:12:53 jcaratzas Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -109,6 +109,7 @@ struct cddb_track_s
 /** Actual definition of disc structure. */
 struct cddb_disc_s
 {
+    unsigned int revision;      /**< revision number */
     unsigned int discid;        /**< four byte disc ID */
     cddb_cat_t category;        /**< CDDB category */
     char *genre;                /**< disc genre */
