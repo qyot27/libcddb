@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_conn.h,v 1.30 2005/08/03 18:25:01 airborne Exp $
+    $Id: cddb_conn.h,v 1.31 2009/03/01 03:28:07 jcaratzas Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -28,7 +28,9 @@
 
 
 #include <stdio.h>
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
 
 #include "cddb/cddb_site.h"
 

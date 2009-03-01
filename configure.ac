@@ -92,7 +92,7 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS([arpa/inet.h netdb.h netinet/in.h regex.h stdlib.h string.h sys/socket.h])
-AC_CHECK_HEADERS([unistd.h errno.h time.h sys/time.h fcntl.h])
+AC_CHECK_HEADERS([unistd.h errno.h time.h sys/time.h fcntl.h windows.h winsock2.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -187,6 +187,15 @@ dnl MAINTAINER_CFLAGS="-Werror -O0"
     unset warning_flags
 fi
 CFLAGS="$CFLAGS $WARN_CFLAGS $MAINTAINER_CFLAGS"
+
+dnl Additional configuration (platform dependant)
+case $host in
+    *mingw*)
+        LIBS="$LIBS -lws2_32 -lregex"
+        ;;
+    *)
+        ;;
+esac
 
 dnl Create makefiles
 AC_OUTPUT

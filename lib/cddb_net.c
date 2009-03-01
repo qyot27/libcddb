@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_net.c,v 1.18 2005/03/11 21:29:30 airborne Exp $
+    $Id: cddb_net.c,v 1.19 2009/03/01 03:28:07 jcaratzas Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -228,6 +228,7 @@ int sock_vfprintf(cddb_conn_t *c, const char *format, va_list ap)
 
 /* Time-out enabled work-alikes */
 
+#ifdef HAVE_ALARM
 /* time-out jump buffer */
 static jmp_buf timeout_expired;
 
@@ -236,9 +237,11 @@ static void alarm_handler(int signum)
 {
     longjmp(timeout_expired, 1);
 }
+#endif
 
 struct hostent *timeout_gethostbyname(const char *hostname, int timeout)
 {
+#ifdef HAVE_ALARM
     struct hostent *he = NULL;
     struct sigaction action;
     struct sigaction old;
@@ -262,6 +265,9 @@ struct hostent *timeout_gethostbyname(const char *hostname, int timeout)
     sigaction(SIGALRM, &old, NULL); /* restore previous signal handler */
 
     return he;
+#else
+    return gethostbyname(hostname); /* execute DNS query directly */
+#endif
 }
 
 int timeout_connect(int sockfd, const struct sockaddr *addr, 
@@ -277,6 +283,11 @@ int timeout_connect(int sockfd, const struct sockaddr *addr,
         /* error while trying to set socket to non-blocking */
         return -1;
     }
+#elif defined WIN32
+    unsigned long arg = 1;
+
+    if (ioctlsocket(sockfd, FIONBIO, &arg))
+        return -1;
 #else
     int flags;
 

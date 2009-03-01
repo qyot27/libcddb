@@ -34,3 +34,6 @@
 
     Adrian Reber
         - parsing bugfix and new feature ideas
+
+    Carlo Bramini
+        - fixed Mingw + msys building support

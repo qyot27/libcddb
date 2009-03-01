@@ -1,5 +1,5 @@
 /*
-    $Id: cddb_ni.h,v 1.31 2007/08/07 03:12:53 jcaratzas Exp $
+    $Id: cddb_ni.h,v 1.32 2009/03/01 03:28:07 jcaratzas Exp $
 
     Copyright (C) 2003, 2004, 2005 Kris Verbeeck <airborne@advalvas.be>
 
@@ -35,6 +35,23 @@
 #  include <iconv.h>
 #else
    typedef void *iconv_t;       /* for code uniformity */
+#endif
+
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#endif
+
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#ifndef ETIMEDOUT
+#define ETIMEDOUT   WSAETIMEDOUT
+#endif
+#ifndef EWOULDBLOCK
+#define EWOULDBLOCK WSAEWOULDBLOCK
+#endif
+#ifndef EINPROGRESS
+#define EINPROGRESS WSAEINPROGRESS
+#endif
 #endif
 
 #include "cddb/cddb_regex.h"
