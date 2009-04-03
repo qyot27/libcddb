@@ -73,6 +73,13 @@ case $host in
          On MacOS, <cddb_net.h> needs this but that header doesn't
          include it.])
         ;;
+    *haiku*)
+        AC_DEFINE([HAIKU],1,[Define if compiling on Haiku system.])
+        AC_DEFINE([CDDB_NEED_UNISTD_H],1,
+        [Define if you have <unistd.h> and need it included.])
+        AC_DEFINE([CDDB_NEED_SYS_SOCKET_H],1,
+        [Define if you have <sys/socket.h> and need it included.])
+        ;;
 esac
 
 dnl Checks for programs.
@@ -87,6 +94,7 @@ AC_PROG_MAKE_SET
 
 dnl Checks for libraries.
 AC_CHECK_LIB([socket], [connect])
+AC_CHECK_LIB([network], [connect])
 
 dnl Checks for header files.
 AC_HEADER_STDC
