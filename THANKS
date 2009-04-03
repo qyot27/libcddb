@@ -37,3 +37,6 @@
 
     Carlo Bramini
         - fixed Mingw + msys building support
+
+    Scott McCreary
+	- Haiku support
