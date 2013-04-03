@@ -226,6 +226,12 @@ int sock_vfprintf(cddb_conn_t *c, const char *format, va_list ap)
     return rv;
 }
 
+#ifdef WIN32
+#ifdef HAVE_ALARM
+#undef HAVE_ALARM
+#endif
+#endif
+
 /* Time-out enabled work-alikes */
 
 #ifdef HAVE_ALARM

@@ -37,10 +37,6 @@
    typedef void *iconv_t;       /* for code uniformity */
 #endif
 
-#ifdef HAVE_WINDOWS_H
-#include <windows.h>
-#endif
-
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
 #ifndef ETIMEDOUT
@@ -52,6 +48,10 @@
 #ifndef EINPROGRESS
 #define EINPROGRESS WSAEINPROGRESS
 #endif
+#endif
+
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
 #endif
 
 #include "cddb/cddb_regex.h"

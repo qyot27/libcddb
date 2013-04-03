@@ -65,7 +65,7 @@ typedef enum {
     SEARCH_TITLE = 2,           /**< disc title field */
     SEARCH_TRACK = 4,           /**< track title field */
     SEARCH_OTHER = 8,           /**< other fields */
-    SEARCH_ALL = ~0,            /**< all fields */
+    SEARCH_ALL_CDDB = ~0,            /**< all fields */
 } cddb_search_t;
 
 /**
@@ -539,13 +539,13 @@ void cddb_search_set_fields(cddb_conn_t *c, unsigned int fields);
  * Set the bit-string specifying which categories to examine when
  * performing a text search.  The #SEARCHCAT macro needs to be used to
  * build the actual bit-string from individual categories.  The
- * #cddb_search_t values #SEARCH_NONE and #SEARCH_ALL are also valid.
+ * #cddb_search_t values #SEARCH_NONE and #SEARCH_ALL_CDDB are also valid.
  * The example below shows some possible combinations.  By default all
  * categories are searched.
  *
  * @code
  * unsigned int cats = SEARCHCAT(CDDB_CAT_ROCK) | SEARCHCAT(CDDB_CAT_MISC);
- * unsigned int cats = SEARCH_ALL;
+ * unsigned int cats = SEARCH_ALL_CDDB;
  * unsigned int cats = SEARCH_NONE;
  * @endcode
  *
