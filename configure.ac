@@ -15,6 +15,7 @@ AC_CONFIG_FILES([Makefile              \
                  tests/settings.sh])
 AM_INIT_AUTOMAKE([dist-bzip2])
 AM_MAINTAINER_MODE
+AM_SILENT_RULES([yes])
 
 LIBCDDB_VERSION_NUM=131
 AC_SUBST(LIBCDDB_VERSION_NUM)
