@@ -34,8 +34,15 @@
 #include <unistd.h>
 #endif
 #include <sys/types.h>          /* need for MacOS X */
-#include <regex.h>
 
+#ifndef WIN32
+#include <regex.h>
+#elif defined WIN32
+#define PCRE_STATIC
+#define PCREPOSIX_EXP_DECL
+#include <pcreposix.h>
+#include <pcre.h>
+#endif
 
 extern regex_t *REGEX_TRACK_FRAME_OFFSETS;
 extern regex_t *REGEX_TRACK_FRAME_OFFSET;

@@ -200,7 +200,7 @@ CFLAGS="$CFLAGS $WARN_CFLAGS $MAINTAINER_CFLAGS"
 dnl Additional configuration (platform dependant)
 case $host in
     *mingw*)
-        LIBS="$LIBS -lws2_32 -lregex"
+        LIBS="$LIBS -lws2_32 -lpcreposix -lpcre"
         ;;
     *)
         ;;
